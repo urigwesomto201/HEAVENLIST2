@@ -5,18 +5,35 @@ module.exports = {
     await queryInterface.createTable('Tenants', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.UUID
       },
-      name: {
-        type: Sequelize.STRING
+      fullName: {
+        type: Sequelize.STRING,
+        allowNull: false
       },
       email: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
+        lowercase: true
+
       },
-      phone: {
-        type: Sequelize.STRING
+      username: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        lowercase: true
+      },
+      password: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      isVerified: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+      },
+      isLoggedIn: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
       },
       createdAt: {
         allowNull: false,

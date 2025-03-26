@@ -1,10 +1,12 @@
 const { Sequelize, DataTypes, Model } = require('sequelize');
 const sequelize = require('../database/sequelize');
 // const Post = require('./post');
+const Landlord = require('./landlord');
+const Listing = require('./listing');
 
-class User extends Model {}
+class Admin extends Model {}
 
-User.init(
+Admin.init(
   {
     // Model attributes are defined here
     id: {
@@ -31,29 +33,45 @@ User.init(
     },
     isVerified: {
       type: DataTypes.BOOLEAN, // Changed from STRING to BOOLEAN
-      defaultValue: false 
+      defaultValue: true 
     },
     isLoggedIn: {
       type: DataTypes.BOOLEAN, // Changed from STRING to BOOLEAN
       defaultValue: false 
     },
+    isAdmin: {
+      type: DataTypes.BOOLEAN, // Changed from STRING to BOOLEAN
+      defaultValue: true 
+    },
   },
   {
     // Other model options go here
     sequelize, // We need to pass the connection instance
-    modelName: 'User', // We need to choose the model name
-    tableName: 'Users'
+    modelName: 'Admin', // We need to choose the model name
+    tableName: 'Admins'
   },
 );
 
-// User.hasMany(Post,{
-//   foreignKey: "userId",
-//   as: "Posts"
+// Admin.hasMany(Listing,{
+//   foreignKey: "adminId",
+//   as: "Listings"
 // })
 
-// Post.belongsTo(User, {
+// Listing.belongsTo(Admin, {
 //   foreignKey: 'id',
-//   as: 'User'
+//   as: 'Admin'
+
 // })
 
-module.exports = User
+// Admin.hasMany(Landlord,{
+//   foreignKey: "adminId",
+//   as: "Landlords"
+// })
+
+// Landlord.belongsTo(Admin, {
+//   foreignKey: 'id',
+//   as: 'Admin'
+
+// })
+
+module.exports = Admin

@@ -1,22 +1,39 @@
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up(queryInterface, Sequelize) {
+  async up(queryInterface, Sequelize) { 
     await queryInterface.createTable('Users', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.UUID
       },
-      firstName: {
-        type: Sequelize.STRING
-      },
-      lastName: {
-        type: Sequelize.STRING
+      fullName: {
+        type: Sequelize.STRING,
+        allowNull: false
       },
       email: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
+        lowercase: true
+
+      },
+      username: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        lowercase: true
+      },
+      password: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      isVerified: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+      },
+      isLoggedIn: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
       },
       createdAt: {
         allowNull: false,
