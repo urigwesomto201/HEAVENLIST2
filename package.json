@@ -3,18 +3,19 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-   "dev": "nodemon server.js",
+    "dev": "nodemon server.js",
     "start": "node server.js",
     "db:create": "sequelize db:create",
-    "db:migrate": "npx sequelize-cli db:migrate"
+    "db:migrate": "npx sequelize-cli db:migrate",
+    "db:undo": "npx sequelize-cli db:migrate:undo:all"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "bcrypt": "^5.1.1",
     "cloudinary": "^2.6.0",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "joi": "^17.13.3",
@@ -23,10 +24,24 @@
     "mysql2": "^3.14.0",
     "nodemailer": "^6.10.0",
     "nodemon": "^3.1.9",
+    "op": "^0.0.6",
     "passport": "^0.7.0",
-    "sequelize": "^6.37.6"
+    "sequelize": "^6.37.6",
+    "swagger": "^0.7.5",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "sequelize-cli": "^6.6.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/urigwesomto201/HEAVENLIST2.git"
+  },
+  "bugs": {
+    "url": "https://github.com/urigwesomto201/HEAVENLIST2/issues"
+  },
+  "homepage": "https://github.com/urigwesomto201/HEAVENLIST2#readme",
+  "description": ""
 }

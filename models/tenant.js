@@ -1,25 +1,60 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
-  class Tenant extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
-    }
-  }
-  Tenant.init({
-    name: DataTypes.STRING,
-    email: DataTypes.STRING,
-    phone: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'Tenant',
-  });
-  return Tenant;
-};
+const { Sequelize, DataTypes, Model } = require('sequelize');
+const sequelize = require('../database/sequelize');
+// const Post = require('./post');
+
+class Tenant extends Model {}
+
+Tenant.init(
+  {
+    // Model attributes are defined here
+    id: {
+      allowNull: false,
+      primaryKey: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4
+    },
+    fullName: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    username: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    isVerified: {
+      type: DataTypes.BOOLEAN, // Changed from STRING to BOOLEAN
+      defaultValue: false 
+    },
+    isLoggedIn: {
+      type: DataTypes.BOOLEAN, // Changed from STRING to BOOLEAN
+      defaultValue: false 
+    },
+    
+  },
+  {
+    // Other model options go here
+    sequelize, // We need to pass the connection instance
+    modelName: 'Tenant', // We need to choose the model name
+    tableName: 'Tenants'
+  },
+);
+
+// User.hasMany(Post,{
+//   foreignKey: "userId",
+//   as: "Posts"
+// })
+
+// Post.belongsTo(User, {
+//   foreignKey: 'id',
+//   as: 'User'
+// })
+
+module.exports = Tenant

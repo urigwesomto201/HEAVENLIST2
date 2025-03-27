@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Landlords', {
+    await queryInterface.createTable('Admins', {
       id: {
         allowNull: false,
         primaryKey: true,
@@ -16,7 +16,6 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
         lowercase: true
-
       },
       username: {
         type: Sequelize.STRING,
@@ -29,11 +28,15 @@ module.exports = {
       },
       isVerified: {
         type: Sequelize.BOOLEAN,
-        defaultValue: false
+        defaultValue: true
       },
       isLoggedIn: {
         type: Sequelize.BOOLEAN,
         defaultValue: false
+      },
+      isAdmin: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true
       },
       createdAt: {
         allowNull: false,
@@ -46,6 +49,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Landlords');
+    await queryInterface.dropTable('Admins');
   }
 };
