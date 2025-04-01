@@ -9,66 +9,67 @@ const {validate} = require('../helper/utilities')
 const {registerSchema, loginSchema, verificationEmailSchema, forgotPasswordSchema, resetPasswordschema, changePassword} = require('../validation/user')
 
 
-
 exports.registerAdmin = async (req, res) => {
     try {
-        const validated = await validate(req.body , registerSchema)
-        
-        const {fullName, email, password, username, confirmPassword} = validated
+        // Validate request body
+        const validated = await validate(req.body, registerSchema);
+        const { fullName, email, password, username, confirmPassword } = validated;
 
-        if(password !== confirmPassword) {
-            return res.status(400).json({message: 'passwords do not match'})
+        if (password !== confirmPassword) {
+            return res.status(400).json({ message: 'Passwords do not match' });
         }
 
-        const admin = await adminModel.findOne({ where: { email: email.toLowerCase() } })
+        // Check if the admin already exists
+        const existingAdmin = await adminModel.findOne({ where: { email: email.toLowerCase() } });
+        if (existingAdmin) {
+            if (existingAdmin.isAdmin) {
+                return res.status(400).json({ message: 'User is already an Admin' });
+            }
 
-        if(admin) {
-            return res.status(400).json({message: `user with email: ${email} already exists please use another email`})
+            // If the admin exists but is not marked as admin, update it
+            await adminModel.update({ isAdmin: true }, { where: { id: existingAdmin.id } });
+
+            return res.status(200).json({ message: 'User has been updated to Admin', data: existingAdmin });
         }
 
-
-        const usernameExists = await adminModel.findOne({where:{ username: username.toLowerCase()}})
-
-        if(usernameExists) {
-            return res.status(400).json({message: 'username has been taken'})
+        // Check if the username is taken
+        const usernameExists = await adminModel.findOne({ where: { username: username.toLowerCase() } });
+        if (usernameExists) {
+            return res.status(400).json({ message: 'Username has already been taken' });
         }
 
+        // Hash the password before storing
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
 
-        const salt = await bcrypt.genSalt(10)
-        const hashedPassword = await bcrypt.hash(password, salt)
-
-     
-        const newAdmin = new adminModel({
+        // Create a new admin in the adminModel
+        const newAdmin = await adminModel.create({
             fullName,
-            email,
+            email: email.toLowerCase(),
             password: hashedPassword,
-            username,
+            username: username.toLowerCase(),
             isVerified: true,
             isAdmin: true,
-             
-        })
+        });
 
-        const firstName = newAdmin.fullName.split(' ')[0]
-
+        // Send an email to the new admin
+        const firstName = newAdmin.fullName.split(' ')[0];
         const mailDetails = {
             subject: 'Welcome Admin',
             email: newAdmin.email,
-            html : adminTemplate(firstName)
-        }
+            html: adminTemplate(firstName),
+        };
 
-        await sendEmail(mailDetails)
+        await sendEmail(mailDetails);
 
-        await newAdmin.save()
-
-        res.status(201).json({message: 'admin registered successfully', data: newAdmin })
-
+        return res.status(201).json({ message: 'Admin registered successfully', data: newAdmin });
 
     } catch (error) {
-        console.log(error.message)
-        res.status(500).json({message: 'error registering admin' , error: error.message})
-
+        console.error(error.message);
+        return res.status(500).json({ message: 'Error registering admin', error: error.message });
     }
-}
+};
+
 
 
 

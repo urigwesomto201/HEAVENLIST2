@@ -12,6 +12,7 @@ const {registerSchema, loginSchema, verificationEmailSchema, forgotPasswordSchem
 exports.registerUser = async (req, res) => {
     try {
         const validated = await validate(req.body , registerSchema)
+       
         
         const {fullName, email, password, username, confirmPassword} = validated
 
@@ -419,4 +420,102 @@ exports.getUserProfile = async (req, res) => {
 }
 
 
+exports.makeAdmin = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const user = await userModel.findByPk(id);
+        if (!user) {
+            return res.status(404).json({
+                message: 'User not found'
+            })
+        }
 
+        if (user.isAdmin == true) {
+            return res.status(400).json({
+                message: 'User already an Admin'
+            })
+        }
+        const admin = await userModel.update({ isAdmin: true }, { where: { id: id } });
+        // console.log(admin)
+        // user.gender = 'Male';
+        // await user.save()
+        res.status(200).json({
+            message: 'User is now an Admin',
+            data: admin
+        })
+
+    } catch (error) {
+        res.status(500).json({ message: 'Error making User an Admin: ' + error.message })
+    }
+}
+
+
+// Get a single admin by ID
+exports.getAdmin = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const admin = await userModel.findOne({ where: { id, isAdmin: true } });
+
+        if (!admin) {
+            return res.status(404).json({ message: 'Admin not found' });
+        }
+
+        res.status(200).json({ message: 'Admin retrieved successfully', data: admin });
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching admin: ' + error.message });
+    }
+};
+
+// Get all admins
+exports.getAllAdmins = async (req, res) => {
+    try {
+        const admins = await userModel.findAll({ where: { isAdmin: true } });
+
+        if (admins.length === 0) {
+            return res.status(404).json({ message: 'No admins found' });
+        }
+
+        res.status(200).json({ message: 'Admins retrieved successfully', data: admins });
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching admins: ' + error.message });
+    }
+};
+
+// Update an admin
+exports.updateAdmin = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, email } = req.body;
+
+        const admin = await userModel.findOne({ where: { id, isAdmin: true } });
+
+        if (!admin) {
+            return res.status(404).json({ message: 'Admin not found' });
+        }
+
+        await userModel.update({ name, email }, { where: { id } });
+
+        res.status(200).json({ message: 'Admin updated successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating admin: ' + error.message });
+    }
+};
+
+// Delete an admin
+exports.deleteAdmin = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const admin = await userModel.findOne({ where: { id, isAdmin: true } });
+
+        if (!admin) {
+            return res.status(404).json({ message: 'Admin not found' });
+        }
+
+        await userModel.destroy({ where: { id } });
+
+        res.status(200).json({ message: 'Admin deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error deleting admin: ' + error.message });
+    }
+};
