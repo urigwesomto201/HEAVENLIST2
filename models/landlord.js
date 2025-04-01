@@ -39,6 +39,10 @@ Landlord.init(
       type: DataTypes.BOOLEAN, // Changed from STRING to BOOLEAN
       defaultValue: false 
     },
+    isAdmin: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
   },
   {
     // Other model options go here

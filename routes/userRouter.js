@@ -1,9 +1,10 @@
 const router = require('express').Router()
 
 
-const { registerUser, loginUser, verifyUserEmail, forgotPassword, resetPassword, resendVerificationEmail, changePassword, logoutUser} = require('../controller/userController')
+const { registerUser, loginUser, verifyUserEmail, getAdmin,getAllAdmins,updateAdmin,deleteAdmin,forgotPassword,makeAdmin, resetPassword, resendVerificationEmail, changePassword, logoutUser} = require('../controller/userController')
 const { userAuthenticate } = require('../middlewares/authentication')
-
+const jwt = require('jsonwebtoken');
+const passport = require('passport')
 
 /**
  * @swagger
@@ -377,6 +378,42 @@ router.post('/change-password',userAuthenticate, changePassword)
  *         description: Internal server error
  */
 router.post('/log-out', userAuthenticate, logoutUser)
+
+
+router.put('/make-admin/:id', makeAdmin);
+router.get('/admin/:id', getAdmin); // Get single admin
+router.get('/admins', getAllAdmins); // Get all admins
+router.put('/admin/:id', updateAdmin); // Update admin
+router.delete('/admin/:id', deleteAdmin); // Delete admin
+
+
+router.get('/google-autheticate', passport.authenticate('google',{scope: ['profile','email']}));
+
+
+
+router.get('/auth/google/login', passport.authenticate('google'),async(req,res)=>{
+    console.log('Req User: ',req.user)
+    const token = await jwt.sign({userId: req.user.id, isVerified: req.user.isVerified}, process.env.SECRET,{expiresIn:'1day'});
+    res.status(200).json({
+        message: 'Google Auth Login Successful',
+        data:req.user,
+        token
+    })
+});
+
+
+// // Facebook Login Route
+// router.get("/auth-facebook", passport.authenticate("facebook", { scope: ["email"] }));
+
+// // Facebook Callback Route
+// router.get(
+//   "/auth/facebook/callback",
+//   passport.authenticate("facebook", { failureRedirect: "/" }),
+//   (req, res) => {
+//     res.redirect("/dashboard");
+//   }
+// );
+
 
 
 
