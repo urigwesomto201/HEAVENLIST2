@@ -1,8 +1,9 @@
 const router = require('express').Router()
 
 
-const { registerUser, loginUser, verifyUserEmail, getAdmin,getAllAdmins,updateAdmin,deleteAdmin,forgotPassword,makeAdmin, resetPassword, resendVerificationEmail, changePassword, logoutUser} = require('../controller/userController')
-const { userAuthenticate } = require('../middlewares/authentication')
+const { registerUser, loginUser, verifyUserEmail, getAdmin,getAllAdmins,updateAdmin,deleteAdmin,updateUserProfile,
+    forgotPassword,makeAdmin, resetPassword, resendVerificationEmail, changePassword, logoutUser, getUserProfile} = require('../controller/userController')
+const { userAuthenticate, adminAuthenticate } = require('../middlewares/authentication')
 const jwt = require('jsonwebtoken');
 const passport = require('passport')
 
@@ -10,6 +11,8 @@ const passport = require('passport')
  * @swagger
  * /api/v1/registerUser:
  *   post:
+ *     tags:
+ *       - user
  *     summary: this is the register or signup route
  *     requestBody:
  *       required: true
@@ -106,6 +109,8 @@ router.post('/registerUser', registerUser)
  * @swagger
  * /api/v1/loginUser:
  *   post:
+ *     tags:
+ *       - user
  *     summary: Login user
  *     requestBody:
  *       required: true
@@ -168,6 +173,8 @@ router.post('/loginUser', loginUser)
  * @swagger
  * /api/v1/user-verify/{token}:
  *   get:
+ *     tags:
+ *       - user
  *     summary: Verify user email
  *     parameters:
  *       - name: token
@@ -204,6 +211,8 @@ router.get('/user-verify/:token', verifyUserEmail)
  * @swagger
  * /api/v1/resendverificationemail:
  *   post:
+ *     tags:
+ *       - user
  *     summary: Resend verification email
  *     requestBody:
  *       required: true
@@ -242,6 +251,8 @@ router.post('/resendverificationemail', resendVerificationEmail)
  * @swagger
  * /api/v1/forget-password:
  *   post:
+ *     tags:
+ *       - user
  *     summary: Send password reset email
  *     requestBody:
  *       required: true
@@ -279,6 +290,8 @@ router.post('/forget-password', forgotPassword)
  * @swagger
  * /api/v1/reset-password/{token}:
  *   post:
+ *     tags:
+ *       - user
  *     summary: Reset user password
  *     parameters:
  *       - name: token
@@ -326,6 +339,8 @@ router.post('/reset-password/:token', resetPassword)
  * @swagger
  * /api/v1/change-password:
  *   post:
+ *     tags:
+ *       - user
  *     summary: Change user password
  *     security:
  *       - bearerAuth: []
@@ -366,6 +381,8 @@ router.post('/change-password',userAuthenticate, changePassword)
  * @swagger
  * /api/v1/log-out:
  *   post:
+ *     tags:
+ *       - user
  *     summary: Log out user
  *     security:
  *       - bearerAuth: []
@@ -380,15 +397,16 @@ router.post('/change-password',userAuthenticate, changePassword)
 router.post('/log-out', userAuthenticate, logoutUser)
 
 
-router.put('/make-admin/:id', makeAdmin);
-router.get('/admin/:id', getAdmin); // Get single admin
-router.get('/admins', getAllAdmins); // Get all admins
-router.put('/admin/:id', updateAdmin); // Update admin
-router.delete('/admin/:id', deleteAdmin); // Delete admin
+
+// router.post('getUserProfile',userAuthenticate,  getUserProfile)
+
+router.put('updateUserProfile',userAuthenticate,  updateUserProfile)
+
+
+
 
 
 router.get('/google-autheticate', passport.authenticate('google',{scope: ['profile','email']}));
-
 
 
 router.get('/auth/google/login', passport.authenticate('google'),async(req,res)=>{

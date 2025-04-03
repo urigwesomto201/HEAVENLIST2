@@ -1,12 +1,15 @@
 const router = require('express').Router();
 
-const { registerTenant, loginTenant, verifyTenantEmail, TenantForgotPassword, TenantResetPassword, resendTenantVerificationEmail, changeTenantPassword, logoutTenant} = require('../controller/tenantController')
+const { registerTenant, loginTenant, verifyTenantEmail, TenantForgotPassword, getTenantProfile,
+    TenantResetPassword, resendTenantVerificationEmail, changeTenantPassword, logoutTenant} = require('../controller/tenantController')
 const { tenantAuthenticate } = require('../middlewares/authentication')
 
 /**
  * @swagger
- * /api/v1/registerTenant:
+ * /api/v1/registerTenant:  
  *   post:
+ *     tags:
+ *       - tenant
  *     summary: this is the register or signup route
  *     requestBody:
  *       required: true
@@ -98,6 +101,8 @@ router.post('/registerTenant', registerTenant)
  * @swagger
  * /api/v1/loginTenant:
  *   post:
+ *     tags:
+ *       - tenant
  *     summary: Login user
  *     requestBody:
  *       required: true
@@ -160,6 +165,8 @@ router.post('/loginTenant', loginTenant)
  * @swagger
  * /api/v1/tenant-verify/{token}:
  *   get:
+ *     tags:
+ *       - tenant
  *     summary: Verify user email
  *     parameters:
  *       - name: token
@@ -196,6 +203,8 @@ router.get('/tenant-verify/:token', verifyTenantEmail)
  * @swagger
  * /api/v1/resendTenantVerificationEmail:
  *   post:
+ *     tags:
+ *       - tenant
  *     summary: Resend verification email
  *     requestBody:
  *       required: true
@@ -234,6 +243,8 @@ router.post('/resendTenantVerificationEmail', resendTenantVerificationEmail)
  * @swagger
  * /api/v1/TenantForgotPassword:
  *   post:
+ *     tags:
+ *       - tenant
  *     summary: Send password reset email
  *     requestBody:
  *       required: true
@@ -271,6 +282,8 @@ router.post('/TenantForgotPassword', TenantForgotPassword)
  * @swagger
  * /api/v1/reset-tenantpassword/{token}:
  *   post:
+ *     tags:
+ *       - tenant
  *     summary: Reset user password
  *     parameters:
  *       - name: token
@@ -312,13 +325,15 @@ router.post('/TenantForgotPassword', TenantForgotPassword)
  */
 
 
-router.post('/reset-tenantpassword/:token', TenantResetPassword)
+router.post('/reset-tenantpassword', TenantResetPassword)
 
 
 /**
  * @swagger
  * /api/v1/changeTenantPassword:
  *   post:
+ *     tags:
+ *       - tenant
  *     summary: Change user password
  *     security:
  *       - bearerAuth: []
@@ -359,6 +374,8 @@ router.post('/changeTenantPassword',tenantAuthenticate, changeTenantPassword)
  * @swagger
  * /api/v1/logoutTenant:
  *   post:
+ *     tags:
+ *       - tenant
  *     summary: Log out user
  *     security:
  *       - bearerAuth: []
@@ -371,6 +388,9 @@ router.post('/changeTenantPassword',tenantAuthenticate, changeTenantPassword)
  *         description: Internal server error
  */
 router.post('/logoutTenant', tenantAuthenticate, logoutTenant)
+
+
+
 
 
 

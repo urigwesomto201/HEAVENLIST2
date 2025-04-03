@@ -7,6 +7,8 @@ const { landlordAuthenticate } = require('../middlewares/authentication')
  * @swagger
  * /api/v1/registerlandlord:
  *   post:
+ *     tags:
+ *       - landlord
  *     summary: this is the register or signup route
  *     requestBody:
  *       required: true
@@ -98,6 +100,8 @@ router.post('/registerlandlord', registerlandlord)
  * @swagger
  * /api/v1/loginlandlord:
  *   post:
+ *     tags:
+ *       - landlord
  *     summary: Login user
  *     requestBody:
  *       required: true
@@ -160,6 +164,8 @@ router.post('/loginlandlord', loginlandlord)
  * @swagger
  * /api/v1/landlord-verify/{token}:
  *   get:
+ *     tags:
+ *       - landlord
  *     summary: Verify user email
  *     parameters:
  *       - name: token
@@ -196,6 +202,8 @@ router.get('/landlord-verify/:token', verifylandlordEmail)
  * @swagger
  * /api/v1/resendlandlordVerificationEmail:
  *   post:
+ *     tags:
+ *       - landlord
  *     summary: Resend verification email
  *     requestBody:
  *       required: true
@@ -234,6 +242,8 @@ router.post('/resendlandlordVerificationEmail', resendlandlordVerificationEmail)
  * @swagger
  * /api/v1/landlordForgotPassword:
  *   post:
+ *     tags:
+ *       - landlord
  *     summary: Send password reset email
  *     requestBody:
  *       required: true
@@ -271,6 +281,8 @@ router.post('/landlordForgotPassword', landlordForgotPassword)
  * @swagger
  * /api/v1/reset-landlordpassword/{token}:
  *   post:
+ *     tags:
+ *       - landlord
  *     summary: Reset user password
  *     parameters:
  *       - name: token
@@ -319,6 +331,8 @@ router.post('/reset-landlordpassword/:token', landlordResetPassword)
  * @swagger
  * /api/v1/changelandlordPassword:
  *   post:
+ *     tags:
+ *       - landlord
  *     summary: Change user password
  *     security:
  *       - bearerAuth: []
@@ -359,6 +373,8 @@ router.post('/changelandlordPassword',landlordAuthenticate, changelandlordPasswo
  * @swagger
  * /api/v1/logoutlandlord:
  *   post:
+ *     tags:
+ *       - landlord
  *     summary: Log out user
  *     security:
  *       - bearerAuth: []

@@ -16,6 +16,10 @@ exports.registerUser = async (req, res) => {
         
         const {fullName, email, password, username, confirmPassword} = validated
 
+        if(!fullName || !email || !password || !username || !confirmPassword) {
+            return res.status(400).json({message:'please input correct fields'})
+        }
+
         if(password !== confirmPassword) {
             return res.status(400).json({message: 'passwords do not match'})
         }
@@ -40,7 +44,7 @@ exports.registerUser = async (req, res) => {
 
      
 
-        const newUser = new userModel({
+        const newUser = await userModel.create({
             fullName,
             email,
             password: hashedPassword,
@@ -64,8 +68,6 @@ exports.registerUser = async (req, res) => {
         }
 
         await sendEmail(mailDetails)
-
-        await newUser.save()
 
         res.status(201).json({message: 'user registered successfully', data: newUser })
 
@@ -396,126 +398,64 @@ exports.logoutUser = async (req, res) => {
 
 
 
-exports.getUserProfile = async (req, res) => {
-    try {
-        const { id } = req.user;
 
-        if (!id) {
-            return res.status(401).json({ message: 'Unauthorized. User not authenticated' });
+// exports.getUserProfile = async (req, res) => {
+//     try {
+//         const { id } = req.user;
+
+//         if (!id) {
+//             return res.status(401).json({ message: 'Unauthorized. Please log in to access this resource.' });
+//         }
+
+//         const user = await userModel.findOne({ where: { id }, attributes: { exclude: ['password']}});
+
+//         if (!user) {
+//             return res.status(404).json({ message: 'User not found' });
+//         }
+
+//         res.status(200).json({ message: 'User profile retrieved successfully', data: user });
+        
+
+//     } catch (error) {
+//         console.error(error.message);
+//         res.status(500).json({ message: 'Error getting userprofile', error: error.message });
+//     }
+// }
+
+
+exports.updateUserProfile = async (req, res) => {
+    try {
+        const {id } = req.user
+
+        const {fullName, username} = req.body
+
+        if (!fullName || !username) {
+            return res.status(400).json({message: 'input the correct fields'})
         }
 
+        // const usernameExists = await userModel.findOne({where: {username: username.toLowerCase()}})
+        const usernameExists = await userModel.findOne({
+            where: { username: username.toLowerCase(), id: { [Op.ne]: id } },
+        });
+
+        if(usernameExists) {
+            return res.status(400).json({message: `${username} already exists, try another`})
+        }
         const user = await userModel.findOne({ where: { id } });
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        res.status(200).json({ message: 'User profile retrieved successfully', data: user });
         
+        user.fullName = fullName;
+        user.username = username.toLowerCase();
+
+        await user.save();
+        res.status(200).json({message: 'profile update successful', data: user})
 
     } catch (error) {
-        console.error(error.message);
-        res.status(500).json({ message: 'Error getting userprofile', error: error.message });
+    console.error(error.message);
+    res.status(500).json({ message: 'Error getting userprofile', error: error.message });
     }
 }
-
-
-exports.makeAdmin = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const user = await userModel.findByPk(id);
-        if (!user) {
-            return res.status(404).json({
-                message: 'User not found'
-            })
-        }
-
-        if (user.isAdmin == true) {
-            return res.status(400).json({
-                message: 'User already an Admin'
-            })
-        }
-        const admin = await userModel.update({ isAdmin: true }, { where: { id: id } });
-        // console.log(admin)
-        // user.gender = 'Male';
-        // await user.save()
-        res.status(200).json({
-            message: 'User is now an Admin',
-            data: admin
-        })
-
-    } catch (error) {
-        res.status(500).json({ message: 'Error making User an Admin: ' + error.message })
-    }
-}
-
-
-// Get a single admin by ID
-exports.getAdmin = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const admin = await userModel.findOne({ where: { id, isAdmin: true } });
-
-        if (!admin) {
-            return res.status(404).json({ message: 'Admin not found' });
-        }
-
-        res.status(200).json({ message: 'Admin retrieved successfully', data: admin });
-    } catch (error) {
-        res.status(500).json({ message: 'Error fetching admin: ' + error.message });
-    }
-};
-
-// Get all admins
-exports.getAllAdmins = async (req, res) => {
-    try {
-        const admins = await userModel.findAll({ where: { isAdmin: true } });
-
-        if (admins.length === 0) {
-            return res.status(404).json({ message: 'No admins found' });
-        }
-
-        res.status(200).json({ message: 'Admins retrieved successfully', data: admins });
-    } catch (error) {
-        res.status(500).json({ message: 'Error fetching admins: ' + error.message });
-    }
-};
-
-// Update an admin
-exports.updateAdmin = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { name, email } = req.body;
-
-        const admin = await userModel.findOne({ where: { id, isAdmin: true } });
-
-        if (!admin) {
-            return res.status(404).json({ message: 'Admin not found' });
-        }
-
-        await userModel.update({ name, email }, { where: { id } });
-
-        res.status(200).json({ message: 'Admin updated successfully' });
-    } catch (error) {
-        res.status(500).json({ message: 'Error updating admin: ' + error.message });
-    }
-};
-
-// Delete an admin
-exports.deleteAdmin = async (req, res) => {
-    try {
-        const { id } = req.params;
-
-        const admin = await userModel.findOne({ where: { id, isAdmin: true } });
-
-        if (!admin) {
-            return res.status(404).json({ message: 'Admin not found' });
-        }
-
-        await userModel.destroy({ where: { id } });
-
-        res.status(200).json({ message: 'Admin deleted successfully' });
-    } catch (error) {
-        res.status(500).json({ message: 'Error deleting admin: ' + error.message });
-    }
-};
