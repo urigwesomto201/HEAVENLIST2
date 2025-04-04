@@ -15,8 +15,9 @@ const tenantRouter = require('./routes/tenantRouter')
 const landlordRouter = require('./routes/landlordRouter')
 const adminRouter = require('./routes/adminRouter')
 const listingRouter = require('./routes/listingRouter')
-// const landlordProfileRouter = require('./routes/landlordProfileRoute')
-
+const landlordProfileRouter = require('./routes/landlordProfileRoute')
+const swaggerJSDOC = require('swagger-jsdoc');
+const swaggerUIEXPRESS = require('swagger-ui-express');
 
 const app = express()
 
@@ -33,13 +34,68 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
+// Swagger Definition
+const swaggerDefinition = {
+  openapi: '3.0.0',
+  info: {
+    title: 'HavenList Documentation',
+    version: '1.0.0',
+    description: 'This is the first Swagger documentation I have ever done.',
+    license: {
+      name: 
+      'Base_URL: https://hotel-m0xi.onrender.com ',
+    },
+    contact: {
+      names: 'urigwe somto $ Ebuka ',
+      url: 'https://www.linkedin.com/in/urigwe-somto/',
+    },
+  },
+  "components": {
+ "securitySchemes": {
+    "BearerAuth": {
+      "type": 'http',
+      "scheme": 'bearer',
+      "bearerFormat": 'JWT',
+    },
+  },
+},
+security: [
+  {
+    bearerAuth: [],
+  },
+],
+  servers: [
+    {
+      url: 'https://hotel-m0xi.onrender.com',
+      description: 'Production server',
+    },
+    {
+      url: 'http://localhost:5050',
+      description: 'Development server',
+    },
+  ],
+
+
+};
+
+
+// Swagger Options
+const options = {
+  swaggerDefinition,
+  apis: ['./routes/*.js'], // Adjust this path based on your actual route files
+};
+
+const swaggerSpec = swaggerJSDOC(options);
+
+// Swagger UI setup
+app.use('/havenList', swaggerUIEXPRESS.serve, swaggerUIEXPRESS.setup(swaggerSpec));
 
 app.use('/api/v1',userRouter)
 app.use('/api/v1',tenantRouter)
 app.use('/api/v1',landlordRouter)
 app.use('/api/v1',adminRouter)
 app.use('/api/v1',listingRouter)
-// app.use('/api/v1',landlordProfileRouter)
+ app.use('/api/v1',landlordProfileRouter)
 app.use(transacRouter)
 app.use((error, req, res, next) => {
   if(error){
@@ -62,34 +118,7 @@ server();
 
 
 
-const swaggerJsdoc = require("swagger-jsdoc");
-const swagger_UI = require("swagger-ui-express")
 
-
-
-const options = {
-  definition: {
-    openapi: '3.0.0',
-    info: {
-      title: 'my api',
-      version: '1.0.0',
-    },
-    components: {
-      securitySchemes: {
-        BearerAuth: {
-          type: "http",
-          scheme: "bearer",
-           bearerFormat: "JWT"
-        }
-      }
-    }, 
-    security: [{ BearerAuth: [] }]
-  },
-  apis: ["./routes/*.js"] // Ensure this points to the correct path
-};
-
-const openapiSpecification = swaggerJsdoc(options);
-app.use("/documentation", swagger_UI.serve, swagger_UI.setup(openapiSpecification))
 
 
 

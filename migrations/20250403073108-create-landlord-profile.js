@@ -21,7 +21,23 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false // Added to match the model
       },
-      businessName: {
+      state: {
+        type: Sequelize.STRING,
+        allowNull: false // Added to match the model
+      },
+      Password: {
+        type: Sequelize.STRING,
+        allowNull: false // Added to match the model
+      },
+      street: {
+        type: Sequelize.STRING,
+        allowNull: false // Added to match the model
+      },
+      locality: {
+        type: Sequelize.STRING,
+        allowNull: false // Added to match the model
+      },
+      profileImage: {
         type: Sequelize.STRING,
         allowNull: false // Added to match the model
       },

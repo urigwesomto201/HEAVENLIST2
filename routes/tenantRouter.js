@@ -10,6 +10,7 @@ const { tenantAuthenticate } = require('../middlewares/authentication')
  *   post:
  *     tags:
  *       - tenant
+  *     security: [] # No authentication required
  *     summary: this is the register or signup route
  *     requestBody:
  *       required: true
@@ -103,6 +104,7 @@ router.post('/registerTenant', registerTenant)
  *   post:
  *     tags:
  *       - tenant
+  *     security: [] # No authentication required
  *     summary: Login user
  *     requestBody:
  *       required: true
@@ -167,6 +169,7 @@ router.post('/loginTenant', loginTenant)
  *   get:
  *     tags:
  *       - tenant
+  *     security: [] # No authentication required
  *     summary: Verify user email
  *     parameters:
  *       - name: token
@@ -205,6 +208,7 @@ router.get('/tenant-verify/:token', verifyTenantEmail)
  *   post:
  *     tags:
  *       - tenant
+  *     security: [] # No authentication required
  *     summary: Resend verification email
  *     requestBody:
  *       required: true
@@ -245,6 +249,7 @@ router.post('/resendTenantVerificationEmail', resendTenantVerificationEmail)
  *   post:
  *     tags:
  *       - tenant
+  *     security: [] # No authentication required
  *     summary: Send password reset email
  *     requestBody:
  *       required: true
@@ -284,6 +289,7 @@ router.post('/TenantForgotPassword', TenantForgotPassword)
  *   post:
  *     tags:
  *       - tenant
+  *     security: [] # No authentication required
  *     summary: Reset user password
  *     parameters:
  *       - name: token
