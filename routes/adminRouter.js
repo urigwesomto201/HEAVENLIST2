@@ -28,7 +28,7 @@ const { adminAuthenticate } = require('../middlewares/authentication')
 
 /**
  * @swagger
- * /admin/getAllUser:
+ * /api/v1/getAllUser:
  *   get:
  *     tags:
  *       - Admin
@@ -46,7 +46,7 @@ router.get('/getAllUser', getAllUser)
 
 /**
  * @swagger
- * /admin/getAllLandlords:
+ * /api/v1/getAllLandlords:
  *   get:
  *     tags:
  *       - Admin
@@ -89,7 +89,7 @@ router.get('/getAllLandlords', getAllLandlords)
 // router.put('/makeAdmin/:id', adminAuthenticate,makeAdmin);
 /**
  * @swagger
- * /admin/getadmin/{id}:
+ * /api/v1/getadmin/{id}:
  *   get:
  *     tags:
  *       - Admin
@@ -114,7 +114,7 @@ router.get('/getadmin/:id',adminAuthenticate, getAdmin);
 
 /**
  * @swagger
- * /admin/getAllAdmins:
+ * /api/v1/getAllAdmins:
  *   get:
  *     tags:
  *       - Admin
@@ -131,7 +131,7 @@ router.get('/getAllAdmins',adminAuthenticate, getAllAdmins);
 
 /**
  * @swagger
- * /admin/{id}:
+ * /api/v1/admin/{id}:
  *   put:
  *     tags:
  *       - Admin
@@ -185,7 +185,7 @@ router.put('/admin/:id',adminAuthenticate, updateAdmin);
 
 /**
  * @swagger
- * /admin/{id}:
+ * /api/v1/admin/{id}:
  *   delete:
  *     tags:
  *       - Admin
@@ -233,7 +233,7 @@ router.delete('/admin/:id',adminAuthenticate, deleteAdmin);
 
 /**
  * @swagger
- * /verfiyAlisting/{landlordId}/{listingId}:
+ * /api/v1/verfiyAlisting/{landlordId}/{listingId}:
  *   put:
  *     summary: Verify a listing by a landlord
  *     description: This endpoint allows a landlord to verify a listing.
@@ -327,7 +327,7 @@ router.put('/verfiyAlisting/:landlordId/:listingId',adminAuthenticate, verfiyAli
 
 /**
  * @swagger
- * /unverifyAlisting/{landlordId}/{listingId}:
+ * /api/v1/unverifyAlisting/{landlordId}/{listingId}:
  *   put:
  *     summary: Unverify a listing
  *     description: This endpoint allows a landlord to unverify a listing by setting `isVerified` and `isAvailable` to false.

@@ -90,13 +90,13 @@ const swaggerSpec = swaggerJSDOC(options);
 // Swagger UI setup
 app.use('/havenList', swaggerUIEXPRESS.serve, swaggerUIEXPRESS.setup(swaggerSpec));
 
-app.use(userRouter)
-app.use(tenantRouter)
-app.use(landlordRouter)
-app.use(adminRouter)
-app.use(listingRouter)
- app.use(landlordProfileRouter)
-app.use(transacRouter)
+app.use('/api/v1/',userRouter)
+app.use('/api/v1/',tenantRouter)
+app.use('/api/v1/',landlordRouter)
+app.use('/api/v1/',adminRouter)
+app.use('/api/v1/',listingRouter)
+ app.use('/api/v1/',landlordProfileRouter)
+app.use('/api/v1/',transacRouter)
 app.use((error, req, res, next) => {
   if(error){
      return res.status(400).json({message:  error.message})
