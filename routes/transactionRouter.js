@@ -5,7 +5,7 @@ const {initialPayment,verifyPayment}= require('../controller/transaction')
 
 /**
  * @swagger
- * /transaction/initialize:
+ * /api/v1/transaction/initialize:
  *   post:
  *     tags:
  *       - Transactions
@@ -38,7 +38,7 @@ transactionrouter.post("/initialize",initialPayment)
 
 /**
  * @swagger
- * /transaction/verify:
+ * /api/v1/transaction/verify:
  *   post:
  *     tags:
  *       - Transactions
