@@ -6,7 +6,7 @@ const { landlordAuthenticate } = require('../middlewares/authentication')
 const upload = require('../utils/multer')
 /**
  * @swagger
- * /api/landlord/createProfile:
+ * /api/v1/landlord/createProfile:
  *   post:
  *     summary: Create a new landlord profile
  *     description: Allows a landlord to create their profile with personal details and an optional profile image.
@@ -121,7 +121,7 @@ router.post('/createProfile/:landlordId', landlordAuthenticate, upload.single('p
 
 /**
  * @swagger
- * /landlord/{landlordId}:
+ * /api/v1/landlord/{landlordId}:
  *   get:
  *     summary: "Get a landlord profile"
  *     description: "Fetch the details of a specific landlord profile by their ID."
@@ -184,7 +184,7 @@ router.post('/createProfile/:landlordId', landlordAuthenticate, upload.single('p
 router.get('/landlord/:landlordId', getOneLandlordProfile);
 /**
 * @swagger
- * /landlords:
+ * /api/v1/landlords:
  *   get:
  *     summary: "Get all landlords"
  *     description: "Fetch the list of all landlords along with their basic profile information."
@@ -238,7 +238,7 @@ router.get('/landlords', getLandlordProfile);
 
 /**
  * @swagger
- * /landlord/{landlordId}:
+ * /api/v1/landlord/{landlordId}:
  *   put:
  *     summary: "Update landlord profile"
  *     description: "Update the details of a specific landlord profile."
@@ -337,7 +337,7 @@ router.put('/landlord/:landlordId', upload.single('profileImage'), updateLandlor
 
 /**
  * @swagger
- * /landlord/{landlordId}:
+ * /api/v1/landlord/{landlordId}:
  *   delete:
  *     summary: "Delete a landlord profile"
  *     description: "Delete a specific landlord profile by their ID."
