@@ -244,3 +244,29 @@ exports.deleteLandlordProfile = async (req, res) => {
 };
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+exports.getAll = async(req,res)=>{
+    try {
+        const cate = await categoryModel.find().populate('rooms',['roomName','price','description']);
+     res.status(200).json({message:'All category in the database',
+        data:cate
+     })
+    } catch (error) {
+        console.log(error.message)
+        res.status(500).json({
+            message: "Internal Server Erroor"
+    })
+}
+}
