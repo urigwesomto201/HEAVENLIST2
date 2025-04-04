@@ -40,14 +40,14 @@ const swaggerDefinition = {
   info: {
     title: 'HavenList Documentation',
     version: '1.0.0',
-    description: 'This is the first Swagger documentation I have ever done.',
+    description: 'This is a swagger documentation for our web application HavenList (Group 7).',
     license: {
       name: 
-      'Base_URL: https://hotel-m0xi.onrender.com ',
+      'Base_URL: https://heavenlist2.onrender.com ',
     },
     contact: {
       names: 'urigwe somto $ Ebuka ',
-      url: 'https://www.linkedin.com/in/urigwe-somto/',
+      url: 'https://github.com/urigwesomto201/HEAVENLIST2',
     },
   },
   "components": {
@@ -66,7 +66,7 @@ security: [
 ],
   servers: [
     {
-      url: 'https://hotel-m0xi.onrender.com',
+      url: 'https://heavenlist2.onrender.com',
       description: 'Production server',
     },
     {
@@ -90,12 +90,12 @@ const swaggerSpec = swaggerJSDOC(options);
 // Swagger UI setup
 app.use('/havenList', swaggerUIEXPRESS.serve, swaggerUIEXPRESS.setup(swaggerSpec));
 
-app.use('/api/v1',userRouter)
-app.use('/api/v1',tenantRouter)
-app.use('/api/v1',landlordRouter)
-app.use('/api/v1',adminRouter)
-app.use('/api/v1',listingRouter)
- app.use('/api/v1',landlordProfileRouter)
+app.use(userRouter)
+app.use(tenantRouter)
+app.use(landlordRouter)
+app.use(adminRouter)
+app.use(listingRouter)
+ app.use(landlordProfileRouter)
 app.use(transacRouter)
 app.use((error, req, res, next) => {
   if(error){

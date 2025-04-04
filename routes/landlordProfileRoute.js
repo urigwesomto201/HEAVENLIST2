@@ -234,7 +234,7 @@ router.get('/landlord/:landlordId', getOneLandlordProfile);
  *       500:
  *         description: "Internal server error"
 */
-router.get('/landlord', getLandlordProfile);
+router.get('/landlords', getLandlordProfile);
 
 /**
  * @swagger
