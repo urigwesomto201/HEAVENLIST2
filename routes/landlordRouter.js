@@ -9,6 +9,7 @@ const { landlordAuthenticate } = require('../middlewares/authentication')
  *   post:
  *     tags:
  *       - landlord
+  *     security: [] # No authentication required
  *     summary: this is the register or signup route
  *     requestBody:
  *       required: true
@@ -102,6 +103,7 @@ router.post('/registerlandlord', registerlandlord)
  *   post:
  *     tags:
  *       - landlord
+  *     security: [] # No authentication required
  *     summary: Login user
  *     requestBody:
  *       required: true
@@ -166,6 +168,7 @@ router.post('/loginlandlord', loginlandlord)
  *   get:
  *     tags:
  *       - landlord
+  *     security: [] # No authentication required
  *     summary: Verify user email
  *     parameters:
  *       - name: token
@@ -204,6 +207,7 @@ router.get('/landlord-verify/:token', verifylandlordEmail)
  *   post:
  *     tags:
  *       - landlord
+  *     security: [] # No authentication required
  *     summary: Resend verification email
  *     requestBody:
  *       required: true
@@ -244,6 +248,7 @@ router.post('/resendlandlordVerificationEmail', resendlandlordVerificationEmail)
  *   post:
  *     tags:
  *       - landlord
+  *     security: [] # No authentication required
  *     summary: Send password reset email
  *     requestBody:
  *       required: true
@@ -283,6 +288,7 @@ router.post('/landlordForgotPassword', landlordForgotPassword)
  *   post:
  *     tags:
  *       - landlord
+  *     security: [] # No authentication required
  *     summary: Reset user password
  *     parameters:
  *       - name: token

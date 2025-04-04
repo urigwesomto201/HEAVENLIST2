@@ -25,13 +25,29 @@ LandlordProfile.init(
       type: DataTypes.STRING,
       allowNull: false // Added to match the model
     },
-    businessName: {
+    state: {
       type: DataTypes.STRING,
       allowNull: false // Added to match the model
+    },
+    street: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    Password: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    locality: {
+      type: DataTypes.STRING,
+      allowNull: false
     },
     isVerified: {
       type: DataTypes.BOOLEAN, // Changed to BOOLEAN to match the model
       defaultValue: false // Added default value
+    },
+    profileImage: {
+      type: DataTypes.STRING,
+      allowNull: false
     },
     landlordId: {
       type: DataTypes.UUID,

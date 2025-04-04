@@ -9,6 +9,7 @@ const {initialPayment,verifyPayment}= require('../controller/transaction')
  *   post:
  *     tags:
  *       - Transactions
+  *     security: [] # No authentication required
  *     summary: Initialize a payment
  *     description: This route initializes a payment process.
  *     responses:
@@ -41,6 +42,7 @@ transactionrouter.post("/initialize",initialPayment)
  *   post:
  *     tags:
  *       - Transactions
+*     security: [] # No authentication required
  *     summary: Verify a payment
  *     description: This route verifies a payment transaction.
  *     parameters:

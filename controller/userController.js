@@ -70,7 +70,6 @@ exports.registerUser = async (req, res) => {
         await sendEmail(mailDetails)
 
         res.status(201).json({message: 'user registered successfully', data: newUser })
-
     } catch (error) {
         console.log(error.message)
         res.status(500).json({message: 'error registering user' , error: error.message})

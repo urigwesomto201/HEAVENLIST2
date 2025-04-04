@@ -62,8 +62,8 @@ exports.createListing = async (req, res) => {
         res.status(201).json({message: 'listing created successfully', data: newListing})
 
     } catch (error) {
-        console.error(error.message)
-        res.status(500).json({ message: 'Error creating listing', error: error.message })
+       
+        res.status(500).json({ message: 'Error creating listing',  }+ error.message)
          
     }
 }
@@ -88,8 +88,8 @@ exports.getAllListings = async (req, res) => {
         res.status(200).json({message: 'find all Listing below', total: listings.length, data: listings})
 
     } catch (error) {
-        console.error(error.message)
-        res.status(500).json({ message: 'Error fetching listings', error: error.message })
+       
+        res.status(500).json({ message: 'Error fetching listings',  }+ error.message)
     }
 }
 
@@ -161,8 +161,8 @@ exports.getOneListing = async (req, res) => {
         res.status(200).json({message: 'find listing by id below', data: listing})
         
     } catch (error) {
-        console.error(error.message)
-        res.status(500).json({ message: 'Error fetching listing', error: error.message })
+      
+        res.status(500).json({ message: 'Error fetching listing',  }+ error.message )
     }
 }
 
@@ -196,7 +196,7 @@ exports.getAllListingsByLandlord = async (req, res) => {
         
     } catch (error) {
         console.error(error.message)
-        res.status(500).json({ message: 'Error fetching listing', error: error.message })
+        res.status(500).json({ message: 'Error fetching listing',  }+error.message)
     }
 }
 
@@ -327,7 +327,7 @@ exports.deleteListing = async (req, res) => {
 
     } catch (error) {
         console.error(error.message);
-        res.status(500).json({ message: 'Error deleting listings', error: error.message });
+        res.status(500).json({ message: 'Error deleting listings', }+error.message);
     }
 }
 

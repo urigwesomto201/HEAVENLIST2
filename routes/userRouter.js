@@ -13,6 +13,7 @@ const passport = require('passport')
  *   post:
  *     tags:
  *       - user
+  *     security: [] # No authentication required
  *     summary: this is the register or signup route
  *     requestBody:
  *       required: true
@@ -111,6 +112,7 @@ router.post('/registerUser', registerUser)
  *   post:
  *     tags:
  *       - user
+  *     security: [] # No authentication required
  *     summary: Login user
  *     requestBody:
  *       required: true
@@ -175,6 +177,7 @@ router.post('/loginUser', loginUser)
  *   get:
  *     tags:
  *       - user
+  *     security: [] # No authentication required
  *     summary: Verify user email
  *     parameters:
  *       - name: token
@@ -213,6 +216,7 @@ router.get('/user-verify/:token', verifyUserEmail)
  *   post:
  *     tags:
  *       - user
+  *     security: [] # No authentication required
  *     summary: Resend verification email
  *     requestBody:
  *       required: true
@@ -253,6 +257,7 @@ router.post('/resendverificationemail', resendVerificationEmail)
  *   post:
  *     tags:
  *       - user
+  *     security: [] # No authentication required
  *     summary: Send password reset email
  *     requestBody:
  *       required: true
@@ -292,6 +297,7 @@ router.post('/forget-password', forgotPassword)
  *   post:
  *     tags:
  *       - user
+ *     security: [] # No authentication required
  *     summary: Reset user password
  *     parameters:
  *       - name: token
