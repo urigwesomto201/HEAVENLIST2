@@ -41,6 +41,10 @@ Tenant.init(
       type: DataTypes.BOOLEAN,
       defaultValue: false
     },
+    isSuperAdmin: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
     
   },
   {

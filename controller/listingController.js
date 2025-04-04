@@ -1,6 +1,8 @@
+const { Sequelize, DataTypes, Model } = require('sequelize');
 const listingModel = require('../models/listing')
 const cloudinary = require('../database/cloudinary')
 const landlordModel = require('../models/landlord')
+const { Op } = require('sequelize')
 
 const fs = require('fs')
 
@@ -8,7 +10,14 @@ const fs = require('fs')
 exports.createListing = async (req, res) => {
     try {
         const { landlordId } = req.params
-        const { type, description, price, location } = req.body
+        const { location, title, category, bedrooms,bathrooms,price,
+            size,locality,area,type,description, minrent, maxrent
+         } = req.body
+
+        if(!location || !title || !category || !bedrooms || !bathrooms || !price
+            || !size || !locality || !area || !type || !description) {
+            return res.status(400).json({message:'please input correct fields'})
+        }
 
         if(!landlordId) {
             return res.status(400).json({message: 'landlordId is required'})
@@ -20,22 +29,35 @@ exports.createListing = async (req, res) => {
             return res.status(404).json({ message: 'Landlord not found' });
         }
 
-        const result = await cloudinary.uploader.upload(req.file.path)
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ message: 'At least one listing image is required.' });
+        }
 
-        const newListing = new listingModel({
-            type,
-            description,
-            price,
+        const result = await cloudinary.uploader.upload(req.files[0].path)
+
+        const newListing = await listingModel.create({
             location,
+            title, 
+            category, 
+            bedrooms,
+            bathrooms,
+            price,
+            size,
+            locality,
+            area,
+            type,
+            minrent,
+            maxrent,
+            description,
             listingImage: {
                 imageUrl: result.secure_url,
                 publicId: result.public_id
             },
             landlordId: landlordId,
+            isVerified: false,
+            isAvailable: false,
             
         })
-
-        await newListing.save()
 
         res.status(201).json({message: 'listing created successfully', data: newListing})
 
@@ -53,12 +75,12 @@ exports.getAllListings = async (req, res) => {
     try {
         
         const listings = await listingModel.findAll({
-            where: { },
+            where: {isVerified: true, isAvailable: true},
             include: [
                 {
                 model: landlordModel,
-                attributes: ['id', 'fullName', 'email'], 
-                 as: 'landlord', 
+                attributes: ['id', 'fullName'], 
+                as: 'landlord', 
                 },
             ],
         });
@@ -74,10 +96,11 @@ exports.getAllListings = async (req, res) => {
 
 
 
-
 exports.getOneListingByLandlord= async (req, res) => {
     try {
-        const { landlordId, listingId } = req.params
+        const {landlordId} = req.params
+
+        const { listingId } = req.params
 
         if(!listingId) {
             return res.status(400).json({message: 'listingId is required'})
@@ -87,11 +110,11 @@ exports.getOneListingByLandlord= async (req, res) => {
         }
 
         const listing = await listingModel.findOne({
-            where: { id: listingId, landlordId }, 
+            where: { id: listingId, landlordId}, 
             include: [
                 {
                     model: landlordModel,
-                    attributes: ['id', 'fullName', 'email'], 
+                    attributes: ['id', 'fullName'], 
                     as: 'landlord', 
                 },
             ],
@@ -121,11 +144,11 @@ exports.getOneListing = async (req, res) => {
         }
 
         const listing = await listingModel.findOne({
-            where: { id: listingId },
+            where: { id: listingId, isAvailable:true, isVerified:true },
             include: [
                 {
                     model: landlordModel,
-                    attributes: ['id', 'fullName', 'email'], 
+                    attributes: ['id', 'fullName'], 
                     as: 'landlord', 
                 },
             ],
@@ -158,7 +181,7 @@ exports.getAllListingsByLandlord = async (req, res) => {
             include: [
                 {
                 model: landlordModel,
-                attributes: ['id', 'fullName', 'email'], 
+                attributes: ['id', 'fullName'], 
                  as: 'landlord', 
                 },
             ],
@@ -183,7 +206,9 @@ exports.getAllListingsByLandlord = async (req, res) => {
 
 exports.updateListing = async (req, res) => {
     try {
-        const {landlordId, listingId } = req.params
+        const {landlordId} = req.params
+
+        const { listingId } = req.params
 
 
         const {type, description, price, location} = req.body
@@ -205,12 +230,12 @@ exports.updateListing = async (req, res) => {
         let updatedImage = listing.listingImage
 
        
-        if (req.file) {
+        if (req.files) {
             if (listing.listingImage && listing.listingImage.publicId) {
                 await cloudinary.uploader.destroy(listing.listingImage.publicId);
             }
 
-            const result = await cloudinary.uploader.upload(req.file.path);
+            const result = await cloudinary.uploader.upload(req.files[0].path);
             updatedImage = {
                 imageUrl: result.secure_url,
                 publicId: result.public_id,
@@ -219,10 +244,19 @@ exports.updateListing = async (req, res) => {
 
         await listingModel.update(
             {
-                type,
-                description,
-                price,
                 location,
+                title, 
+                category, 
+                bedrooms,
+                bathrooms,
+                price,
+                size,
+                locality,
+                area,
+                type,
+                minrent,
+                maxrent,
+                description,
                 listingImage: updatedImage,
             },
             { where: { id: listingId, landlordId } } 
@@ -233,7 +267,7 @@ exports.updateListing = async (req, res) => {
         include: [
             {
             model: landlordModel,
-            attributes: ['id', 'fullName', 'email'], 
+            attributes: ['id', 'fullName'], 
              as: 'landlord', 
             },
         ],
@@ -253,7 +287,8 @@ exports.updateListing = async (req, res) => {
 
 exports.deleteListing = async (req, res) => {
     try {
-        const {landlordId, listingId } = req.params
+        const {landlordId} = req.params
+        const { listingId } = req.params
 
         if(!listingId) {
             return res.status(400).json({message: 'listingId is required'})
@@ -267,7 +302,7 @@ exports.deleteListing = async (req, res) => {
             include: [
                 {
                 model: landlordModel,
-                attributes: ['id', 'fullName', 'email'], 
+                attributes: ['id', 'fullName'], 
                  as: 'landlord', 
                 },
             ],
@@ -295,3 +330,44 @@ exports.deleteListing = async (req, res) => {
         res.status(500).json({ message: 'Error deleting listings', error: error.message });
     }
 }
+
+
+
+
+
+exports.searchListing = async (req, res) => {
+    try {
+        const { locality, type, bedrooms, minrent, maxrent } = req.body;
+
+        const queryCondition = {};
+        if (locality) queryCondition.locality = locality.toLowerCase();
+        if (type) queryCondition.type = type;
+        if (bedrooms) queryCondition.bedrooms = bedrooms;
+        if (minrent) queryCondition.minrent = minrent
+        if (maxrent) queryCondition.maxrent = maxrent
+
+        const listings = await listingModel.findAll({
+            where: {
+                ...queryCondition,
+                isAvailable: true,
+                isVerified: true,
+            },
+            include: [
+                {
+                    model: landlordModel, 
+                    attributes: ['id', 'fullName'], 
+                    as: 'landlord', 
+                },
+            ],
+        });
+
+        if (listings.length === 0) {
+            return res.status(404).json({ message: 'No listings found for the specified criteria' });
+        }
+
+        res.status(200).json({ message: 'Listings for the specified criteria', total: listings.length, data: listings });
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ message: 'Error getting listings by criteria', error: error.message });
+    }
+};

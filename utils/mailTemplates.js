@@ -93,7 +93,7 @@ exports.signUpTemplate = (verifyLink,firstName)=>{
 
 
 
-exports.forgotTemplate = (verifyLink,firstName)=>{
+exports.forgotTemplate = (otp,firstName)=>{
     return `
     <!DOCTYPE html>
     <html lang="en">
@@ -168,10 +168,7 @@ exports.forgotTemplate = (verifyLink,firstName)=>{
             <div class="content">
                 <p>Hello ${firstName},</p>
                 <p>You performed an action in adhere to forgetting your password.</p>
-                <p>Please click the button below:</p>
-                <div class="button-container">
-                    <a href="${verifyLink}" class="button">reset password</a>
-                </div>
+                <p>Your OTP for resetting your password is <strong>${otp}</strong>. It is valid for 5 minutes.</p>
                 <p>If you did not perform this action up on our platform, kindly ignore this email.</p>
                 <p>Best regards,<br>Havenlist</p>
             </div>

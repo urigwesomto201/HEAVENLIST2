@@ -2,8 +2,6 @@ const { Sequelize, DataTypes, Model } = require('sequelize');
 const sequelize = require('../database/sequelize');
 const Listing = require('./listing');
 
-
-
 class Landlord extends Model {}
 
 Landlord.init(
@@ -43,6 +41,10 @@ Landlord.init(
       type: DataTypes.BOOLEAN,
       defaultValue: false
     },
+    isSuperAdmin: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
   },
   {
     // Other model options go here
@@ -52,10 +54,9 @@ Landlord.init(
   },
 );
 
-
 Landlord.hasMany(Listing, {
   foreignKey: 'landlordId', // This should match the foreign key in the Listing model
-  as: 'Listings', // Alias for the association
+  as: 'listings', // Alias for the association (changed to lowercase for consistency)
   onUpdate: 'CASCADE',
   onDelete: 'CASCADE',
 });
@@ -67,4 +68,4 @@ Listing.belongsTo(Landlord, {
   onDelete: 'CASCADE',
 });
 
-module.exports = Landlord
+module.exports = Landlord;

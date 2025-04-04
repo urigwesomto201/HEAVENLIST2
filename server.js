@@ -15,6 +15,7 @@ const tenantRouter = require('./routes/tenantRouter')
 const landlordRouter = require('./routes/landlordRouter')
 const adminRouter = require('./routes/adminRouter')
 const listingRouter = require('./routes/listingRouter')
+// const landlordProfileRouter = require('./routes/landlordProfileRoute')
 
 
 const app = express()
@@ -38,6 +39,7 @@ app.use('/api/v1',tenantRouter)
 app.use('/api/v1',landlordRouter)
 app.use('/api/v1',adminRouter)
 app.use('/api/v1',listingRouter)
+// app.use('/api/v1',landlordProfileRouter)
 app.use(transacRouter)
 app.use((error, req, res, next) => {
   if(error){

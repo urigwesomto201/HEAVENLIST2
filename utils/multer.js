@@ -23,7 +23,7 @@ const fileFilter = (req, file, cb) => {
 
 
 const limits = {
-    limits : 1024 * 1024 * 10
+    limits : 1024 * 1024 * 50
 }
 
 

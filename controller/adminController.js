@@ -1,12 +1,18 @@
 const adminModel = require('../models/admin')
+const userModel = require('../models/user')
+const tenantModel = require('../models/tenant')
+const listingModel = require('../models/listing')
+const landlordModel = require('../models/landlord')
 // const bcrypt  = require('bcryptjs')
 const sendEmail = require('../middlewares/nodemailer')
 const bcrypt  = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { Op } = require('sequelize')
+const { totp } = require('otplib');
 const { signUpTemplate ,forgotTemplate, adminTemplate } = require('../utils/mailTemplates')
 const {validate} = require('../helper/utilities')
 const {registerSchema, loginSchema, verificationEmailSchema, forgotPasswordSchema, resetPasswordschema, changePassword} = require('../validation/user')
+totp.options = { digits: 4, step: 300}
 
 
 exports.registerAdmin = async (req, res) => {
@@ -70,9 +76,6 @@ exports.registerAdmin = async (req, res) => {
     }
 };
 
-
-
-
 exports.loginAdmin = async (req, res) => {
     try {
   
@@ -127,8 +130,6 @@ exports.loginAdmin = async (req, res) => {
     }
 };
 
-
-
 exports.adminForgotPassword = async (req, res) => {
     try {
         
@@ -146,13 +147,12 @@ exports.adminForgotPassword = async (req, res) => {
             return res.status(404).json({message: 'admin not found'})
         }
 
-        const token = await jwt.sign({ adminId: admin.id}, process.env.JWT_SECRET, { expiresIn: '1h'})
-
-        const link = `${req.protocol}://${req.get('host')}/api/v1/reset-adminpassword/${token}`
+        const secret = process.env.OTP_SECRET + email; 
+        const otp = totp.generate(secret);
 
         const firstName = admin.fullName.split(' ')[0]
 
-        const html = forgotTemplate(link, firstName)
+        const html = forgotTemplate(otp, firstName)
 
         const mailOptions = {
             subject: 'admin reset password',
@@ -162,7 +162,7 @@ exports.adminForgotPassword = async (req, res) => {
 
         await sendEmail(mailOptions)
 
-        res.status(200).json({message: 'reset password email sent, please check mail box'})
+        res.status(200).json({message: 'otp has been sent, please check mail box'})
 
     } catch (error) {
         console.log(error.message)
@@ -170,34 +170,28 @@ exports.adminForgotPassword = async (req, res) => {
     }
 }
 
-
-
-
 exports.adminResetPassword = async (req, res) => {
     try {
 
         const validated = await validate(req.body , resetPasswordschema)
 
-        const {password, confirmPassword} = validated
+   
+        const { email, otp, password, confirmPassword } = validated;
 
-        const { token } = req.params;
-
-        if (!token) {
-            return res.status(400).json({ message: 'Token not found' });
-        }
 
         if (password !== confirmPassword) {
             return res.status(400).json({ message: 'Passwords do not match' });
         }
 
-        const decodedToken = await jwt.verify(token, process.env.JWT_SECRET);
-
-
-        if (!decodedToken || !decodedToken.adminId) {
-            return res.status(400).json({ message: 'Invalid token payload' });
+        const secret = process.env.OTP_SECRET + email; 
+        const isValidOTP = totp.check(otp, secret);
+  
+        if (!isValidOTP) {
+           return res.status(400).json({ message: 'Invalid or expired OTP' });
         }
+  
 
-        const admin = await adminModel.findOne({ where: { id: decodedToken.adminId } });
+        const admin = await adminModel.findOne({ where: { email: email.toLowerCase() } });
 
         if (!admin) {
             return res.status(404).json({ message: 'admin not found' });
@@ -222,9 +216,6 @@ exports.adminResetPassword = async (req, res) => {
        res.status(500).json({message: 'Error resetting password', error: error.message});
     }
 }
-
-
-
 
 exports.changeAdminPassword = async (req, res) => {
     try {
@@ -277,8 +268,6 @@ exports.changeAdminPassword = async (req, res) => {
     }
 };
 
-
-
 exports.logoutAdmin = async (req, res) => {
     try {
         const { id } = req.admin;
@@ -311,7 +300,236 @@ exports.logoutAdmin = async (req, res) => {
 
 
 
+exports.getAllUser = async (req, res) => {
+    try {
+        const user = await userModel.findAll()
+
+        res.status(200).json({message: 'find all users below', total: user.length, data: user})
+    } catch (error) {
+        console.error(error.message)
+        res.status(500).json({ message: 'Error getting all users' , error:error.message })
+    }
+}
+
+
+
+exports.getAllLandlords = async (req, res) => {
+    try {
+        const landlord = await landlordModel.findAll()
+
+        res.status(200).json({message: 'find all landlord below', total: landlord.length, data: landlord})
+    } catch (error) {
+        console.error(error.message)
+        res.status(500).json({ message: 'Error getting all landlords' , error:error.message })
+    }
+}
+
+
+
+// exports.makeAdmin = async (req, res) => {
+//     try {
+//         const { id } = req.params;
+
+
+//         const user = await userModel.findByPk(id);
+//         if (!user) {
+//             return res.status(404).json({
+//                 message: 'user not found'
+//             })
+//         }
+
+
+//         if (user.isAdmin == true) {
+//             return res.status(400).json({
+//                 message: 'user already an Admin'
+//             })
+//         }
+//         await userModel.update({ isAdmin: true }, { where: { id: id } });
+
+
+//         const updatedTenant = await userModel.findByPk(id);
+
+//         res.status(200).json({
+//             message: 'user is now an Admin',
+//             data: updatedTenant
+//         })
+
+//     } catch (error) {
+//         console.error(error.message)
+//         res.status(500).json({ message: 'Error making User an Admin: ' , error:error.message })
+//     }
+// }
+
+
+
+// Get a single admin by ID
+exports.getAdmin = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const admin = await userModel.findOne({ where: { id, isAdmin: true } });
+
+        if (!admin) {
+            return res.status(404).json({ message: 'Admin not found' });
+        }
+
+        res.status(200).json({ message: 'find admin by id below', data: admin });
+    } catch (error) {
+        console.error(error.message)
+        res.status(500).json({ message: 'Error fetching admin: ' , error:error.message });
+    }
+};
+
+
+
+// Get all admins
+exports.getAllAdmins = async (req, res) => {
+    try {
+        const admins = await userModel.findAll({ where: { isAdmin: true } });
+
+        if (admins.length === 0) {
+            return res.status(404).json({ message: 'No admins found' });
+        }
+
+        res.status(200).json({ message: 'find all admins below', total: admins.length, data: admins });
+    } catch (error) {
+        console.error(error.message)
+        res.status(500).json({ message: 'Error fetching admins: ' , error:error.message });
+    }
+};
+
+
+// Update an admin
+exports.updateAdmin = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, email } = req.body;
+
+        const admin = await userModel.findOne({ where: { id, isAdmin: true } });
+
+        if (!admin) {
+            return res.status(404).json({ message: 'Admin not found' });
+        }
+
+        await userModel.update({ name, email }, { where: { id } });
+
+        res.status(200).json({ message: 'Admin updated successfully' });
+    } catch (error) {
+        console.error(error.message)
+        res.status(500).json({ message: 'Error updating admin: ' , error:error.message });
+    }
+};
+
+
+// Delete an admin
+exports.deleteAdmin = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const admin = await userModel.findOne({ where: { id, isAdmin: true } });
+
+        if (!admin) {
+            return res.status(404).json({ message: 'Admin not found' });
+        }
+
+        await userModel.destroy({ where: { id } });
+
+        res.status(200).json({ message: 'Admin deleted successfully' });
+    } catch (error) {
+        console.error(error.message)
+        res.status(500).json({ message: 'Error deleting admin: ' , error:error.message });
+    }
+};
 
 
 
 
+
+exports.verfiyAlisting = async (req, res) => {
+    try {
+        const {listingId, landlordId} = req.params
+
+        if(!listingId) {
+            return res.status(400).json({message: 'listing id is required'})
+        }
+
+        if (!landlordId) {
+            return res.status(400).json({ message: 'Landlord ID is required' });
+        }
+ 
+        const listing = await listingModel.findOne({
+            where: { id: listingId, landlordId}, 
+            include: [
+                {
+                    model: landlordModel,
+                    attributes: ['id', 'fullName'], 
+                    as: 'landlord', 
+                },
+            ],
+        });
+
+        if (!listing) {
+            return res.status(404).json({ message: 'Listing not found or does not belong to the specified landlord' });
+        }
+
+        if(listing.isVerified === true){
+            return res.status(400).json({message:'listing has already been verified'})
+        }
+
+        listing.isVerified = true
+        listing.isAvailable = true
+
+        await listing.save()
+
+        res.status(200).json({message:'listing has been verified',data: listing})
+        
+    } catch (error) {
+        console.error(error.message)
+        res.status(500).json({ message: 'Error verifying a listing', error: error.message })
+    }
+}
+
+
+
+exports.unverifyAlisting = async (req, res) => {
+    try {
+        const {listingId, landlordId} = req.params
+
+        if(!listingId) {
+            return res.status(400).json({message: 'listing id is required'})
+        }
+
+        if (!landlordId) {
+            return res.status(400).json({ message: 'Landlord ID is required' });
+        }
+ 
+        const listing = await listingModel.findOne({
+            where: { id: listingId, landlordId}, 
+            include: [
+                {
+                    model: landlordModel,
+                    attributes: ['id', 'fullName'], 
+                    as: 'landlord', 
+                },
+            ],
+        });
+
+        if (!listing) {
+            return res.status(404).json({ message: 'Listing not found or does not belong to the specified landlord' });
+        }
+
+        if(listing.isVerified === false){
+            return res.status(400).json({message:'listing has already been unverified'})
+        }
+
+        listing.isVerified = false
+        listing.isAvailable = false
+
+        await listing.save()
+
+        res.status(200).json({message:'listing has been unverified',data: listing})
+        
+    } catch (error) {
+        console.error(error.message)
+        res.status(500).json({ message: 'Error unverifying listings', error: error.message })
+    }
+}

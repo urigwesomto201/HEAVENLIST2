@@ -43,6 +43,10 @@ Admin.init(
       type: DataTypes.BOOLEAN, // Changed from STRING to BOOLEAN
       defaultValue: true 
     },
+    isSuperAdmin: {
+      type: DataTypes.BOOLEAN, // Changed from STRING to BOOLEAN
+      defaultValue: false 
+    },
   },
   {
     // Other model options go here

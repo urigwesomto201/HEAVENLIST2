@@ -4,10 +4,11 @@ const sendEmail = require('../middlewares/nodemailer')
 const bcrypt  = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { Op } = require('sequelize')
+const { totp } = require('otplib');
 const { signUpTemplate ,forgotTemplate } = require('../utils/mailTemplates')
 const {validate} = require('../helper/utilities')
 const {registerSchema, loginSchema, verificationEmailSchema, forgotPasswordSchema, resetPasswordschema, changePassword} = require('../validation/user')
-
+totp.options = { digits: 4, step: 300}
 
 
 
@@ -16,6 +17,10 @@ exports.registerTenant = async (req, res) => {
         const validated = await validate(req.body , registerSchema)
         
         const {fullName, email, password, username, confirmPassword} = validated
+
+        if(!fullName || !email || !password || !username || !confirmPassword) {
+            return res.status(400).json({message:'please input correct fields'})
+        }
 
         if(password !== confirmPassword) {
             return res.status(400).json({message: 'passwords do not match'})
@@ -39,7 +44,7 @@ exports.registerTenant = async (req, res) => {
 
      
 
-        const newTenant = new tenantModel({
+        const newTenant = await tenantModel.create({
             fullName,
             email,
             password: hashedPassword,
@@ -48,7 +53,7 @@ exports.registerTenant = async (req, res) => {
         })
 
 
-        const token = await jwt.sign({ tenantId: newTenant.id}, process.env.JWT_SECRET, { expiresIn: '1day'})
+        const token = await jwt.sign({ tenantId: newTenant.id}, process.env.JWT_SECRET, { expiresIn: '2day'})
 
         const link = `${req.protocol}://${req.get('host')}/api/v1/tenant-verify/${token}`
 
@@ -62,8 +67,6 @@ exports.registerTenant = async (req, res) => {
         }
 
         await sendEmail(mailDetails)
-
-        await newTenant.save()
 
         res.status(201).json({message: 'tenant registered successfully', data: newTenant })
 
@@ -203,7 +206,7 @@ exports.loginTenant = async (req, res) => {
 
         tenant.isLoggedIn = true;
 
-        const token = jwt.sign({ tenantId: tenant.id, isLoggedIn: tenant.isLoggedIn }, process.env.JWT_SECRET, { expiresIn: '1day' });
+        const token = jwt.sign({ tenantId: tenant.id, isLoggedIn: tenant.isLoggedIn }, process.env.JWT_SECRET, { expiresIn: '2day' });
 
         await tenant.save();
 
@@ -235,23 +238,24 @@ exports.TenantForgotPassword = async (req, res) => {
             return res.status(404).json({message: 'tenant not found'})
         }
 
-        const token = await jwt.sign({ tenantId: tenant.id}, process.env.JWT_SECRET, { expiresIn: '1h'})
+        const secret = process.env.OTP_SECRET + email; 
+        const otp = totp.generate(secret);
 
-        const link = `${req.protocol}://${req.get('host')}/api/v1/reset-tenantpassword/${token}`
+        // const link = `${req.protocol}://${req.get('host')}/api/v1/reset-tenantpassword/${otp}`
 
         const firstName = tenant.fullName.split(' ')[0]
 
-        const html = forgotTemplate(link, firstName)
+        const html = forgotTemplate(otp, firstName)
 
         const mailOptions = {
             subject: 'reset password',
             email: tenant.email,
-            html
+            html 
         }
 
         await sendEmail(mailOptions)
 
-        res.status(200).json({message: 'reset password email sent, please check mail box'})
+        res.status(200).json({message: 'otp has been sent, please check mail box'})
 
     } catch (error) {
         console.log(error.message)
@@ -265,23 +269,25 @@ exports.TenantForgotPassword = async (req, res) => {
 exports.TenantResetPassword = async (req, res) => {
     try {
 
-        const validated = await validate(req.body , resetPasswordschema)
+        const validated = await validate(req.body, resetPasswordschema);
 
-        const {password, confirmPassword} = validated
+        const { email, otp, password, confirmPassword } = validated;
 
-        const { token } = req.params;
-
-        if (!token) {
-            return res.status(400).json({ message: 'Token not found' });
-        }
+    
 
         if (password !== confirmPassword) {
             return res.status(400).json({ message: 'Passwords do not match' });
         }
 
-        const decodedToken = await jwt.verify(token, process.env.JWT_SECRET);
+        const secret = process.env.OTP_SECRET + email; 
+        const isValidOTP = totp.check(otp, secret);
+  
+        if (!isValidOTP) {
+           return res.status(400).json({ message: 'Invalid or expired OTP' });
+        }
+  
 
-        const tenant = await tenantModel.findOne({ where: { id: decodedToken.tenantId } });
+        const tenant = await tenantModel.findOne({ where: { email: email.toLowerCase() } });
 
         if (!tenant) {
             return res.status(404).json({ message: 'tenant not found' });
@@ -385,3 +391,5 @@ exports.logoutTenant = async (req, res) => {
         res.status(500).json({ message: 'Error logging out tenant', error: error.message });
     }
 };
+
+
