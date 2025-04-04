@@ -74,15 +74,14 @@ module.exports = {
         defaultValue: false
       },
       listingImage: {
-        type: Sequelize.JSON, // JSON to store an array of objects
-        allowNull: false,
-        defaultValue: [] // Default to an empty array
+        type: Sequelize.TEXT('long'), // JSON to store an array of objects
+        allowNull: false
       },
       landlordId: {
         type: Sequelize.UUID,
         allowNull: false,
         references: {
-          model: 'landlords', // Corrected to match the actual table name in the database
+          model: 'Landlords', // Corrected to match the actual table name in the database
           key: 'id', // Column in the referenced table
         },
         onUpdate: 'CASCADE',

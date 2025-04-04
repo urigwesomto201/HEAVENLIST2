@@ -7,7 +7,7 @@ const passport = require('passport');
 require('./middlewares/passport');
 
 
-const PORT = process.env.PORT || 5050
+const PORT = process.env.PORT 
 const secret = process.env.EXPRESS_SECRET; // Ensure this is defined in .env
 const transacRouter = require('./routes/transactionRouter')
 const userRouter = require('./routes/userRouter')
