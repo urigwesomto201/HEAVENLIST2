@@ -42,7 +42,7 @@ const swaggerDefinition = {
     description: 'This is a swagger documentation for our web application HavenList (Group 7).',
     license: {
       name: 
-      'Base_URL: https://heavenlist2.onrender.com ',
+      'Base_URL: https://heavenlist2-zaz3.onrender.com ',
     },
     contact: {
       names: 'urigwe somto $ Ebuka ',
