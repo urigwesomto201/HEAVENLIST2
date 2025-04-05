@@ -272,7 +272,7 @@ router.post('/landlordForgotPassword', landlordForgotPassword)
 
 /**
  * @swagger
- * /api/v1/reset-landlordpassword/{token}:
+ * /api/v1/reset-landlordpassword:
  *   post:
  *     tags:
  *       - landlord
@@ -326,7 +326,7 @@ router.post('/landlordForgotPassword', landlordForgotPassword)
  */
 
 
-router.post('/reset-landlordpassword/:token', landlordResetPassword)
+router.post('/reset-landlordpassword', landlordResetPassword)
 
 
 /**
