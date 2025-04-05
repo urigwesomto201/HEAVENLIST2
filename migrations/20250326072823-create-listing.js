@@ -6,46 +6,45 @@ module.exports = {
       id: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV4 // Added default value for UUID
-      },
-      location: {
-        type: Sequelize.STRING,
-        allowNull: false
+        type: Sequelize.UUID
+        
       },
       title: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      category: {
-        type: Sequelize.ENUM('Houses', 'Apartments'),
-        allowNull: false
+      type: {
+        type: Sequelize.ENUM('Houses', 'Apartments')
+    
       },
       bedrooms: {
-        type: Sequelize.ENUM('1', '2', '3', '4', '5', '6', '7', '8', '9', '10+'),
-        allowNull: false
+        type: Sequelize.ENUM('1', '2', '3', '4', '5+')
+      
       },
       bathrooms: {
-        type: Sequelize.ENUM('1', '2', '3', '4', '5', '6', '7', '8', '9', '10+'),
-        allowNull: false
+        type: Sequelize.ENUM('1', '2', '3', '4', '5+')
+        
+      },
+      toilets: {
+        type: Sequelize.ENUM('1', '2', '3', '4', '5+')
+        
       },
       minrent: {
-        type: Sequelize.ENUM('500000','600000','700000','800000','900000','1000000'),
-        allowNull: false
+        type: Sequelize.ENUM('500000','600000','700000','800000','900000','1000000')
+      
       },
       maxrent: {
-        type: Sequelize.ENUM('1000000','2000000','3000000','4000000','5000000'),
-        allowNull: false
+        type: Sequelize.ENUM('1000000','2000000','3000000','4000000','5000000')
+        
+      },
+      state: {
+        type: Sequelize.ENUM('Lagos')
       },
       price: {
         type: Sequelize.INTEGER,
         allowNull: false
       },
-      size: {
-        type: Sequelize.DECIMAL,
-        allowNull: false
-      },
-      locality: {
+      area: {
         type: Sequelize.ENUM(
           'Agege', 'Ajeromi-Ifelodun', 'Alimosho', 'Amuwo Odofin',
           'Apapa', 'Badagry', 'Epe', 'Eti-Osa', 'Ibeju Lekki', 'Ikeja', 'Ikorodu',
@@ -53,13 +52,13 @@ module.exports = {
         ),
         allowNull: false
       },
-      area: {
+      street: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      type: {
-        type: Sequelize.STRING,
-        allowNull: false
+      isClicked: {
+        type: Sequelize.INTEGER, 
+        defaultValue: 0
       },
       description: {
         type: Sequelize.STRING,
@@ -75,13 +74,14 @@ module.exports = {
       },
       listingImage: {
         type: Sequelize.TEXT('long'), // JSON to store an array of objects
-        allowNull: false
+        allowNull: false,
+        defaultValue: []
       },
       landlordId: {
         type: Sequelize.UUID,
         allowNull: false,
         references: {
-          model: 'Landlords', // Corrected to match the actual table name in the database
+          model: 'landlords', // Corrected to match the actual table name in the database
           key: 'id', // Column in the referenced table
         },
         onUpdate: 'CASCADE',

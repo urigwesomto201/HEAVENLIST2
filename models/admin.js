@@ -23,10 +23,6 @@ Admin.init(
       type: DataTypes.STRING,
       allowNull: false
     },
-    username: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
     password: {
       type: DataTypes.STRING,
       allowNull: false
@@ -42,10 +38,6 @@ Admin.init(
     isAdmin: {
       type: DataTypes.BOOLEAN, // Changed from STRING to BOOLEAN
       defaultValue: true 
-    },
-    isSuperAdmin: {
-      type: DataTypes.BOOLEAN, // Changed from STRING to BOOLEAN
-      defaultValue: false 
     },
   },
   {

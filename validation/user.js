@@ -21,11 +21,6 @@ exports.registerSchema = Joi.object().keys({
         'any.only': 'Passwords do not match',
         'any.required': 'Confirm password is required',
     }).required(),
-    username: Joi.string().min(3).trim().required().messages({
-        'string.min': 'Username must be at least 3 characters',
-        'any.required': 'Username is required',
-        'string.empty': 'Username cannot be empty',
-    }),
 });
 
 
@@ -44,13 +39,18 @@ exports.registerSchema = Joi.object().keys({
 
 
 exports.loginSchema = Joi.object().keys({
-    email: Joi.string().trim().email().optional(),
-    password: Joi.string().required().messages({
+    email: Joi.string().trim().email().required().messages({
+        'string.email': 'Invalid email format',
+        'any.required': 'Email is required',
+        'string.empty': 'Email cannot be empty',
+    }),
+    password: Joi.string().pattern(/^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/).trim().messages({
+        'string.pattern.base': 'Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character [!@#$%^&*]',
         'any.required': 'Password is required',
         'string.empty': 'Password cannot be empty',
-    }),
-    username: Joi.string().min(3).optional(),
-}).or('email', 'username') 
+    }).required(),
+    
+})
 
 
 exports.verificationEmailSchema = Joi.object().keys({

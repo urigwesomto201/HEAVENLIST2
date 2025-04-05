@@ -1,6 +1,7 @@
 const { Sequelize, DataTypes, Model } = require('sequelize');
 const sequelize = require('../database/sequelize');
 const Listing = require('./listing');
+const LandlordProfile = require('./landlordprofile');
 
 class Landlord extends Model {}
 
@@ -21,10 +22,6 @@ Landlord.init(
       type: DataTypes.STRING,
       allowNull: false
     },
-    username: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
     password: {
       type: DataTypes.STRING,
       allowNull: false
@@ -41,10 +38,6 @@ Landlord.init(
       type: DataTypes.BOOLEAN,
       defaultValue: false
     },
-    isSuperAdmin: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
-    },
   },
   {
     // Other model options go here
@@ -54,18 +47,42 @@ Landlord.init(
   },
 );
 
+Landlord.hasOne(LandlordProfile, {
+  foreignKey: 'landlordId',
+  as: 'landlordProfiles',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
 Landlord.hasMany(Listing, {
-  foreignKey: 'landlordId', // This should match the foreign key in the Listing model
-  as: 'listings', // Alias for the association (changed to lowercase for consistency)
-  onUpdate: 'CASCADE',
+  foreignKey: 'landlordId',
+  as: 'listings',
   onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
 });
-
+LandlordProfile.belongsTo(Landlord, {
+  foreignKey: 'landlordId',
+  as: 'landlords',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
 Listing.belongsTo(Landlord, {
-  foreignKey: 'landlordId', // Correct foreign key referencing the landlordId in the Listing model
-  as: 'landlord', // Alias for the association
-  onUpdate: 'CASCADE',
+  foreignKey: 'landlordId',
+  as: 'landlords',
   onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
 });
+// LandlordProfile.hasMany(Listing, {
+//   foreignKey: 'landlordProfileId',
+//   as: 'listings',
+//   onDelete: 'CASCADE',
+//   onUpdate: 'CASCADE'
+// });
+// Listing.belongsTo(LandlordProfile, {
+//   foreignKey: 'listingId',
+//   as: 'landlordProfiles',
+//   onDelete: 'CASCADE',
+//   onUpdate: 'CASCADE'
+// });
 
 module.exports = Landlord;
+
