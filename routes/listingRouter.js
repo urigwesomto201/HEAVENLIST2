@@ -9,6 +9,8 @@ const upload = require('../utils/multer')
  * @swagger
  * /api/v1/createlisting/{landlordId}:
  *   post:
+ *    tags:
+ *       - Listings
  *     summary: Create a new property listing
  *     description: Allows a verified landlord to create a new property listing with details and images.
  *     security:
