@@ -443,10 +443,10 @@ router.delete('/admin/:id',adminAuthenticate, deleteAdmin);
  * @swagger
  * /api/v1/verfiyAlisting/{landlordId}/{listingId}:
  *   put:
- *    tags:
+ *     tags:
  *       - Admin
- *     summary: Verify a listing by a landlord
- *     description: This endpoint allows a landlord to verify a listing.
+ *     summary: Verify a listing by a admin
+ *     description: This endpoint allows an admin to verify a listing.
  *     parameters:
  *       - name: landlordId
  *         in: path
@@ -542,7 +542,7 @@ router.put('/verfiyAlisting/:landlordId/:listingId', verfiyAlisting);
  *     tags:
  *       - Admin
  *     summary: Unverify a listing
- *     description: This endpoint allows a landlord to unverify a listing by setting `isVerified` and `isAvailable` to false.
+ *     description: This endpoint allows an admin to unverify a listing by setting `isVerified` and `isAvailable` to false.
  *     parameters:
  *       - in: path
  *         name: landlordId
