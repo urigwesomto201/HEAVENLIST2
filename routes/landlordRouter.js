@@ -26,18 +26,14 @@ const { landlordAuthenticate } = require('../middlewares/authentication')
  *                 type: string
  *                 description: this is the email of the user
  *                 example: alaekekaebuka200@gmail.com
- *               username:
- *                 type: string
- *                 description: this is the username of the user
- *                 example: digitz
  *               password:
  *                 type: string
  *                 description: this is the password of the user
- *                 example: ebusr09
+ *                 example: Successtoall20$
  *               confirmPassword:
  *                 type: string
  *                 description: this is the confirm password of the user
- *                 example: ebusr09
+ *                 example: Successtoall20$
  *     responses:
  *       201:
  *         description: user created successfully
@@ -54,14 +50,10 @@ const { landlordAuthenticate } = require('../middlewares/authentication')
  *                   type: string
  *                   description: this is the email of the user
  *                   example: alaekekaebuka200@gmail.com
- *                 username:
- *                   type: string
- *                   description: this is the username of the user
- *                   example: digitz
  *                 password:
  *                   type: string
  *                   description: this is the password of the user
- *                   example: ebusr09
+ *                   example: Successtoall20$
  *                 isVerified:
  *                   type: boolean 
  *                   description: this is the verification status of the user
@@ -119,7 +111,7 @@ router.post('/registerlandlord', registerlandlord)
  *               password:
  *                 type: string
  *                 description: The password of the user
- *                 example: ebusr09
+ *                 example: Successtoall20$
  *     responses:
  *       200:
  *         description: user login successfully
@@ -136,10 +128,6 @@ router.post('/registerlandlord', registerlandlord)
  *                   type: string
  *                   description: this is the email of the user
  *                   example: alaekekaebuka200@gmail.com
- *                 username:
- *                   type: string
- *                   description: this is the username of the user
- *                   example: digitz
  *                 isVerified:
  *                   type: boolean
  *                   description: this is the verification status of the user
@@ -304,6 +292,14 @@ router.post('/landlordForgotPassword', landlordForgotPassword)
  *           schema:
  *             type: object
  *             properties:
+ *               email:
+ *                 type: string
+ *                 description: The email of the user to reset password
+ *                 example: alaekekaebuka200@gmail.com
+ *               otp:
+ *                 type: string
+ *                 description: The OTP sent to the user's email
+ *                 example: 6759
  *               password:
  *                 type: string
  *                 description: The new password for the user
@@ -356,11 +352,11 @@ router.post('/reset-landlordpassword/:token', landlordResetPassword)
  *               newPassword:
  *                 type: string
  *                 description: The new password for the user
- *                 example: newpassword123
+ *                 example: Successtoall20$
  *               confirmPassword:
  *                 type: string
  *                 description: The confirmation of the new password
- *                 example: newpassword123
+ *                 example: Successtoall20$
  *     responses:
  *       200:
  *         description: Password changed successfully

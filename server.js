@@ -10,7 +10,6 @@ require('./middlewares/passport');
 const PORT = process.env.PORT 
 const secret = process.env.EXPRESS_SECRET; // Ensure this is defined in .env
 const transacRouter = require('./routes/transactionRouter')
-const userRouter = require('./routes/userRouter')
 const tenantRouter = require('./routes/tenantRouter')
 const landlordRouter = require('./routes/landlordRouter')
 const adminRouter = require('./routes/adminRouter')
@@ -90,7 +89,7 @@ const swaggerSpec = swaggerJSDOC(options);
 // Swagger UI setup
 app.use('/havenList', swaggerUIEXPRESS.serve, swaggerUIEXPRESS.setup(swaggerSpec));
 
-app.use('/api/v1/',userRouter)
+
 app.use('/api/v1/',tenantRouter)
 app.use('/api/v1/',landlordRouter)
 app.use('/api/v1/',adminRouter)

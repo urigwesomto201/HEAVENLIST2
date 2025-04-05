@@ -17,9 +17,9 @@ exports.registerlandlord = async (req, res) => {
     try {
         const validated = await validate(req.body , registerSchema)
         
-        const {fullName, email, password, username, confirmPassword} = validated
+        const {fullName, email, password, confirmPassword} = validated
 
-        if(!fullName || !email || !password || !username || !confirmPassword) {
+        if(!fullName || !email || !password || !confirmPassword) {
             return res.status(400).json({message:'please input correct fields'})
         }
 
@@ -34,14 +34,6 @@ exports.registerlandlord = async (req, res) => {
             return res.status(400).json({message: `user with email: ${email} already exists please use another email`})
         }
 
-
-        const usernameExists = await landlordModel.findOne({where:{ username: username.toLowerCase()}})
-
-        if(usernameExists) {
-            return res.status(400).json({message: 'username has been taken'})
-        }
-
-
         const salt = await bcrypt.genSalt(10)
         const hashedPassword = await bcrypt.hash(password, salt)
 
@@ -51,7 +43,6 @@ exports.registerlandlord = async (req, res) => {
             fullName,
             email,
             password: hashedPassword,
-            username
              
         })
 
@@ -167,62 +158,49 @@ exports.resendlandlordVerificationEmail = async (req, res) => {
 
 exports.loginlandlord = async (req, res) => {
     try {
-  
-        const validated = await validate(req.body , loginSchema)
+        
+        const validated = await validate(req.body, loginSchema);
+        const { email, password } = validated;
 
-        const {email, password, username} = validated
-
-        if(!email && !username) {
-            return res.status(400).json({message: 'please enter either email or username'})    
+        
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Please provide both email and password' });
         }
 
-        if(email && username) {
-            return res.status(400).json({message: 'please enter either email or username, not both'})
-        }
-
-        if(!password) {
-            return res.status(400).json({message: 'please enter your password'})    
-        }
-
-        const queryCondition = [];
-        if (email) queryCondition.push({ email: email.toLowerCase() });
-        if (username) queryCondition.push({ username: username.toLowerCase() });
-
+       
         const landlord = await landlordModel.findOne({
-            where: {
-                [Op.or]: queryCondition
-            }
+            where: { email: email.toLowerCase() }
         });
 
-
         if (!landlord) {
-            return res.status(404).json({ message: 'landlord not found' });
+            return res.status(404).json({ message: 'Landlord not found' });
         }
 
+       
         const isPasswordCorrect = await bcrypt.compare(password, landlord.password);
-
         if (!isPasswordCorrect) {
             return res.status(400).json({ message: 'Incorrect password' });
         }
 
+        
         if (!landlord.isVerified) {
             return res.status(400).json({ message: 'Account not verified. Please check your email for the verification link' });
         }
 
+       
+        const token = jwt.sign({ landlordId: landlord.id, isLoggedIn: true },process.env.JWT_SECRET,{ expiresIn: '1d' });
+
+        
         landlord.isLoggedIn = true;
-
-        const token = jwt.sign({ landlordId: landlord.id, isLoggedIn: landlord.isLoggedIn }, process.env.JWT_SECRET, { expiresIn: '1day' });
-
         await landlord.save();
 
-       
+        
         res.status(200).json({ message: 'Login successful', data: landlord, token });
     } catch (error) {
         console.error(error.message);
         res.status(500).json({ message: 'Error logging in landlord', error: error.message });
     }
 };
-
 
 
 

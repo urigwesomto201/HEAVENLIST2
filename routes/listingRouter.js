@@ -1,6 +1,6 @@
 const router  = require('express').Router()
 const { createListing, getAllListings, getOneListingByLandlord,getOneListing, getAllListingsByLandlord,
-    updateListing,deleteListing, searchListing} = require('../controller/listingController')
+    updateListing,deleteListing, searchListing,getClicksbyListing} = require('../controller/listingController')
 const { landlordAuthenticate, adminAuthenticate } = require('../middlewares/authentication')
 
 const upload = require('../utils/multer')
@@ -955,6 +955,97 @@ router.delete('/deleteListing/:landlordId/:listingId',landlordAuthenticate, dele
 router.get('/searchListing', searchListing)
 
 
+/**
+ * @swagger
+ * /api/v1/getClicksbyListing/{listingId}:
+ *   get:
+ *     summary: Get the number of clicks/views for a specific listing
+ *     description: Retrieve the number of times a specific listing has been viewed (clicked).
+ *     tags:
+ *       - Listings
+ *     parameters:
+ *       - name: listingId
+ *         in: path
+ *         required: true
+ *         description: The ID of the listing to retrieve the click count for.
+ *         schema:
+ *           type: string
+ *           example: "64a8e9b7b56c8d001c9a4b2d"
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved the number of clicks for the listing.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Find views by listing below"
+ *                 views:
+ *                   type: integer
+ *                   example: 15
+ *                 listing:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       example: "64a8e9b7b56c8d001c9a4b2d"
+ *                     title:
+ *                       type: string
+ *                       example: "Luxury 3-Bedroom Apartment in Lekki"
+ *                     price:
+ *                       type: number
+ *                       example: 500000
+ *                     description:
+ *                       type: string
+ *                       example: "A beautiful and modern 3-bedroom apartment with ocean views."
+ *                     area:
+ *                       type: string
+ *                       example: "Lekki Phase 1"
+ *                     isClicked:
+ *                       type: integer
+ *                       example: 15
+ *       400:
+ *         description: Bad request, listingId is missing or invalid.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "listingId is required"
+ *       404:
+ *         description: Listing not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Listing not found"
+ *       500:
+ *         description: Internal server error while retrieving the listing clicks.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Error getting clicks by listing"
+ *                 error:
+ *                   type: string
+ *                   example: "Database connection failed"
+ */
+
+
+
+router.get('/getClicksbyListing/:listingId', getClicksbyListing)
+
+
 
 
 
@@ -962,4 +1053,3 @@ router.get('/searchListing', searchListing)
 module.exports = router
 
 
-// upload.array('photos', 12)

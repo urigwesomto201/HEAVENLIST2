@@ -1,8 +1,8 @@
 const adminModel = require('../models/admin')
-const userModel = require('../models/user')
 const tenantModel = require('../models/tenant')
 const listingModel = require('../models/listing')
 const landlordModel = require('../models/landlord')
+const LandlordProfile = require('../models/landlordprofile')
 // const bcrypt  = require('bcryptjs')
 const sendEmail = require('../middlewares/nodemailer')
 const bcrypt  = require('bcrypt')
@@ -17,16 +17,20 @@ totp.options = { digits: 4, step: 300}
 
 exports.registerAdmin = async (req, res) => {
     try {
-        // Validate request body
+        
         const validated = await validate(req.body, registerSchema);
-        const { fullName, email, password, username, confirmPassword } = validated;
+        const { fullName, email, password, confirmPassword } = validated;
+
+        if(!fullName || !email || !password || !confirmPassword) {
+            return res.status(400).json({message:'please input correct fields'})
+        }
 
         if (password !== confirmPassword) {
             return res.status(400).json({ message: 'Passwords do not match' });
         }
 
-        // Check if the admin already exists
         const existingAdmin = await adminModel.findOne({ where: { email: email.toLowerCase() } });
+
         if (existingAdmin) {
             if (existingAdmin.isAdmin) {
                 return res.status(400).json({ message: 'User is already an Admin' });
@@ -38,12 +42,6 @@ exports.registerAdmin = async (req, res) => {
             return res.status(200).json({ message: 'User has been updated to Admin', data: existingAdmin });
         }
 
-        // Check if the username is taken
-        const usernameExists = await adminModel.findOne({ where: { username: username.toLowerCase() } });
-        if (usernameExists) {
-            return res.status(400).json({ message: 'Username has already been taken' });
-        }
-
         // Hash the password before storing
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
@@ -53,13 +51,13 @@ exports.registerAdmin = async (req, res) => {
             fullName,
             email: email.toLowerCase(),
             password: hashedPassword,
-            username: username.toLowerCase(),
             isVerified: true,
             isAdmin: true,
         });
 
         // Send an email to the new admin
         const firstName = newAdmin.fullName.split(' ')[0];
+
         const mailDetails = {
             subject: 'Welcome Admin',
             email: newAdmin.email,
@@ -76,59 +74,53 @@ exports.registerAdmin = async (req, res) => {
     }
 };
 
+
+
 exports.loginAdmin = async (req, res) => {
     try {
-  
-        const validated = await validate(req.body , loginSchema)
+        
+        const validated = await validate(req.body, loginSchema);
+        const { email, password } = validated;
 
-        const {email, password, username} = validated
-
-        if(!email && !username) {
-            return res.status(400).json({message: 'please enter either email or username'})    
+       
+        if (!email) {
+            return res.status(400).json({ message: 'Please enter email' });
         }
 
-        if(email && username) {
-            return res.status(400).json({message: 'please enter either email or username, not both'})
+        if (!password) {
+            return res.status(400).json({ message: 'Please enter your password' });
         }
 
-        if(!password) {
-            return res.status(400).json({message: 'please enter your password'})    
-        }
-
-        const queryCondition = [];
-        if (email) queryCondition.push({ email: email.toLowerCase() });
-        if (username) queryCondition.push({ username: username.toLowerCase() });
-
+    
         const admin = await adminModel.findOne({
-            where: {
-                [Op.or]: queryCondition
-            }
+            where: { email: email.toLowerCase() }
         });
 
-
         if (!admin) {
-            return res.status(404).json({ message: 'admin not found' });
+            return res.status(404).json({ message: 'Admin not found' });
         }
 
+       
         const isPasswordCorrect = await bcrypt.compare(password, admin.password);
-
         if (!isPasswordCorrect) {
             return res.status(400).json({ message: 'Incorrect password' });
         }
 
         admin.isLoggedIn = true;
 
-        const token = jwt.sign({ adminId: admin.id, isLoggedIn: admin.isLoggedIn }, process.env.JWT_SECRET, { expiresIn: '1day' });
-
         await admin.save();
+        
+        const token = jwt.sign({ adminId: admin.id, isLoggedIn: admin.isLoggedIn },process.env.JWT_SECRET,{ expiresIn: '1d' });
+        
 
-       
         res.status(200).json({ message: 'Login successful', data: admin, token });
     } catch (error) {
         console.error(error.message);
         res.status(500).json({ message: 'Error logging in admin', error: error.message });
     }
 };
+
+
 
 exports.adminForgotPassword = async (req, res) => {
     try {
@@ -169,6 +161,8 @@ exports.adminForgotPassword = async (req, res) => {
         res.status(500).json({message: 'error initializing forget password:' , error:error.message})
     }
 }
+
+
 
 exports.adminResetPassword = async (req, res) => {
     try {
@@ -216,6 +210,8 @@ exports.adminResetPassword = async (req, res) => {
        res.status(500).json({message: 'Error resetting password', error: error.message});
     }
 }
+
+
 
 exports.changeAdminPassword = async (req, res) => {
     try {
@@ -268,6 +264,8 @@ exports.changeAdminPassword = async (req, res) => {
     }
 };
 
+
+
 exports.logoutAdmin = async (req, res) => {
     try {
         const { id } = req.admin;
@@ -300,11 +298,19 @@ exports.logoutAdmin = async (req, res) => {
 
 
 
-exports.getAllUser = async (req, res) => {
-    try {
-        const user = await userModel.findAll()
 
-        res.status(200).json({message: 'find all users below', total: user.length, data: user})
+exports.getAllTenants = async (req, res) => {
+    try {
+        const tenants = await tenantModel.findAll({where: {},
+            include: [
+                {
+                    model: tenantModel,
+                    attributes: ['id', 'fullName']
+                }
+            ]
+        })
+
+        res.status(200).json({message: 'find all tenants below', total: tenants.length, data: tenants})
     } catch (error) {
         console.error(error.message)
         res.status(500).json({ message: 'Error getting all users' , error:error.message })
@@ -313,9 +319,42 @@ exports.getAllUser = async (req, res) => {
 
 
 
+exports.getOneTenant = async (req, res) => {
+    try {
+        const { tenantId } = req.params;
+        const tenant = await tenantModel.findOne({ where: { id: tenantId },
+            include: [
+                {
+                    model: tenantModel,
+                    attributes: ['id', 'fullName']
+                }
+            ] 
+        });
+
+        if (!tenant) {
+            return res.status(404).json({ message: 'Tenant not found' });
+        }
+
+        res.status(200).json({ message: 'find tenant by id below', data: tenant });
+    } catch (error) {
+        console.error(error.message)
+        res.status(500).json({ message: 'Error fetching tenant: ' , error:error.message });
+    }
+}
+
+
+
 exports.getAllLandlords = async (req, res) => {
     try {
-        const landlord = await landlordModel.findAll()
+        const landlord = await landlordModel.findAll({where: {
+        }, include: [
+            {
+                model: listingModel,
+                attributes: ['area', 'description', 'category', 'type', 'isVerified', 'isAvailable'], 
+                as: 'listing', 
+            },
+        ],
+        });
 
         res.status(200).json({message: 'find all landlord below', total: landlord.length, data: landlord})
     } catch (error) {
@@ -326,7 +365,116 @@ exports.getAllLandlords = async (req, res) => {
 
 
 
+exports.getOneLandlord = async (req, res) => {
+    try {
+        const { landlordId } = req.params;
+        const landlord = await landlordModel.findOne({ where: { id: landlordId ,
+            id: listingId},
+            include: [
+                {
+                    model: listingModel,
+                    attributes: ['area', 'description', 'category', 'type', 'isVerified', 'isAvailable'], 
+                    as: 'listing', 
+                },
+            ], 
+        });
+
+        if (!landlord) {
+            return res.status(404).json({ message: 'Landlord not found' });
+        }
+
+        res.status(200).json({ message: 'find landlord by id below', data: landlord });
+    } catch (error) {
+        console.error(error.message)
+        res.status(500).json({ message: 'Error fetching landlord: ' , error:error.message });
+    }
+}
+
+
+
+exports.getOneLandlordProfile = async (req, res) => {
+    try {
+        const { landlordProfileId } = req.params;
+        const landlordProfile = await LandlordProfile.findOne({ where: { id: landlordProfileId,
+            id: listingId },
+            include: [
+                {
+                    model: listingModel,
+                    attributes: ['area', 'description', 'category', 'type', 'isVerified', 'isAvailable'], 
+                    as: 'listing', 
+                },
+            ], 
+         });
+
+        if (!landlordProfile) {
+            return res.status(404).json({ message: 'Landlord profile not found' });
+        }
+
+        res.status(200).json({ message: 'find landlord profile by id below', data: landlordProfile });
+    } catch (error) {
+        console.error(error.message)
+        res.status(500).json({ message: 'Error fetching landlord profile: ' , error:error.message });
+    }
+}
+
+
+
+exports.getAllLandlordProfile = async (req, res) => {
+    try {
+        const landlordProfile = await LandlordProfile.findAll( { where: {
+            id: listingId },
+            include: [
+                {
+                    model: listingModel,
+                    attributes: ['area', 'description', 'category', 'type', 'isVerified', 'isAvailable'], 
+                    as: 'listing', 
+                },
+            ],
+    })
+
+        res.status(200).json({message: 'find all landlord profile below', total: landlordProfile.length, data: landlordProfile})
+    } catch (error) {
+        console.error(error.message)
+        res.status(500).json({ message: 'Error getting all landlords' , error:error.message })
+    }
+}
+
+
+
+
+exports.deleteLandlordProfile = async (req, res) => {
+    try {
+        const { landlordProfileId } = req.params;
+        const landlordProfile = await LandlordProfile.findOne({ where: { id: landlordProfileId,
+            id: listingId, isAvailable:true, isVerified:true },
+                include: [
+                    {
+                        model: listingModel,
+                        attributes: ['area', 'description', 'category', 'type', 'isVerified', 'isAvailable'], 
+                        as: 'listing', 
+                    },
+                ],
+          });
+
+        if (!landlordProfile) {
+            return res.status(404).json({ message: 'Landlord profile not found' });
+        }
+
+        await LandlordProfile.destroy({ where: { id: landlordProfileId, id: listingId } });
+
+        res.status(200).json({ message: 'Landlord profile deleted successfully' });
+    } catch (error) {
+        console.error(error.message)
+        res.status(500).json({ message: 'Error deleting landlord profile: ' , error:error.message });
+    }
+}
+
+
+
+
+
 // exports.makeAdmin = async (req, res) => {
+
 //     try {
 //         const { id } = req.params;
 
@@ -362,11 +510,20 @@ exports.getAllLandlords = async (req, res) => {
 
 
 
+
+
 // Get a single admin by ID
 exports.getAdmin = async (req, res) => {
     try {
-        const { id } = req.params;
-        const admin = await userModel.findOne({ where: { id, isAdmin: true } });
+        const { adminId } = req.params;
+        const admin = await adminModel.findOne({ where: { adminId, isAdmin: true },
+            include: [
+                {
+                    model: adminModel,
+                    attributes: ['adminId', 'fullName', 'email'],
+                }
+
+            ]});
 
         if (!admin) {
             return res.status(404).json({ message: 'Admin not found' });
@@ -384,7 +541,7 @@ exports.getAdmin = async (req, res) => {
 // Get all admins
 exports.getAllAdmins = async (req, res) => {
     try {
-        const admins = await userModel.findAll({ where: { isAdmin: true } });
+        const admins = await adminModel.findAll({ where: { isAdmin: true } });
 
         if (admins.length === 0) {
             return res.status(404).json({ message: 'No admins found' });
@@ -401,16 +558,16 @@ exports.getAllAdmins = async (req, res) => {
 // Update an admin
 exports.updateAdmin = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { adminId } = req.params;
         const { name, email } = req.body;
 
-        const admin = await userModel.findOne({ where: { id, isAdmin: true } });
+        const admin = await adminModel.findOne({ where: { adminId, isAdmin: true } });
 
         if (!admin) {
             return res.status(404).json({ message: 'Admin not found' });
         }
 
-        await userModel.update({ name, email }, { where: { id } });
+        await adminModel.update({ name, email }, { where: { adminId } });
 
         res.status(200).json({ message: 'Admin updated successfully' });
     } catch (error) {
@@ -423,15 +580,15 @@ exports.updateAdmin = async (req, res) => {
 // Delete an admin
 exports.deleteAdmin = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { adminId } = req.params;
 
-        const admin = await userModel.findOne({ where: { id, isAdmin: true } });
+        const admin = await adminModel.findOne({ where: { adminId, isAdmin: true } });
 
         if (!admin) {
             return res.status(404).json({ message: 'Admin not found' });
         }
 
-        await userModel.destroy({ where: { id } });
+        await adminModel.destroy({ where: { adminId } });
 
         res.status(200).json({ message: 'Admin deleted successfully' });
     } catch (error) {
@@ -462,7 +619,7 @@ exports.verfiyAlisting = async (req, res) => {
                 {
                     model: landlordModel,
                     attributes: ['id', 'fullName'], 
-                    as: 'landlord', 
+                    as: 'landlords', 
                 },
             ],
         });
@@ -490,6 +647,7 @@ exports.verfiyAlisting = async (req, res) => {
 
 
 
+
 exports.unverifyAlisting = async (req, res) => {
     try {
         const {listingId, landlordId} = req.params
@@ -508,7 +666,7 @@ exports.unverifyAlisting = async (req, res) => {
                 {
                     model: landlordModel,
                     attributes: ['id', 'fullName'], 
-                    as: 'landlord', 
+                    as: 'landlords', 
                 },
             ],
         });

@@ -1,4 +1,4 @@
-const userModel = require('../models/user')
+
 const tenantModel = require('../models/tenant')
 const landlordModel = require('../models/landlord')
 const adminModel = require('../models/admin')
@@ -6,52 +6,52 @@ const jwt = require('jsonwebtoken')
 
 
 
-exports.userAuthenticate = async (req, res, next) => {
-    try {
-        const auth = req.headers.authorization;
-        if (!auth) {
-            return res.status(400).json({
-                message: 'token not found'
-            })
-        }
-        const token = auth.split(' ')[1]
-        if (!token) {
-            return res.status(404).json({
-                message: 'Invalid Token'
-            })
-        }
-        const decodedToken = jwt.verify(token, process.env.JWT_SECRET)
+// exports.userAuthenticate = async (req, res, next) => {
+//     try {
+//         const auth = req.headers.authorization;
+//         if (!auth) {
+//             return res.status(400).json({
+//                 message: 'token not found'
+//             })
+//         }
+//         const token = auth.split(' ')[1]
+//         if (!token) {
+//             return res.status(404).json({
+//                 message: 'Invalid Token'
+//             })
+//         }
+//         const decodedToken = jwt.verify(token, process.env.JWT_SECRET)
 
-        const user = await userModel.findByPk(decodedToken.userId)
+//         const user = await userModel.findByPk(decodedToken.userId)
         
-        if (!user) {
-            return res.status(400).json({
-                message: 'Authentication failed : user not found'
-            })
-        }
+//         if (!user) {
+//             return res.status(400).json({
+//                 message: 'Authentication failed : user not found'
+//             })
+//         }
 
-        if(user.isLoggedIn !== decodedToken.isLoggedIn) {
-            return res.status(401).json({
-              message: "User is not logged in" })
-        }
+//         if(user.isLoggedIn !== decodedToken.isLoggedIn) {
+//             return res.status(401).json({
+//               message: "User is not logged in" })
+//         }
 
 
-        req.user = user
+//         req.user = user
 
-        next()
+//         next()
 
-    } catch (error) {
-        console.log(error.message);
-        if (error instanceof jwt.JsonWebTokenError) {
-            return res.status(400).json({
-                message: 'Session timeout : Please Login To Continue'
-            })
-        }
-        res.status(500).json({
-            message: 'internal server error'
-        })
-    }
-}
+//     } catch (error) {
+//         console.log(error.message);
+//         if (error instanceof jwt.JsonWebTokenError) {
+//             return res.status(400).json({
+//                 message: 'Session timeout : Please Login To Continue'
+//             })
+//         }
+//         res.status(500).json({
+//             message: 'internal server error'
+//         })
+//     }
+// }
 
 
 

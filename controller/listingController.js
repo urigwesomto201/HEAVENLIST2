@@ -10,14 +10,11 @@ const fs = require('fs')
 exports.createListing = async (req, res) => {
     try {
         const { landlordId } = req.params
-        const { location, title, category, bedrooms,bathrooms,price,
-            size,locality,area,type,description, minrent, maxrent
+        const { title, type, bedrooms,bathrooms,price,toilets,
+            state,area,description, minrent, maxrent, street
          } = req.body
 
-        if(!location || !title || !category || !bedrooms || !bathrooms || !price
-            || !size || !locality || !area || !type || !description) {
-            return res.status(400).json({message:'please input correct fields'})
-        }
+
 
         if(!landlordId) {
             return res.status(400).json({message: 'landlordId is required'})
@@ -36,19 +33,18 @@ exports.createListing = async (req, res) => {
         const result = await cloudinary.uploader.upload(req.files[0].path)
 
         const newListing = await listingModel.create({
-            location,
             title, 
-            category, 
+            type, 
             bedrooms,
             bathrooms,
             price,
-            size,
-            locality,
+            toilets,
+            state,
             area,
-            type,
-            minrent,
-            maxrent,
-            description,
+            description, 
+            minrent, 
+            maxrent, 
+            street,
             listingImage: {
                 imageUrl: result.secure_url,
                 publicId: result.public_id
@@ -56,6 +52,8 @@ exports.createListing = async (req, res) => {
             landlordId: landlordId,
             isVerified: false,
             isAvailable: false,
+            isClicked: 0,
+            
             
         })
 
@@ -80,7 +78,7 @@ exports.getAllListings = async (req, res) => {
                 {
                 model: landlordModel,
                 attributes: ['id', 'fullName'], 
-                as: 'landlord', 
+                as: 'landlords', 
                 },
             ],
         });
@@ -115,7 +113,7 @@ exports.getOneListingByLandlord= async (req, res) => {
                 {
                     model: landlordModel,
                     attributes: ['id', 'fullName'], 
-                    as: 'landlord', 
+                    as: 'landlords', 
                 },
             ],
         });
@@ -149,14 +147,19 @@ exports.getOneListing = async (req, res) => {
                 {
                     model: landlordModel,
                     attributes: ['id', 'fullName'], 
-                    as: 'landlord', 
+                    as: 'landlords', 
                 },
             ],
         });
 
+        
+
         if (!listing) {
             return res.status(404).json({ message: 'Listing not found' });
         }
+
+        listing.isClicked += 1
+        await listing.save()
 
         res.status(200).json({message: 'find listing by id below', data: listing})
         
@@ -182,7 +185,7 @@ exports.getAllListingsByLandlord = async (req, res) => {
                 {
                 model: landlordModel,
                 attributes: ['id', 'fullName'], 
-                 as: 'landlord', 
+                 as: 'landlords', 
                 },
             ],
         });
@@ -244,20 +247,19 @@ exports.updateListing = async (req, res) => {
 
         await listingModel.update(
             {
-                location,
-                title, 
-                category, 
-                bedrooms,
-                bathrooms,
-                price,
-                size,
-                locality,
-                area,
-                type,
-                minrent,
-                maxrent,
-                description,
-                listingImage: updatedImage,
+            title, 
+            type, 
+            bedrooms,
+            bathrooms,
+            price,
+            toilets,
+            state,
+            area,
+            description, 
+            minrent, 
+            maxrent, 
+            street,
+            listingImage: updatedImage,
             },
             { where: { id: listingId, landlordId } } 
         );
@@ -268,7 +270,7 @@ exports.updateListing = async (req, res) => {
             {
             model: landlordModel,
             attributes: ['id', 'fullName'], 
-             as: 'landlord', 
+             as: 'landlords', 
             },
         ],
     });
@@ -303,7 +305,7 @@ exports.deleteListing = async (req, res) => {
                 {
                 model: landlordModel,
                 attributes: ['id', 'fullName'], 
-                 as: 'landlord', 
+                 as: 'landlords', 
                 },
             ],
         });
@@ -337,10 +339,10 @@ exports.deleteListing = async (req, res) => {
 
 exports.searchListing = async (req, res) => {
     try {
-        const { locality, type, bedrooms, minrent, maxrent } = req.body;
+        const { area, type, bedrooms, minrent, maxrent } = req.body;
 
         const queryCondition = {};
-        if (locality) queryCondition.locality = locality.toLowerCase();
+        if (area) queryCondition.area = area.toLowerCase();
         if (type) queryCondition.type = type;
         if (bedrooms) queryCondition.bedrooms = bedrooms;
         if (minrent) queryCondition.minrent = minrent
@@ -356,7 +358,7 @@ exports.searchListing = async (req, res) => {
                 {
                     model: landlordModel, 
                     attributes: ['id', 'fullName'], 
-                    as: 'landlord', 
+                    as: 'landlords', 
                 },
             ],
         });
@@ -371,3 +373,29 @@ exports.searchListing = async (req, res) => {
         res.status(500).json({ message: 'Error getting listings by criteria', error: error.message });
     }
 };
+
+
+
+exports.getClicksbyListing = async (req, res) => {
+    try {
+        const { listingId } = req.params
+
+        if(!listingId) {
+            return res.status(400).json({message: 'listingId is required'})
+        }
+
+        const listing = await listingModel.findOne({ where: { id : listingId, isAvailable:true, isVerified:true },
+            attributes: ['id', 'title', 'price', 'description', 'area', 'isClicked']
+        });
+
+        if (!listing) {
+            return res.status(404).json({ message: 'Listing not found' });
+        } 
+
+        res.status(200).json({message: 'find views by listing below', views: listing.isClicked , listing})
+        
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ message: 'Error getting clicks by listing', error: error.message });
+    }
+}

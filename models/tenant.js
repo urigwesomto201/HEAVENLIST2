@@ -21,10 +21,6 @@ Tenant.init(
       type: DataTypes.STRING,
       allowNull: false
     },
-    username: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
     password: {
       type: DataTypes.STRING,
       allowNull: false
@@ -40,11 +36,7 @@ Tenant.init(
     isAdmin: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
-    },
-    isSuperAdmin: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
-    },
+    }
     
   },
   {

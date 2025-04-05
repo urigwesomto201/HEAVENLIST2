@@ -16,9 +16,9 @@ exports.registerTenant = async (req, res) => {
     try {
         const validated = await validate(req.body , registerSchema)
         
-        const {fullName, email, password, username, confirmPassword} = validated
+        const {fullName, email, password, confirmPassword} = validated
 
-        if(!fullName || !email || !password || !username || !confirmPassword) {
+        if(!fullName || !email || !password || !confirmPassword) {
             return res.status(400).json({message:'please input correct fields'})
         }
 
@@ -33,25 +33,17 @@ exports.registerTenant = async (req, res) => {
         }
 
 
-        const usernameExists = await tenantModel.findOne({where:{ username: username.toLowerCase()}})
-
-        if(usernameExists) {
-            return res.status(400).json({message: 'username has been taken'})
-        }
-
         const salt = await bcrypt.genSalt(10)
         const hashedPassword = await bcrypt.hash(password, salt)
 
-     
 
         const newTenant = await tenantModel.create({
             fullName,
             email,
             password: hashedPassword,
-            username
+            
              
         })
-
 
         const token = await jwt.sign({ tenantId: newTenant.id}, process.env.JWT_SECRET, { expiresIn: '2day'})
 
@@ -162,36 +154,25 @@ exports.resendTenantVerificationEmail = async (req, res) => {
 
 exports.loginTenant = async (req, res) => {
     try {
-  
-        const validated = await validate(req.body , loginSchema)
+        const validated = await validate(req.body, loginSchema);
 
-        const {email, password, username} = validated
+        const { email, password } = validated;
 
-        if(!email && !username) {
-            return res.status(400).json({message: 'please enter either email or username'})    
+        if (!email) {
+            return res.status(400).json({ message: 'Please enter email' });
         }
 
-        if(email && username) {
-            return res.status(400).json({message: 'please enter either email or username, not both'})
+        if (!password) {
+            return res.status(400).json({ message: 'Please enter your password' });
         }
 
-        if(!password) {
-            return res.status(400).json({message: 'please enter your password'})    
-        }
-
-        const queryCondition = [];
-        if (email) queryCondition.push({ email: email.toLowerCase() });
-        if (username) queryCondition.push({ username : username.toLowerCase() });
-
+        
         const tenant = await tenantModel.findOne({
-            where: {
-                [Op.or]: queryCondition
-            }
+            where: { email: email.toLowerCase() }
         });
 
-
         if (!tenant) {
-            return res.status(404).json({ message: 'tenant not found' });
+            return res.status(404).json({ message: 'Tenant not found' });
         }
 
         const isPasswordCorrect = await bcrypt.compare(password, tenant.password);
@@ -204,20 +185,18 @@ exports.loginTenant = async (req, res) => {
             return res.status(400).json({ message: 'Account not verified. Please check your email for the verification link' });
         }
 
+        
+        const token = jwt.sign({ tenantId: tenant.id, isLoggedIn: true }, process.env.JWT_SECRET,{ expiresIn: '2d' });
+        
         tenant.isLoggedIn = true;
-
-        const token = jwt.sign({ tenantId: tenant.id, isLoggedIn: tenant.isLoggedIn }, process.env.JWT_SECRET, { expiresIn: '2day' });
-
         await tenant.save();
 
-       
         res.status(200).json({ message: 'Login successful', data: tenant, token });
     } catch (error) {
         console.error(error.message);
         res.status(500).json({ message: 'Error logging in tenant', error: error.message });
     }
 };
-
 
 
 
@@ -241,7 +220,7 @@ exports.TenantForgotPassword = async (req, res) => {
         const secret = process.env.OTP_SECRET + email; 
         const otp = totp.generate(secret);
 
-        // const link = `${req.protocol}://${req.get('host')}/api/v1/reset-tenantpassword/${otp}`
+    
 
         const firstName = tenant.fullName.split(' ')[0]
 
@@ -279,7 +258,7 @@ exports.TenantResetPassword = async (req, res) => {
             return res.status(400).json({ message: 'Passwords do not match' });
         }
 
-        const secret = process.env.OTP_SECRET + email; 
+        const secret = `${process.env.OTP_SECRET}${email.toLowerCase()}`;
         const isValidOTP = totp.check(otp, secret);
   
         if (!isValidOTP) {

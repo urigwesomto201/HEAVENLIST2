@@ -7,18 +7,13 @@ module.exports = {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.UUID
+        
       },
       fullName: {
         type: Sequelize.STRING,
         allowNull: false
       },
       email: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        lowercase: true
-
-      },
-      username: {
         type: Sequelize.STRING,
         allowNull: false,
         lowercase: true
@@ -36,10 +31,6 @@ module.exports = {
         defaultValue: false
       },
       isAdmin: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false
-      },
-      isSuperAdmin: {
         type: Sequelize.BOOLEAN,
         defaultValue: false
       },

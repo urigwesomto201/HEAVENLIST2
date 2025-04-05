@@ -1,6 +1,8 @@
 const { Sequelize, DataTypes, Model } = require('sequelize'); // Ensure Sequelize and DataTypes are imported
 const sequelize = require('../database/sequelize'); // Import the sequelize instance
 const Landlord = require('./landlord'); // Import the Landlord model
+const LandlordProfile = require('./landlordprofile'); // Import 
+
 
 class Listing extends Model {}
 
@@ -13,43 +15,42 @@ Listing.init(
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4
     },
-    location: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
     title: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    category: {
-      type: DataTypes.ENUM('Houses', 'Apartments'),
-      allowNull: false
+    type: {
+      type: DataTypes.ENUM('Houses', 'Apartments')
+  
     },
     bedrooms: {
-      type: DataTypes.ENUM('1', '2', '3', '4', '5', '6', '7', '8', '9', '10+'),
-      allowNull: false
+      type: DataTypes.ENUM('1', '2', '3', '4', '5+')
+    
     },
     bathrooms: {
-      type: DataTypes.ENUM('1', '2', '3', '4', '5', '6', '7', '8', '9', '10+'),
-      allowNull: false
+      type: DataTypes.ENUM('1', '2', '3', '4', '5+')
+      
+    },
+    toilets: {
+      type: DataTypes.ENUM('1', '2', '3', '4', '5+')
+      
     },
     minrent: {
-      type: DataTypes.ENUM('500000','600000','700000','800000','900000','1000000'),
-      allowNull: false
+      type: DataTypes.ENUM('500000','600000','700000','800000','900000','1000000')
+    
     },
     maxrent: {
-      type: DataTypes.ENUM('1000000','2000000','3000000','4000000','5000000'),
-      allowNull: false
+      type: DataTypes.ENUM('1000000','2000000','3000000','4000000','5000000')
+      
+    },
+    state: {
+      type: DataTypes.ENUM('Lagos')
     },
     price: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    size: {
-      type: DataTypes.DECIMAL,
-      allowNull: false
-    },
-    locality: {
+    area: {
       type: DataTypes.ENUM(
         'Agege', 'Ajeromi-Ifelodun', 'Alimosho', 'Amuwo Odofin',
         'Apapa', 'Badagry', 'Epe', 'Eti-Osa', 'Ibeju Lekki', 'Ikeja', 'Ikorodu',
@@ -57,13 +58,13 @@ Listing.init(
       ),
       allowNull: false
     },
-    area: {
+    street: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    type: {
-      type: DataTypes.STRING,
-      allowNull: false
+    isClicked: {
+      type: DataTypes.INTEGER, 
+      defaultValue: 0
     },
     description: {
       type: DataTypes.STRING,
@@ -78,7 +79,7 @@ Listing.init(
       defaultValue: false
     },
     listingImage: {
-      type: DataTypes.JSON, // JSON can store arrays of objects
+      type: DataTypes.TEXT('long'), // JSON can store arrays of objects
       allowNull: false,
       defaultValue: [] // Default to an empty array
     },
@@ -86,8 +87,8 @@ Listing.init(
       type: DataTypes.UUID,
       allowNull: false,
       references: {
-        model: Landlord, // Reference the Landlord model directly
-        key: 'id' // Ensure this matches the primary key in the Landlord model
+        model: 'Landlords',
+        key: 'id'
       },
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE'

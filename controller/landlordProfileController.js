@@ -1,6 +1,6 @@
 const adminModel = require('../models/admin')
-const userModel = require('../models/user')
 const tenantModel = require('../models/tenant')
+const LandlordProfile = require('../models/landlordprofile')
 const bcrypt  = require('bcrypt')
 const fs = require('fs');
 const listingModel = require('../models/listing')
@@ -13,20 +13,19 @@ const cloudinary = require('../database/cloudinary')
 exports.createLandlordProfile = async (req, res) => {
     try {
         const { landlordId } = req.params;
-        const { firstName, lastName, email, state, street, locality, confirmPassword, Password } = req.body;
+        const { fullName, email, state, street, locality} = req.body;
+
         console.log("ID", landlordId);
 
-        if (!firstName || !lastName || !email || !state || !street || !locality || !confirmPassword || !Password) {
+        if (!fullName || !email || !state || !street || !locality) {
             return res.status(400).json({ message: 'Please input correct fields' });
         }
-        if (Password !== confirmPassword) {
-            return res.status(400).json({ message: 'Passwords do not match' });
-        }
+
         if (!landlordId) {
             return res.status(400).json({ message: 'Landlord ID is required' });
         }
 
-        const existingLandlord = await landlordModel.findOne({ where: { id: landlordId } });
+        const existingLandlord = await LandlordProfile.findOne({ where: { id: landlordId } });
 
         if (existingLandlord) {
             if (req.file && fs.existsSync(req.file.path)) {
@@ -60,21 +59,20 @@ exports.createLandlordProfile = async (req, res) => {
             }
         }
 
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(Password, salt);
-
-        const newProfile = await landlordModel.create({
+        const newProfile = await LandlordProfile.create({
             id: landlordId,
-            firstName,
-            lastName,
+            fullName,
             email,
             state,
             landlordId,
             street,
-            Password: hashedPassword,
             locality,
             profileImage: result.secure_url
         });
+
+        newProfile.isVerified = true; 
+
+        await newProfile.save()
 
         res.status(201).json({ message: 'Landlord profile created successfully', data: newProfile });
 
@@ -94,6 +92,8 @@ exports.createLandlordProfile = async (req, res) => {
 };
 
 
+
+
 // GET one Landlord Profile
 exports.getOneLandlordProfile = async (req, res) => {
     try {
@@ -104,7 +104,14 @@ exports.getOneLandlordProfile = async (req, res) => {
         }
 
         // Find the landlord profile by the landlordId
-        const landlordProfile = await landlordModel.findOne({ where: { id: landlordId } });
+        const landlordProfile = await LandlordProfile.findOne({ where: { id: landlordId },
+            include:[{
+                model:listingModel,
+                attributes:['title','price','description','locality'],
+                as:'Listings'
+           
+             }] 
+        });
 
         // If the landlord profile doesn't exist, return an error
         if (!landlordProfile) {
@@ -120,15 +127,26 @@ exports.getOneLandlordProfile = async (req, res) => {
     }
 };
 
+
+
 exports.getLandlordProfile = async (req, res) => {
     try {
 
 
-       const landlords = await landlordModel.findAll();
+       const landlords = await LandlordProfile.findAll({where:{isVerified:true}, 
+        include:[{
+             model:listingModel,
+             attributes:['title','price','description','locality'],
+             as:'Listings'
+        
+          }]
+        });
+
         if (landlords.length === 0){
             return res.status(4004).json({message:"no landlordsProfile found"})
         }
-  res.status(200).json({message:'landlords fetched successfully',
+
+  res.status(200).json({message:'landlords fetched successfully',  total: landlords.length, 
     data:landlords
   })
     } catch (error) {
@@ -137,32 +155,25 @@ exports.getLandlordProfile = async (req, res) => {
     }
 };
 
+
+
 // UPDATE
 
 exports.updateLandlordProfile = async (req, res) => {
     try {
         const { landlordId } = req.params;
-        const { firstName, lastName, email, state, street, locality, confirmPassword, Password } = req.body;
+        const { fullName, email, state, street, locality } = req.body;
 
         if (!landlordId) {
             return res.status(400).json({ message: 'Landlord ID is required' });
         }
 
-        const existingLandlord = await landlordModel.findOne({ where: { id: landlordId } });
+        const existingLandlord = await LandlordProfile.findOne({ where: { id: landlordId } });
 
         if (!existingLandlord) {
             return res.status(404).json({ message: 'Landlord profile not found' });
         }
 
-        if (Password && Password !== confirmPassword) {
-            return res.status(400).json({ message: 'Passwords do not match' });
-        }
-
-        if (Password) {
-            const salt = await bcrypt.genSalt(10);
-            const hashedPassword = await bcrypt.hash(Password, salt);
-            existingLandlord.Password = hashedPassword;
-        }
 
         let updatedImage = existingLandlord.profileImage;
 
@@ -173,8 +184,6 @@ exports.updateLandlordProfile = async (req, res) => {
                 await cloudinary.uploader.destroy(existingLandlord.profileImage.publicId);
             }
 
-           
-            
             
         }
          // Upload the new image to Cloudinary
@@ -182,18 +191,26 @@ exports.updateLandlordProfile = async (req, res) => {
 
         // Update the landlord profile
         await existingLandlord.update({
-            firstName,
-            lastName,
+            fullName,
             email,
             state,
             street,
             locality,
             profileImage: result.secure_url
+
         });
+
+        existingLandlord.isVerified = true;
 
         // Fetch the updated landlord profile
         const updatedLandlord = await landlordModel.findOne({
             where: { id: landlordId },
+            include:[{
+                model:listingModel,
+                attributes:['title','price','description','locality'],
+                as:'Listings'
+           
+             }]
         });
 
         res.status(200).json({ message: 'Landlord profile updated successfully', data: updatedLandlord });
@@ -210,6 +227,7 @@ exports.updateLandlordProfile = async (req, res) => {
         res.status(500).json({ message: 'Error updating landlord profile', error: error.message });
     }
 };
+
 
 
 exports.deleteLandlordProfile = async (req, res) => {

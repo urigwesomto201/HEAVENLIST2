@@ -6,26 +6,15 @@ module.exports = {
       id: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.UUID, // Changed to UUID
-        defaultValue: Sequelize.UUIDV4 // Added default value for UUID
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4 // Changed to UUID
+        
       },
-      firstName: {
-        type: Sequelize.STRING,
-        allowNull: false // Added to match the model
-      },
-      lastName: {
+      fullName: {
         type: Sequelize.STRING,
         allowNull: false // Added to match the model
       },
       email: {
-        type: Sequelize.STRING,
-        allowNull: false // Added to match the model
-      },
-      state: {
-        type: Sequelize.STRING,
-        allowNull: false // Added to match the model
-      },
-      Password: {
         type: Sequelize.STRING,
         allowNull: false // Added to match the model
       },
@@ -37,9 +26,13 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false // Added to match the model
       },
-      profileImage: {
+      state: {
         type: Sequelize.STRING,
         allowNull: false // Added to match the model
+      },
+      profileImage: {
+        type: Sequelize.STRING
+         // Added to match the model
       },
       isVerified: {
         type: Sequelize.BOOLEAN, // Changed to BOOLEAN to match the model

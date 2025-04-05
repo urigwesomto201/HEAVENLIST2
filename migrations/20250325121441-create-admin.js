@@ -17,11 +17,6 @@ module.exports = {
         allowNull: false,
         lowercase: true
       },
-      username: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        lowercase: true
-      },
       password: {
         type: Sequelize.STRING,
         allowNull: false
@@ -37,10 +32,6 @@ module.exports = {
       isAdmin: {
         type: Sequelize.BOOLEAN,
         defaultValue: true
-      },
-      isSuperAdmin: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false
       },
       createdAt: {
         allowNull: false,

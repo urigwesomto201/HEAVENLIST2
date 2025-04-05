@@ -1,48 +1,223 @@
 const router = require('express').Router();
 
 const {registerAdmin, loginAdmin, adminForgotPassword, adminResetPassword,changeAdminPassword, logoutAdmin,
-     getAdmin, getAllAdmins, updateAdmin, deleteAdmin, getAllUser,
-    getAllLandlords, verfiyAlisting, unverifyAlisting
+     getAdmin, getAllAdmins, deleteAdmin, getAllTenants,
+    getAllLandlords, verfiyAlisting, unverifyAlisting,
+    getOneTenant, getOneLandlord, getOneLandlordProfile, getAllLandlordProfile,deleteLandlordProfile
 } = require('../controller/adminController')
 const { adminAuthenticate } = require('../middlewares/authentication')
 
 
 
-// router.post('/registeradmin', registerAdmin)
+/**
+ * @swagger
+ * /api/v1/registeradmin:
+ *   post:
+ *     tags:
+ *       - Admin
+ *     summary: Register a new admin
+ *     description: Create a new admin account with the provided details.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               fullName:
+ *                 type: string
+ *                 example: John Doe
+ *               email:
+ *                 type: string
+ *                 example: admin@example.com
+ *               password:
+ *                 type: string
+ *                 example: StrongPassword123
+ *     responses:
+ *       201:
+ *         description: Admin registered successfully
+ *       400:
+ *         description: Bad request due to invalid input
+ *       500:
+ *         description: Internal server error
+ */
 
 
-// router.post('/loginAdmin', loginAdmin)
-
-
-// router.post('/adminForgotPassword', adminForgotPassword)
-
-
-
-// router.post('/reset-adminpassword/:token', adminResetPassword)
-
-
-
-// router.post('/changeAdminPassword',adminAuthenticate, changeAdminPassword)
+router.post('/registeradmin', registerAdmin)
 
 
 
 /**
  * @swagger
- * /api/v1/getAllUser:
- *   get:
+ * /api/v1/loginAdmin:
+ *   post:
  *     tags:
  *       - Admin
- *     security: [] # No authentication required
- *     summary: Get all users
- *     description: Retrieve a list of all users
+ *     summary: Admin login
+ *     description: Authenticate an admin with email and password.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: admin@example.com
+ *               password:
+ *                 type: string
+ *                 example: StrongPassword123
  *     responses:
  *       200:
- *         description: List of users retrieved successfully
+ *         description: Admin logged in successfully
+ *       401:
+ *         description: Invalid credentials
+ *       500:
+ *         description: Internal server error
+ */
+router.post('/loginAdmin', loginAdmin)
+
+
+/**
+ * @swagger
+ * /api/v1/adminForgotPassword:
+ *   post:
+ *     tags:
+ *       - Admin
+ *     summary: Forgot password
+ *     description: Send a password reset link to the admin's email.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: admin@example.com
+ *     responses:
+ *       200:
+ *         description: Password reset link sent successfully
+ *       404:
+ *         description: Admin not found
  *       500:
  *         description: Internal server error
  */
 
-router.get('/getAllUser', getAllUser)
+router.post('/adminForgotPassword', adminForgotPassword)
+
+/**
+ * @swagger
+ * /api/v1/reset-adminpassword:
+ *   post:
+ *     tags:
+ *       - Admin
+ *     summary: Reset admin password
+ *     description: Reset the admin's password using a valid token.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               token:
+ *                 type: string
+ *                 example: resetToken123
+ *               newPassword:
+ *                 type: string
+ *                 example: NewStrongPassword123
+ *     responses:
+ *       200:
+ *         description: Password reset successfully
+ *       400:
+ *         description: Invalid token or input
+ *       500:
+ *         description: Internal server error
+ */
+
+router.post('/reset-adminpassword', adminResetPassword)
+
+/**
+ * @swagger
+ * /api/v1/changeAdminPassword:
+ *   post:
+ *     tags:
+ *       - Admin
+ *     summary: Change admin password
+ *     description: Change the admin's password after authentication.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               oldPassword:
+ *                 type: string
+ *                 example: OldPassword123
+ *               newPassword:
+ *                 type: string
+ *                 example: NewStrongPassword123
+ *     responses:
+ *       200:
+ *         description: Password changed successfully
+ *       401:
+ *         description: Unauthorized or invalid old password
+ *       500:
+ *         description: Internal server error
+ */
+
+router.post('/changeAdminPassword',adminAuthenticate, changeAdminPassword)
+
+
+
+/**
+ * @swagger
+ * /api/v1/getAllTenants:
+ *   get:
+ *     tags:
+ *       - Admin
+ *     summary: Get all tenants
+ *     description: Retrieve a list of all tenants.
+ *     responses:
+ *       200:
+ *         description: List of tenants retrieved successfully
+ *       500:
+ *         description: Internal server error
+ */
+
+router.get('/getAllTenants', getAllTenants)
+
+/**
+ * @swagger
+ * /api/v1/getOneTenant/{tenantId}:
+ *   get:
+ *     tags:
+ *       - Admin
+ *     summary: Get a single tenant
+ *     description: Retrieve details of a specific tenant by ID.
+ *     parameters:
+ *       - in: path
+ *         name: tenantId
+ *         required: true
+ *         description: ID of the tenant to retrieve
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Tenant details retrieved successfully
+ *       404:
+ *         description: Tenant not found
+ *       500:
+ *         description: Internal server error
+ */
+
+router.get('/getOneTenant/:tenantId', getOneTenant)
+
+
 
 /**
  * @swagger
@@ -62,31 +237,115 @@ router.get('/getAllUser', getAllUser)
 
 router.get('/getAllLandlords', getAllLandlords)
 
+
 /**
  * @swagger
- * /admin/makeAdmin/{id}:
- *   put:
+ * /api/v1/getOneLandlord/{landlordId}:
+ *   get:
  *     tags:
  *       - Admin
- *     summary: Make a user an admin
- *     description: Grant admin privileges to a user
+ *     summary: Get one landlord
+ *     description: Retrieve details of a specific landlord by ID
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: landlordId
  *         required: true
- *         description: ID of the user to make an admin
- *         type: string
+ *         description: ID of the landlord to retrieve
+ *         schema:
+ *           type: string
  *     responses:
  *       200:
- *         description: User successfully made an admin
+ *         description: Landlord details retrieved successfully
  *       404:
- *         description: User not found
+ *         description: Landlord not found
  *       500:
  *         description: Internal server error
  */
 
 
-// router.put('/makeAdmin/:id', adminAuthenticate,makeAdmin);
+router.get('/getOneLandlord/:landlordId', getOneLandlord)
+
+/**
+ * @swagger
+ * /api/v1/getOneLandlordProfile/{landlordProfileId}:
+ *   get:
+ *     tags:
+ *       - Admin
+ *     summary: Get one landlord profile
+ *     description: Retrieve details of a specific landlord profile by ID
+ *     parameters:
+ *       - in: path
+ *         name: landlordProfileId
+ *         required: true
+ *         description: ID of the landlord profile to retrieve
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Landlord profile details retrieved successfully
+ *       404:
+ *         description: Landlord profile not found
+ *       500:
+ *         description: Internal server error
+ */
+
+
+router.get('/getOneLandlordProfile/:landlordProfileId', getOneLandlordProfile)
+
+
+/**
+ * @swagger
+ * /api/v1/getAllLandlordProfile:
+ *   get:
+ *     tags:
+ *       - Admin
+ *     summary: Get all landlord profiles
+ *     description: Retrieve a list of all landlord profiles
+ *     responses:
+ *       200:
+ *         description: List of landlord profiles retrieved successfully
+ *       500:
+ *         description: Internal server error
+ */
+
+router.get('/getAllLandlordProfile', getAllLandlordProfile)
+
+
+
+
+/**
+ * @swagger
+ * /api/v1/deleteLandlordProfile/{landlordProfileId}:
+ *   delete:
+ *     tags:
+ *       - Admin
+ *     summary: Delete a landlord profile
+ *     description: Delete a specific landlord profile by ID
+ *     parameters:
+ *       - in: path
+ *         name: landlordProfileId
+ *         required: true
+ *         description: ID of the landlord profile to delete
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Landlord profile deleted successfully
+ *       404:
+ *         description: Landlord profile not found
+ *       500:
+ *         description: Internal server error
+ */
+
+router.delete('/deleteLandlordProfile/:landlordProfileId', deleteLandlordProfile)
+
+
+
+
+
+
+
+
 /**
  * @swagger
  * /api/v1/getadmin/{id}:
@@ -112,6 +371,8 @@ router.get('/getAllLandlords', getAllLandlords)
 
 router.get('/getadmin/:id',adminAuthenticate, getAdmin); 
 
+
+
 /**
  * @swagger
  * /api/v1/getAllAdmins:
@@ -129,59 +390,6 @@ router.get('/getadmin/:id',adminAuthenticate, getAdmin);
 
 router.get('/getAllAdmins',adminAuthenticate, getAllAdmins); 
 
-/**
- * @swagger
- * /api/v1/admin/{id}:
- *   put:
- *     tags:
- *       - Admin
- *     summary: Update admin details
- *     description: Update the details of a specific admin
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: ID of the admin to update
- *         type: string
- *       - in: body
- *         name: body
- *         description: Admin details to update
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             fullName:
- *               type: string
- *             email:
- *               type: string
- *     responses:
- *       200:
- *         description: Admin details updated successfully
- *       404:
- *         description: Admin not found
- *       500:
- *         description: Internal server error
- *   delete:
- *     tags:
- *       - Admin
- *     summary: Delete an admin
- *     description: Delete a specific admin by ID
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: ID of the admin to delete
- *         type: string
- *     responses:
- *       200:
- *         description: Admin deleted successfully
- *       404:
- *         description: Admin not found
- *       500:
- *         description: Internal server error
- */
-
-router.put('/admin/:id',adminAuthenticate, updateAdmin); 
 
 /**
  * @swagger
@@ -323,7 +531,7 @@ router.delete('/admin/:id',adminAuthenticate, deleteAdmin);
  *                   type: string
  *                   example: "Error verifying a listing."
  */
-router.put('/verfiyAlisting/:landlordId/:listingId',adminAuthenticate, verfiyAlisting);
+router.put('/verfiyAlisting/:landlordId/:listingId', verfiyAlisting);
 
 /**
  * @swagger
