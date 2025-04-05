@@ -539,10 +539,10 @@ router.put('/verfiyAlisting/:landlordId/:listingId', verfiyAlisting);
  * @swagger
  * /api/v1/unverifyAlisting/{landlordId}/{listingId}:
  *   put:
- *     summary: Unverify a listing
- *     description: This endpoint allows a landlord to unverify a listing by setting `isVerified` and `isAvailable` to false.
  *     tags:
  *       - Admin
+ *     summary: Unverify a listing
+ *     description: This endpoint allows a landlord to unverify a listing by setting `isVerified` and `isAvailable` to false.
  *     parameters:
  *       - in: path
  *         name: landlordId
