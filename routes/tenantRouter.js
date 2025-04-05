@@ -273,7 +273,7 @@ router.post('/TenantForgotPassword', TenantForgotPassword)
 
 /**
  * @swagger
- * /api/v1/reset-tenantpassword/{token}:
+ * /api/v1/reset-tenantpassword:
  *   post:
  *     tags:
  *       - tenant
