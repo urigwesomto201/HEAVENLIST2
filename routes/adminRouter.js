@@ -1,7 +1,7 @@
 const router = require('express').Router();
 
 const {registerAdmin, loginAdmin, adminForgotPassword, adminResetPassword,changeAdminPassword, logoutAdmin,
-     getAdmin, getAllAdmins, deleteAdmin, getAllTenants,
+    getAdmin, getAllAdmins, deleteAdmin, getAllTenants, verifyAdminEmail,
     getAllLandlords, verfiyAlisting, unverifyAlisting,
     getOneTenant, getOneLandlord, getOneLandlordProfile, getAllLandlordProfile,deleteLandlordProfile
 } = require('../controller/adminController')
@@ -44,6 +44,35 @@ const { adminAuthenticate } = require('../middlewares/authentication')
 
 
 router.post('/registeradmin', registerAdmin)
+
+
+
+/**
+ * @swagger
+ * /api/v1/admin-verify/{token}:
+ *   get:
+ *     tags:
+ *       - Admin
+ *     summary: Verify admin email
+ *     description: Verify the admin's email using a token.
+ *     parameters:
+ *       - in: path
+ *         name: token
+ *         required: true
+ *         description: The verification token sent to the admin's email.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Admin verified successfully
+ *       400:
+ *         description: Invalid or missing token
+ *       500:
+ *         description: Internal server error
+ */
+
+
+router.get('/admin-verify/:token', verifyAdminEmail)
 
 
 
@@ -108,9 +137,10 @@ router.post('/loginAdmin', loginAdmin)
 
 router.post('/adminForgotPassword', adminForgotPassword)
 
+
 /**
  * @swagger
- * /api/v1/reset-adminpassword:
+ * /api/v1/adminResetPassword:
  *   post:
  *     tags:
  *       - Admin
@@ -138,7 +168,7 @@ router.post('/adminForgotPassword', adminForgotPassword)
  *         description: Internal server error
  */
 
-router.post('/reset-adminpassword', adminResetPassword)
+router.post('/adminResetPassword', adminResetPassword)
 
 /**
  * @swagger
@@ -176,6 +206,54 @@ router.post('/changeAdminPassword',adminAuthenticate, changeAdminPassword)
 
 /**
  * @swagger
+ * /api/v1/logoutAdmin:
+ *   post:
+ *     tags:
+ *       - Admin
+ *     summary: Logout admin
+ *     description: Logs out the currently authenticated admin by invalidating their session or token.
+ *     security:
+ *       - bearerAuth: [] # Requires authentication
+ *     responses:
+ *       200:
+ *         description: Admin logged out successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Admin logged out successfully"
+ *       401:
+ *         description: Unauthorized, admin is not authenticated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Unauthorized"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Error logging out admin"
+ */
+
+
+router.post('/logoutAdmin',adminAuthenticate, logoutAdmin)
+
+
+
+/**
+ * @swagger
  * /api/v1/getAllTenants:
  *   get:
  *     tags:
@@ -189,7 +267,8 @@ router.post('/changeAdminPassword',adminAuthenticate, changeAdminPassword)
  *         description: Internal server error
  */
 
-router.get('/getAllTenants', getAllTenants)
+router.get('/getAllTenants',adminAuthenticate, getAllTenants)
+
 
 /**
  * @swagger
@@ -215,7 +294,7 @@ router.get('/getAllTenants', getAllTenants)
  *         description: Internal server error
  */
 
-router.get('/getOneTenant/:tenantId', getOneTenant)
+router.get('/getOneTenant/:tenantId',adminAuthenticate, getOneTenant)
 
 
 
@@ -235,7 +314,7 @@ router.get('/getOneTenant/:tenantId', getOneTenant)
  *         description: Internal server error
  */
 
-router.get('/getAllLandlords', getAllLandlords)
+router.get('/getAllLandlords',adminAuthenticate, getAllLandlords)
 
 
 /**
@@ -263,7 +342,7 @@ router.get('/getAllLandlords', getAllLandlords)
  */
 
 
-router.get('/getOneLandlord/:landlordId', getOneLandlord)
+router.get('/getOneLandlord/:landlordId',adminAuthenticate, getOneLandlord)
 
 /**
  * @swagger
@@ -290,7 +369,7 @@ router.get('/getOneLandlord/:landlordId', getOneLandlord)
  */
 
 
-router.get('/getOneLandlordProfile/:landlordProfileId', getOneLandlordProfile)
+router.get('/getOneLandlordProfile/:landlordProfileId',adminAuthenticate, getOneLandlordProfile)
 
 
 /**
@@ -308,7 +387,7 @@ router.get('/getOneLandlordProfile/:landlordProfileId', getOneLandlordProfile)
  *         description: Internal server error
  */
 
-router.get('/getAllLandlordProfile', getAllLandlordProfile)
+router.get('/getAllLandlordProfile',adminAuthenticate, getAllLandlordProfile)
 
 
 
@@ -337,7 +416,7 @@ router.get('/getAllLandlordProfile', getAllLandlordProfile)
  *         description: Internal server error
  */
 
-router.delete('/deleteLandlordProfile/:landlordProfileId', deleteLandlordProfile)
+router.delete('/deleteLandlordProfile/:landlordProfileId',adminAuthenticate, deleteLandlordProfile)
 
 
 
@@ -533,7 +612,7 @@ router.delete('/admin/:id',adminAuthenticate, deleteAdmin);
  *                   type: string
  *                   example: "Error verifying a listing."
  */
-router.put('/verfiyAlisting/:landlordId/:listingId', verfiyAlisting);
+router.put('/verfiyAlisting/:landlordId/:listingId',adminAuthenticate, verfiyAlisting);
 
 /**
  * @swagger

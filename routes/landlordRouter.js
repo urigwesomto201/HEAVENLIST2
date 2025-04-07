@@ -191,7 +191,7 @@ router.get('/landlord-verify/:token', verifylandlordEmail)
 
 /**
  * @swagger
- * /api/v1/resendlandlordVerificationEmail:
+ * /api/v1/resendlandlord-verify:
  *   post:
  *     tags:
  *       - landlord
@@ -226,7 +226,7 @@ router.get('/landlord-verify/:token', verifylandlordEmail)
  */
 
 
-router.post('/resendlandlordVerificationEmail', resendlandlordVerificationEmail)
+router.post('/resendlandlord-verify', resendlandlordVerificationEmail)
 
 
 
@@ -272,7 +272,7 @@ router.post('/landlordForgotPassword', landlordForgotPassword)
 
 /**
  * @swagger
- * /api/v1/reset-landlordpassword:
+ * /api/v1/landlordResetPassword:
  *   post:
  *     tags:
  *       - landlord
@@ -326,7 +326,7 @@ router.post('/landlordForgotPassword', landlordForgotPassword)
  */
 
 
-router.post('/reset-landlordpassword', landlordResetPassword)
+router.post('/landlordResetPassword', landlordResetPassword)
 
 
 /**

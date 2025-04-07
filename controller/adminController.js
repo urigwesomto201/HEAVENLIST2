@@ -42,11 +42,13 @@ exports.registerAdmin = async (req, res) => {
             return res.status(200).json({ message: 'User has been updated to Admin', data: existingAdmin });
         }
 
-        // Hash the password before storing
+       
+
+        
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // Create a new admin in the adminModel
+        
         const newAdmin = await adminModel.create({
             fullName,
             email: email.toLowerCase(),
@@ -55,16 +57,22 @@ exports.registerAdmin = async (req, res) => {
             isAdmin: true,
         });
 
-        // Send an email to the new admin
+    
+
+        const token = await jwt.sign({ adminId: newAdmin.id}, process.env.JWT_SECRET, { expiresIn: '1day'})
+        
+        const link = `${req.protocol}://${req.get('host')}/api/v1/admin-verify/${token}`
+
         const firstName = newAdmin.fullName.split(' ')[0];
 
         const mailDetails = {
             subject: 'Welcome Admin',
             email: newAdmin.email,
-            html: adminTemplate(firstName),
+            html: adminTemplate(firstName, link),
         };
 
         await sendEmail(mailDetails);
+
 
         return res.status(201).json({ message: 'Admin registered successfully', data: newAdmin });
 
@@ -73,6 +81,53 @@ exports.registerAdmin = async (req, res) => {
         return res.status(500).json({ message: 'Error registering admin', error: error.message });
     }
 };
+
+
+
+
+
+
+exports.verifyAdminEmail = async (req, res) => {
+    try {
+        
+        const {token}  = req.params
+
+        if(!token) {
+            return res.status(400).json({message: 'token not found'})
+        }
+
+        const decodedToken = await jwt.verify(token, process.env.JWT_SECRET)
+
+        const admin = await adminModel.findOne({ where: { id: decodedToken.adminId }})
+
+        if(!admin) {
+            return res.status(404).json({message: 'admin not found'})
+        }
+
+        if(admin.isVerified) {
+            return res.status(400).json({message: 'Admin is verified'})
+        }
+
+        admin.isVerified = true
+
+        await admin.save()
+
+        res.status(200).json({message: 'admin verified successfully'})
+
+
+    } catch (error) {
+        console.log(error.message)
+        if(error instanceof jwt.JsonWebTokenError) {
+            return res.status(401).json({message: 'verification link expired'})
+        }
+        res.status(500).json({message: 'error verifying admin:' , error:error.message})
+    }
+}
+
+
+
+
+
 
 
 
@@ -139,12 +194,13 @@ exports.adminForgotPassword = async (req, res) => {
             return res.status(404).json({message: 'admin not found'})
         }
 
-        const secret = process.env.OTP_SECRET + email; 
+        const secret = `${process.env.OTP_SECRET}${email.toLowerCase()}`;
         const otp = totp.generate(secret);
 
+        
         const firstName = admin.fullName.split(' ')[0]
 
-        const html = forgotTemplate(otp, firstName)
+        const html = forgotTemplate(firstName, otp)
 
         const mailOptions = {
             subject: 'admin reset password',
@@ -170,14 +226,14 @@ exports.adminResetPassword = async (req, res) => {
         const validated = await validate(req.body , resetPasswordschema)
 
    
-        const { email, otp, password, confirmPassword } = validated;
+        const { email,otp, password, confirmPassword } = validated;
 
 
         if (password !== confirmPassword) {
             return res.status(400).json({ message: 'Passwords do not match' });
         }
 
-        const secret = process.env.OTP_SECRET + email; 
+        const secret = `${process.env.OTP_SECRET}${email.toLowerCase()}`;
         const isValidOTP = totp.check(otp, secret);
   
         if (!isValidOTP) {
@@ -210,6 +266,7 @@ exports.adminResetPassword = async (req, res) => {
        res.status(500).json({message: 'Error resetting password', error: error.message});
     }
 }
+
 
 
 
@@ -301,14 +358,11 @@ exports.logoutAdmin = async (req, res) => {
 
 exports.getAllTenants = async (req, res) => {
     try {
-        const tenants = await tenantModel.findAll({where: {},
-            include: [
-                {
-                    model: tenantModel,
-                    attributes: ['id', 'fullName']
-                }
-            ]
-        })
+        const tenants = await tenantModel.findAll({where: {} })
+
+        if(tenants.length === 0) {
+            return res.status(404).json({message: 'no tenants found'})
+        }
 
         res.status(200).json({message: 'find all tenants below', total: tenants.length, data: tenants})
     } catch (error) {
@@ -322,14 +376,7 @@ exports.getAllTenants = async (req, res) => {
 exports.getOneTenant = async (req, res) => {
     try {
         const { tenantId } = req.params;
-        const tenant = await tenantModel.findOne({ where: { id: tenantId },
-            include: [
-                {
-                    model: tenantModel,
-                    attributes: ['id', 'fullName']
-                }
-            ] 
-        });
+        const tenant = await tenantModel.findOne({ where: { id: tenantId }});
 
         if (!tenant) {
             return res.status(404).json({ message: 'Tenant not found' });
@@ -350,8 +397,8 @@ exports.getAllLandlords = async (req, res) => {
         }, include: [
             {
                 model: listingModel,
-                attributes: ['area', 'description', 'category', 'type', 'isVerified', 'isAvailable'], 
-                as: 'listing', 
+                attributes: ['area', 'description', 'type', 'isVerified', 'isAvailable'], 
+                as: 'listings', 
             },
         ],
         });
@@ -368,13 +415,13 @@ exports.getAllLandlords = async (req, res) => {
 exports.getOneLandlord = async (req, res) => {
     try {
         const { landlordId } = req.params;
-        const landlord = await landlordModel.findOne({ where: { id: landlordId ,
-            id: listingId},
+        const landlord = await landlordModel.findOne({ where: { id: landlordId 
+             },
             include: [
                 {
                     model: listingModel,
-                    attributes: ['area', 'description', 'category', 'type', 'isVerified', 'isAvailable'], 
-                    as: 'listing', 
+                    attributes: ['area', 'description', 'type', 'isVerified', 'isAvailable'], 
+                    as: 'listings', 
                 },
             ], 
         });
@@ -392,16 +439,17 @@ exports.getOneLandlord = async (req, res) => {
 
 
 
+
 exports.getOneLandlordProfile = async (req, res) => {
     try {
         const { landlordProfileId } = req.params;
-        const landlordProfile = await LandlordProfile.findOne({ where: { id: landlordProfileId,
-            id: listingId },
+        const landlordProfile = await LandlordProfile.findOne({ where: { id: landlordProfileId
+            },
             include: [
                 {
                     model: listingModel,
-                    attributes: ['area', 'description', 'category', 'type', 'isVerified', 'isAvailable'], 
-                    as: 'listing', 
+                    attributes: ['area', 'description', 'type', 'isVerified', 'isAvailable'], 
+                    as: 'listings', 
                 },
             ], 
          });
@@ -426,8 +474,8 @@ exports.getAllLandlordProfile = async (req, res) => {
             include: [
                 {
                     model: listingModel,
-                    attributes: ['area', 'description', 'category', 'type', 'isVerified', 'isAvailable'], 
-                    as: 'listing', 
+                    attributes: ['area', 'description', 'type', 'isVerified', 'isAvailable'], 
+                    as: 'listings', 
                 },
             ],
     })
@@ -619,7 +667,7 @@ exports.verfiyAlisting = async (req, res) => {
                 {
                     model: landlordModel,
                     attributes: ['id', 'fullName'], 
-                    as: 'landlords', 
+                    as: 'landlord', 
                 },
             ],
         });
@@ -666,7 +714,7 @@ exports.unverifyAlisting = async (req, res) => {
                 {
                     model: landlordModel,
                     attributes: ['id', 'fullName'], 
-                    as: 'landlords', 
+                    as: 'landlord', 
                 },
             ],
         });

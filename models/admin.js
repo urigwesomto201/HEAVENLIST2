@@ -29,7 +29,7 @@ Admin.init(
     },
     isVerified: {
       type: DataTypes.BOOLEAN, // Changed from STRING to BOOLEAN
-      defaultValue: true 
+      defaultValue: false 
     },
     isLoggedIn: {
       type: DataTypes.BOOLEAN, // Changed from STRING to BOOLEAN
@@ -37,7 +37,7 @@ Admin.init(
     },
     isAdmin: {
       type: DataTypes.BOOLEAN, // Changed from STRING to BOOLEAN
-      defaultValue: true 
+      defaultValue: false 
     },
   },
   {

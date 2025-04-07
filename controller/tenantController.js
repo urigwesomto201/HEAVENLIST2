@@ -45,7 +45,7 @@ exports.registerTenant = async (req, res) => {
              
         })
 
-        const token = await jwt.sign({ tenantId: newTenant.id}, process.env.JWT_SECRET, { expiresIn: '2day'})
+        const token = await jwt.sign({ tenantId: newTenant.id}, process.env.JWT_SECRET, { expiresIn: '2days'})
 
         const link = `${req.protocol}://${req.get('host')}/api/v1/tenant-verify/${token}`
 
@@ -126,7 +126,7 @@ exports.resendTenantVerificationEmail = async (req, res) => {
             return res.status(404).json({message: 'tenant not found'})
         }
 
-        const token = await jwt.sign({ tenantId: tenant.id}, process.env.JWT_SECRET, { expiresIn: '1h'})
+        const token = await jwt.sign({ tenantId: tenant.id}, process.env.JWT_SECRET, { expiresIn: '2h'})
 
         const link = `${req.protocol}://${req.get('host')}/api/v1/tenant-verify/${token}`
 
@@ -211,23 +211,23 @@ exports.TenantForgotPassword = async (req, res) => {
             return res.status(400).json({message: 'please enter email address'})
         }
 
+        
         const tenant = await tenantModel.findOne({ where: { email: email.toLowerCase() } })
-
+        
         if(!tenant) {
             return res.status(404).json({message: 'tenant not found'})
         }
-
-        const secret = process.env.OTP_SECRET + email; 
+        
+        const secret = `${process.env.OTP_SECRET}${email.toLowerCase()}`
         const otp = totp.generate(secret);
-
-    
+        
 
         const firstName = tenant.fullName.split(' ')[0]
 
-        const html = forgotTemplate(otp, firstName)
+        const html = forgotTemplate( firstName, otp)
 
         const mailOptions = {
-            subject: 'reset password',
+            subject: ' tenant reset password',
             email: tenant.email,
             html 
         }
@@ -253,7 +253,6 @@ exports.TenantResetPassword = async (req, res) => {
         const { email, otp, password, confirmPassword } = validated;
 
     
-
         if (password !== confirmPassword) {
             return res.status(400).json({ message: 'Passwords do not match' });
         }
@@ -264,7 +263,7 @@ exports.TenantResetPassword = async (req, res) => {
         if (!isValidOTP) {
            return res.status(400).json({ message: 'Invalid or expired OTP' });
         }
-  
+
 
         const tenant = await tenantModel.findOne({ where: { email: email.toLowerCase() } });
 

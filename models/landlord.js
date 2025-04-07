@@ -7,7 +7,6 @@ class Landlord extends Model {}
 
 Landlord.init(
   {
-    // Model attributes are defined here
     id: {
       allowNull: false,
       primaryKey: true,
@@ -27,12 +26,12 @@ Landlord.init(
       allowNull: false
     },
     isVerified: {
-      type: DataTypes.BOOLEAN, // Changed from STRING to BOOLEAN
-      defaultValue: false 
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     },
     isLoggedIn: {
-      type: DataTypes.BOOLEAN, // Changed from STRING to BOOLEAN
-      defaultValue: false 
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     },
     isAdmin: {
       type: DataTypes.BOOLEAN,
@@ -40,49 +39,42 @@ Landlord.init(
     },
   },
   {
-    // Other model options go here
-    sequelize, // We need to pass the connection instance
-    modelName: 'Landlord', // We need to choose the model name
+    sequelize,
+    modelName: 'Landlord',
     tableName: 'Landlords'
   },
 );
 
+// Define associations after all models are initialized
 Landlord.hasOne(LandlordProfile, {
   foreignKey: 'landlordId',
-  as: 'landlordProfiles',
+  as: 'landlordProfile', // Singular form for one-to-one relationship
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
 });
+
 Landlord.hasMany(Listing, {
   foreignKey: 'landlordId',
-  as: 'listings',
+  as: 'listings', // Plural form for one-to-many relationship
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
 });
+
 LandlordProfile.belongsTo(Landlord, {
   foreignKey: 'landlordId',
-  as: 'landlords',
+  as: 'landlord', // Singular form for consistency
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
 });
+
 Listing.belongsTo(Landlord, {
   foreignKey: 'landlordId',
-  as: 'landlords',
+  as: 'landlord', // Singular form for consistency
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
 });
-// LandlordProfile.hasMany(Listing, {
-//   foreignKey: 'landlordProfileId',
-//   as: 'listings',
-//   onDelete: 'CASCADE',
-//   onUpdate: 'CASCADE'
-// });
-// Listing.belongsTo(LandlordProfile, {
-//   foreignKey: 'listingId',
-//   as: 'landlordProfiles',
-//   onDelete: 'CASCADE',
-//   onUpdate: 'CASCADE'
-// });
+
+
+
 
 module.exports = Landlord;
-

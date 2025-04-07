@@ -97,28 +97,22 @@ exports.createLandlordProfile = async (req, res) => {
 // GET one Landlord Profile
 exports.getOneLandlordProfile = async (req, res) => {
     try {
-        const { landlordId } = req.params;
+        const { landlordId } = req.params
 
-        if (!landlordId) {
-            return res.status(400).json({ message: 'Landlord ID is required' });
-        }
-
-        // Find the landlord profile by the landlordId
         const landlordProfile = await LandlordProfile.findOne({ where: { id: landlordId },
-            include:[{
-                model:listingModel,
-                attributes:['title','price','description','locality'],
-                as:'Listings'
-           
-             }] 
+            include: [
+                {
+                    model: listingModel,
+                    as: 'listings',
+                    attributes: ['title', 'price', 'description'],
+                },
+            ],
         });
-
-        // If the landlord profile doesn't exist, return an error
+       
         if (!landlordProfile) {
             return res.status(404).json({ message: 'Landlord profile not found' });
         }
 
-        // Return the landlord profile data if found
         res.status(200).json({ message: 'Landlord profile fetched successfully', data: landlordProfile });
 
     } catch (error) {
@@ -129,24 +123,27 @@ exports.getOneLandlordProfile = async (req, res) => {
 
 
 
-exports.getLandlordProfile = async (req, res) => {
+
+
+exports.alllandlordProfiles = async (req, res) => {
     try {
 
+       const landlords = await LandlordProfile.findAll({
+            include: [
+                {
+                    model: listingModel,
+                    as: 'listings',
+                    attributes: ['title', 'price', 'description'],
+                },
+            ],
 
-       const landlords = await LandlordProfile.findAll({where:{isVerified:true}, 
-        include:[{
-             model:listingModel,
-             attributes:['title','price','description','locality'],
-             as:'Listings'
-        
-          }]
-        });
+       });
 
         if (landlords.length === 0){
-            return res.status(4004).json({message:"no landlordsProfile found"})
+            return res.status(404).json({message:"no landlordsProfile found"})
         }
 
-  res.status(200).json({message:'landlords fetched successfully',  total: landlords.length, 
+  res.status(200).json({message:'landlords profile fetched successfully',  total: landlords.length, 
     data:landlords
   })
     } catch (error) {
@@ -174,43 +171,46 @@ exports.updateLandlordProfile = async (req, res) => {
             return res.status(404).json({ message: 'Landlord profile not found' });
         }
 
-
         let updatedImage = existingLandlord.profileImage;
 
-        // Handle file upload if a new image is provided
+        
         if (req.file) {
-            // If the landlord profile has an existing image, remove it from Cloudinary
             if (existingLandlord.profileImage && existingLandlord.profileImage.publicId) {
                 await cloudinary.uploader.destroy(existingLandlord.profileImage.publicId);
             }
 
-            
-        }
-         // Upload the new image to Cloudinary
-         const result = await cloudinary.uploader.upload(req.file.path, { resource_type: 'auto' });
+            const result = await cloudinary.uploader.upload(req.file.path, { resource_type: 'auto' });
+            updatedImage = result.secure_url;
 
-        // Update the landlord profile
+            if (fs.existsSync(req.file.path)) {
+                try {
+                    fs.unlinkSync(req.file.path);
+                } catch (err) {
+                    console.error("Error deleting file:", err.message);
+                }
+            }
+        }
+
+       
         await existingLandlord.update({
             fullName,
-            email,
             state,
             street,
             locality,
-            profileImage: result.secure_url
-
+            email,
+            profileImage: updatedImage 
         });
 
         existingLandlord.isVerified = true;
 
-        // Fetch the updated landlord profile
+       
         const updatedLandlord = await landlordModel.findOne({
             where: { id: landlordId },
-            include:[{
-                model:listingModel,
-                attributes:['title','price','description','locality'],
-                as:'Listings'
-           
-             }]
+            include: [{
+                model: listingModel,
+                attributes: ['title', 'price', 'description'],
+                as: 'listings'
+            }]
         });
 
         res.status(200).json({ message: 'Landlord profile updated successfully', data: updatedLandlord });
@@ -230,16 +230,18 @@ exports.updateLandlordProfile = async (req, res) => {
 
 
 
+
 exports.deleteLandlordProfile = async (req, res) => {
     try {
-        const { landlordId } = req.params;
-
-        if (!landlordId) {
-            return res.status(400).json({ message: 'Landlord ID is required' });
-        }
+        const { landlordId } = req.landlord;
 
         const landlordProfile = await landlordModel.findOne({
-            where: { id: landlordId },
+            where: { },
+            include: [{
+                model: listingModel,
+                attributes: ['title', 'price', 'description'],
+                as: 'listings'
+            }]
         });
 
         if (!landlordProfile) {

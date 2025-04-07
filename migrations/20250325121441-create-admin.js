@@ -23,7 +23,7 @@ module.exports = {
       },
       isVerified: {
         type: Sequelize.BOOLEAN,
-        defaultValue: true
+        defaultValue: false
       },
       isLoggedIn: {
         type: Sequelize.BOOLEAN,
@@ -31,7 +31,7 @@ module.exports = {
       },
       isAdmin: {
         type: Sequelize.BOOLEAN,
-        defaultValue: true
+        defaultValue: false
       },
       createdAt: {
         allowNull: false,

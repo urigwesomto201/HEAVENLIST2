@@ -132,7 +132,7 @@ exports.resendlandlordVerificationEmail = async (req, res) => {
 
         const token = await jwt.sign({ landlordId: landlord.id}, process.env.JWT_SECRET, { expiresIn: '1h'})
 
-        const link = `${req.protocol}://${req.get('host')}/api/v1/landlord-verify/${token}`
+        const link = `${req.protocol}://${req.get('host')}/api/v1/resendlandlord-verify/${token}`
 
         const firstName = landlord.fullName.split(' ')[0]
 
@@ -221,16 +221,16 @@ exports.landlordForgotPassword = async (req, res) => {
             return res.status(404).json({message: 'landlord not found'})
         }
 
-        const secret = process.env.OTP_SECRET + email; 
+        const secret = `${process.env.OTP_SECRET}${email.toLowerCase()}`;
         const otp = totp.generate(secret);
 
       
         const firstName = landlord.fullName.split(' ')[0]
 
-        const html = forgotTemplate(otp, firstName)
+        const html = forgotTemplate(firstName,otp)
 
         const mailOptions = {
-            subject: 'reset password',
+            subject: 'landlord reset password',
             email: landlord.email,
             html
         }
@@ -255,11 +255,12 @@ exports.landlordResetPassword = async (req, res) => {
 
         const {email, otp, password, confirmPassword } = validated
 
+
         if (password !== confirmPassword) {
             return res.status(400).json({ message: 'Passwords do not match' });
         }
 
-        const secret = process.env.OTP_SECRET + email; 
+        const secret = `${process.env.OTP_SECRET}${email.toLowerCase()}`;
         const isValidOTP = totp.check(otp, secret);
   
         if (!isValidOTP) {

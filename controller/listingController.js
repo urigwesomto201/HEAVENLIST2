@@ -14,8 +14,6 @@ exports.createListing = async (req, res) => {
             state,area,description, minrent, maxrent, street
          } = req.body
 
-
-
         if(!landlordId) {
             return res.status(400).json({message: 'landlordId is required'})
         }
@@ -78,7 +76,7 @@ exports.getAllListings = async (req, res) => {
                 {
                 model: landlordModel,
                 attributes: ['id', 'fullName'], 
-                as: 'landlords', 
+                as: 'landlord', 
                 },
             ],
         });
@@ -96,24 +94,21 @@ exports.getAllListings = async (req, res) => {
 
 exports.getOneListingByLandlord= async (req, res) => {
     try {
-        const {landlordId} = req.params
+        const {landlordId} = req.landlord
 
         const { listingId } = req.params
 
         if(!listingId) {
             return res.status(400).json({message: 'listingId is required'})
         }
-        if(!landlordId) {
-            return res.status(400).json({message: 'landlordId is required'})
-        }
 
         const listing = await listingModel.findOne({
-            where: { id: listingId, landlordId}, 
+            where: { id: listingId}, 
             include: [
                 {
                     model: landlordModel,
                     attributes: ['id', 'fullName'], 
-                    as: 'landlords', 
+                    as: 'landlord', 
                 },
             ],
         });
@@ -147,7 +142,7 @@ exports.getOneListing = async (req, res) => {
                 {
                     model: landlordModel,
                     attributes: ['id', 'fullName'], 
-                    as: 'landlords', 
+                    as: 'landlord', 
                 },
             ],
         });
@@ -173,19 +168,15 @@ exports.getOneListing = async (req, res) => {
 
 exports.getAllListingsByLandlord = async (req, res) => {
     try {
-        const {landlordId} = req.params
-
-        if(!landlordId) {
-            return res.status(400).json({message: 'landlordId is required'})
-        }
+        const {landlordId} = req.landlord
 
         const listings = await listingModel.findAll({
-            where: { landlordId },
+            where: { },
             include: [
                 {
                 model: landlordModel,
                 attributes: ['id', 'fullName'], 
-                 as: 'landlords', 
+                 as: 'landlord', 
                 },
             ],
         });
@@ -209,22 +200,20 @@ exports.getAllListingsByLandlord = async (req, res) => {
 
 exports.updateListing = async (req, res) => {
     try {
-        const {landlordId} = req.params
+        const {landlordId} = req.landlord
 
         const { listingId } = req.params
 
 
-        const {type, description, price, location} = req.body
+        const { title, type, bedrooms,bathrooms,price,toilets,
+            state,area,description, minrent, maxrent, street
+        } = req.body
 
         if(!listingId) {
             return res.status(400).json({message: 'listingId is required'})
         }
 
-        if(!landlordId) {
-            return res.status(400).json({message: 'landlordId is required'})
-        }
-
-        const listing = await listingModel.findOne({ where: { id : listingId, landlordId } })
+        const listing = await listingModel.findOne({ where: { id : listingId} })
 
         if (!listing) {
             return res.status(404).json({ message: 'Listing not found' });
@@ -261,16 +250,16 @@ exports.updateListing = async (req, res) => {
             street,
             listingImage: updatedImage,
             },
-            { where: { id: listingId, landlordId } } 
+            { where: { id: listingId } } 
         );
 
        
-        const updatedListing = await listingModel.findOne({ where: { id: listingId, landlordId },
+        const updatedListing = await listingModel.findOne({ where: { id: listingId },
         include: [
             {
             model: landlordModel,
             attributes: ['id', 'fullName'], 
-             as: 'landlords', 
+             as: 'landlord', 
             },
         ],
     });
@@ -287,9 +276,10 @@ exports.updateListing = async (req, res) => {
 
 
 
+
 exports.deleteListing = async (req, res) => {
     try {
-        const {landlordId} = req.params
+        const {landlordId} = req.landlord
         const { listingId } = req.params
 
         if(!listingId) {
@@ -305,7 +295,7 @@ exports.deleteListing = async (req, res) => {
                 {
                 model: landlordModel,
                 attributes: ['id', 'fullName'], 
-                 as: 'landlords', 
+                 as: 'landlord', 
                 },
             ],
         });
@@ -358,7 +348,7 @@ exports.searchListing = async (req, res) => {
                 {
                     model: landlordModel, 
                     attributes: ['id', 'fullName'], 
-                    as: 'landlords', 
+                    as: 'landlord', 
                 },
             ],
         });
