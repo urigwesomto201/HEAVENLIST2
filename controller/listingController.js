@@ -18,7 +18,9 @@ exports.createListing = async (req, res) => {
             return res.status(400).json({message: 'landlordId is required'})
         }
 
-        const landlord = await landlordModel.findOne({ where: { id : landlordId } })
+        const landlord = await landlordModel.findOne({ where: { id : landlordId },
+            attributes: ['id', 'fullName'],
+        })
 
         if (!landlord) {
             return res.status(404).json({ message: 'Landlord not found' });
