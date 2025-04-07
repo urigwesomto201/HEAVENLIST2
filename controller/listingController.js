@@ -47,7 +47,6 @@ exports.createListing = async (req, res) => {
                 imageUrl: result.secure_url,
                 publicId: result.public_id
             },
-            landlordId: landlordId,
             isVerified: false,
             isAvailable: false,
             isClicked: 0,
