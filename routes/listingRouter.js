@@ -94,14 +94,6 @@ const upload = require('../utils/multer');
  *                 type: string
  *                 description: A description of the property
  *                 example: "A beautiful 3-bedroom apartment in the heart of Lagos."
- *               isVerified:
- *                 type: boolean
- *                 description: Whether the listing is verified
- *                 example: false
- *               isAvailable:
- *                 type: boolean
- *                 description: Whether the property is available for rent
- *                 example: true
  *               listingImage:
  *                 type: array
  *                 items:
@@ -297,14 +289,13 @@ router.get('/getAllListingsByLandlord', landlordAuthenticate, getAllListingsByLa
  *                 type: string
  *                 description: A description of the property
  *                 example: "A beautiful 3-bedroom apartment in the heart of Lagos."
- *               isVerified:
- *                 type: boolean
- *                 description: Whether the listing is verified
- *                 example: false
- *               isAvailable:
- *                 type: boolean
- *                 description: Whether the property is available for rent
- *                 example: true
+ *               listingImage:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *                 description: Upload up to 8 images of the property
+
  *     responses:
  *       200:
  *         description: Listing updated successfully
