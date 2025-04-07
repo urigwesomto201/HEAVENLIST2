@@ -86,7 +86,7 @@ Listing.init(
     landlordId: {
       type: DataTypes.UUID,
       references: {
-        model: 'landlords',
+        model: 'Landlord',
         key: 'id'
       },
       onUpdate: 'CASCADE',
@@ -95,7 +95,7 @@ Listing.init(
     landlordId: {
       type: DataTypes.UUID,
       references: {
-        model: 'landlordProfiles',
+        model: 'LandlordProfile',
         key: 'id'
       },
       onUpdate: 'CASCADE',
