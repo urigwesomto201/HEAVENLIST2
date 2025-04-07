@@ -97,9 +97,9 @@ exports.createLandlordProfile = async (req, res) => {
 // GET one Landlord Profile
 exports.getOneLandlordProfile = async (req, res) => {
     try {
-        const { landlordId } = req.params
+        const { landlordId } = req.landlord
 
-        const landlordProfile = await LandlordProfile.findOne({ where: { id: landlordId },
+        const landlordProfile = await LandlordProfile.findOne({ where: { },
             include: [
                 {
                     model: listingModel,

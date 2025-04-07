@@ -15,6 +15,7 @@ const { adminAuthenticate } = require('../middlewares/authentication')
  *   post:
  *     tags:
  *       - Admin
+  *     security: [] # No authentication required
  *     summary: Register a new admin
  *     description: Create a new admin account with the provided details.
  *     requestBody:
@@ -53,6 +54,7 @@ router.post('/registeradmin', registerAdmin)
  *   get:
  *     tags:
  *       - Admin
+   *     security: [] # No authentication required
  *     summary: Verify admin email
  *     description: Verify the admin's email using a token.
  *     parameters:
@@ -82,6 +84,7 @@ router.get('/admin-verify/:token', verifyAdminEmail)
  *   post:
  *     tags:
  *       - Admin
+  *     security: [] # No authentication required
  *     summary: Admin login
  *     description: Authenticate an admin with email and password.
  *     requestBody:
@@ -114,6 +117,7 @@ router.post('/loginAdmin', loginAdmin)
  *   post:
  *     tags:
  *       - Admin
+  *     security: [] # No authentication required
  *     summary: Forgot password
  *     description: Send a password reset link to the admin's email.
  *     requestBody:
@@ -144,6 +148,7 @@ router.post('/adminForgotPassword', adminForgotPassword)
  *   post:
  *     tags:
  *       - Admin
+  *     security: [] # No authentication required
  *     summary: Reset admin password
  *     description: Reset the admin's password using a valid token.
  *     requestBody:
@@ -176,6 +181,8 @@ router.post('/adminResetPassword', adminResetPassword)
  *   post:
  *     tags:
  *       - Admin
+ *     security:
+ *       - bearerAuth: []
  *     summary: Change admin password
  *     description: Change the admin's password after authentication.
  *     requestBody:
@@ -210,6 +217,8 @@ router.post('/changeAdminPassword',adminAuthenticate, changeAdminPassword)
  *   post:
  *     tags:
  *       - Admin
+ *     security:
+ *       - bearerAuth: []
  *     summary: Logout admin
  *     description: Logs out the currently authenticated admin by invalidating their session or token.
  *     security:
@@ -258,6 +267,8 @@ router.post('/logoutAdmin',adminAuthenticate, logoutAdmin)
  *   get:
  *     tags:
  *       - Admin
+ *     security:
+ *       - bearerAuth: []
  *     summary: Get all tenants
  *     description: Retrieve a list of all tenants.
  *     responses:
@@ -276,6 +287,8 @@ router.get('/getAllTenants',adminAuthenticate, getAllTenants)
  *   get:
  *     tags:
  *       - Admin
+ *     security:
+ *       - bearerAuth: []
  *     summary: Get a single tenant
  *     description: Retrieve details of a specific tenant by ID.
  *     parameters:
@@ -304,7 +317,8 @@ router.get('/getOneTenant/:tenantId',adminAuthenticate, getOneTenant)
  *   get:
  *     tags:
  *       - Admin
-  *     security: [] # No authentication required
+ *     security:
+ *       - bearerAuth: []
  *     summary: Get all landlords
  *     description: Retrieve a list of all landlords
  *     responses:
@@ -323,6 +337,8 @@ router.get('/getAllLandlords',adminAuthenticate, getAllLandlords)
  *   get:
  *     tags:
  *       - Admin
+ *     security:
+ *       - bearerAuth: []
  *     summary: Get one landlord
  *     description: Retrieve details of a specific landlord by ID
  *     parameters:
@@ -350,6 +366,8 @@ router.get('/getOneLandlord/:landlordId',adminAuthenticate, getOneLandlord)
  *   get:
  *     tags:
  *       - Admin
+ *     security:
+ *       - bearerAuth: []
  *     summary: Get one landlord profile
  *     description: Retrieve details of a specific landlord profile by ID
  *     parameters:
@@ -378,6 +396,8 @@ router.get('/getOneLandlordProfile/:landlordProfileId',adminAuthenticate, getOne
  *   get:
  *     tags:
  *       - Admin
+ *     security:
+ *       - bearerAuth: []
  *     summary: Get all landlord profiles
  *     description: Retrieve a list of all landlord profiles
  *     responses:
@@ -398,6 +418,8 @@ router.get('/getAllLandlordProfile',adminAuthenticate, getAllLandlordProfile)
  *   delete:
  *     tags:
  *       - Admin
+ *     security:
+ *       - bearerAuth: []
  *     summary: Delete a landlord profile
  *     description: Delete a specific landlord profile by ID
  *     parameters:
@@ -431,6 +453,8 @@ router.delete('/deleteLandlordProfile/:landlordProfileId',adminAuthenticate, del
  *   get:
  *     tags:
  *       - Admin
+ *     security:
+ *       - bearerAuth: []
  *     summary: Get a single admin
  *     description: Retrieve details of a specific admin by ID
  *     parameters:
@@ -458,6 +482,8 @@ router.get('/getadmin/:id',adminAuthenticate, getAdmin);
  *   get:
  *     tags:
  *       - Admin
+ *     security:
+ *       - bearerAuth: []
  *     summary: Get all admins
  *     description: Retrieve a list of all admins
  *     responses:
@@ -476,6 +502,8 @@ router.get('/getAllAdmins',adminAuthenticate, getAllAdmins);
  *   delete:
  *     tags:
  *       - Admin
+ *     security:
+ *       - bearerAuth: []
  *     summary: Delete an admin
  *     description: Delete a specific admin by ID
  *     parameters:
@@ -524,6 +552,8 @@ router.delete('/admin/:id',adminAuthenticate, deleteAdmin);
  *   put:
  *     tags:
  *       - Admin
+ *     security:
+ *       - bearerAuth: []
  *     summary: Verify a listing by a admin
  *     description: This endpoint allows an admin to verify a listing.
  *     parameters:
@@ -620,6 +650,8 @@ router.put('/verfiyAlisting/:landlordId/:listingId',adminAuthenticate, verfiyAli
  *   put:
  *     tags:
  *       - Admin
+ *     security:
+ *       - bearerAuth: []
  *     summary: Unverify a listing
  *     description: This endpoint allows an admin to unverify a listing by setting `isVerified` and `isAvailable` to false.
  *     parameters:
