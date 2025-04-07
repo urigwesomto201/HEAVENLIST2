@@ -121,13 +121,14 @@ router.post('/createProfile/:landlordId', landlordAuthenticate, upload.single('p
 
 /**
  * @swagger
- * /api/v1/landlord/{landlordId}:
+ * /api/v1/landlord:
  *   get:
  *     summary: "Get a landlord profile"
  *     description: "Fetch the details of a specific landlord profile by their ID."
 *     tags:
  *       - Landlord Profile
-  *     security: [] # No authentication required
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - name: "landlordId"
  *         in: "path"
@@ -183,7 +184,7 @@ router.post('/createProfile/:landlordId', landlordAuthenticate, upload.single('p
 
 
 
-router.get('/getlandlordprofile/:landlordId', landlordAuthenticate, getOneLandlordProfile);
+router.get('/getlandlordprofile', landlordAuthenticate, getOneLandlordProfile);
 
 
 
@@ -196,7 +197,8 @@ router.get('/getlandlordprofile/:landlordId', landlordAuthenticate, getOneLandlo
  *     description: "Fetch the list of all landlords along with their basic profile information."
  *     tags:
  *       - Landlord Profile
-  *     security: [] # No authentication required
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: "Successfully fetched all landlords"
@@ -250,7 +252,8 @@ router.get('/alllandlordProfiles', adminAuthenticate, alllandlordProfiles);
  *     description: "Update the details of a specific landlord profile."
 *     tags:
  *       - Landlord Profile
-  *     security: [] # No authentication required
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - name: "landlordId"
  *         in: "path"
@@ -349,7 +352,8 @@ router.put('/updateLandlordProfile/:landlordId', landlordAuthenticate, upload.si
  *     description: "Delete a specific landlord profile by their ID."
 *     tags:
  *       - Landlord Profile
-  *     security: [] # No authentication required
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - name: "landlordId"
  *         in: "path"

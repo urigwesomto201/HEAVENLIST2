@@ -120,6 +120,7 @@ router.post('/createlisting/:landlordId', landlordAuthenticate, upload.array('li
  *     description: Fetch all listings that are verified and available for rent.
  *     tags:
  *       - Listings
+  *     security: [] # No authentication required
  *     responses:
  *       200:
  *         description: A list of available and verified listings
@@ -171,6 +172,7 @@ router.get('/getOneListingByLandlord/:listingId', landlordAuthenticate, getOneLi
  *     description: This endpoint retrieves a specific listing by its ID. The listing must be verified and available.
  *     tags:
  *       - Listings
+  *     security: [] # No authentication required
  *     responses:
  *       200:
  *         description: Listing retrieved successfully
@@ -348,6 +350,7 @@ router.delete('/deleteListing/:listingId', landlordAuthenticate, deleteListing);
  *     description: Allows the user to search for property listings based on various filters such as locality, type, number of bedrooms, bathrooms, price range, and availability.
  *     tags:
  *       - Listings
+  *     security: [] # No authentication required
  *     parameters:
  *       - name: locality
  *         in: query
@@ -452,6 +455,7 @@ router.get('/searchListing', searchListing);
  *     description: Retrieve the number of times a specific listing has been viewed (clicked).
  *     tags:
  *       - Listings
+  *     security: [] # No authentication required
  *     parameters:
  *       - name: listingId
  *         in: path
