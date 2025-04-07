@@ -24,7 +24,7 @@ exports.createLandlordProfile = async (req, res) => {
             return res.status(400).json({ message: 'Landlord ID is required' });
         }
 
-        const existingLandlord = await LandlordProfile.findOne({ where: { landlordId } });
+        const existingLandlord = await landlordModel.findOne({ where: { landlordId } });
 
         if (existingLandlord) {
             if (req.file && fs.existsSync(req.file.path)) {
@@ -96,7 +96,7 @@ exports.getOneLandlordProfile = async (req, res) => {
     try {
         const { landlordId } = req.landlord
 
-        const landlordProfile = await LandlordProfile.findOne({ where: { },
+        const landlordProfile = await LandlordProfile.findOne({ where: { landlordId },
             include: [
                 {
                     model: listingModel,
@@ -233,7 +233,7 @@ exports.deleteLandlordProfile = async (req, res) => {
         const { landlordId } = req.landlord;
 
         const landlordProfile = await LandlordProfile.findOne({
-            where: { },
+            where: { landlordId },
             include: [{
                 model: listingModel,
                 attributes: ['title', 'price', 'description'],
