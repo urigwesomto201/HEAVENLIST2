@@ -308,9 +308,9 @@ router.put('/updateListing/:listingId', landlordAuthenticate, upload.array('list
 
 /**
  * @swagger
- * /api/v1/deleteListing/{landlordId}/{listingId}:
+ * /api/v1/deleteListing/{listingId}:
  *   delete:
- *     summary: Delete a listing by landlord ID and listing ID
+ *     summary: Delete a listing by listing ID
  *     tags:
  *       - Listings
  *     security:
@@ -338,7 +338,7 @@ router.put('/updateListing/:listingId', landlordAuthenticate, upload.array('list
  *       500:
  *         description: Internal server error
  */
-router.delete('/deleteListing/:landlordId/:listingId', landlordAuthenticate, deleteListing);
+router.delete('/deleteListing/:listingId', landlordAuthenticate, deleteListing);
 
 /**
  * @swagger
