@@ -42,16 +42,7 @@ LandlordProfile.init(
     isVerified: {
       type: DataTypes.BOOLEAN, // Changed to BOOLEAN to match the model
       defaultValue: false // Added default value
-    },
-    landlordId: {
-      type: DataTypes.UUID,
-      references: {
-        model: Landlord,
-        key: 'id'
-      },
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE'
-    },
+    }
   },
   {
     // Other model options go here

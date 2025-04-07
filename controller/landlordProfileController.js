@@ -24,7 +24,10 @@ exports.createLandlordProfile = async (req, res) => {
             return res.status(400).json({ message: 'Landlord ID is required' });
         }
 
-        const existingLandlord = await landlordModel.findOne({ where: { landlordId } });
+        const existingLandlord = await landlordModel.findOne({ where: { id: landlordId },
+            attributes: ['id', 'fullName']
+
+         });
 
         if (existingLandlord) {
             if (req.file && fs.existsSync(req.file.path)) {
