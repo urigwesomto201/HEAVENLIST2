@@ -99,7 +99,7 @@ exports.getOneLandlordProfile = async (req, res) => {
     try {
         const { landlordId } = req.landlord
 
-        const landlordProfile = await LandlordProfile.findOne({ where: { landlordId },
+        const landlordProfile = await LandlordProfile.findOne({ where: { },
             include: [
                 {
                     model: listingModel,
@@ -162,7 +162,7 @@ exports.updateLandlordProfile = async (req, res) => {
         const { fullName, email, state, street, locality } = req.body;
 
 
-        const existingLandlord = await LandlordProfile.findOne({ where: { id: landlordId } });
+        const existingLandlord = await LandlordProfile.findOne({ where: {  } });
 
         if (!existingLandlord) {
             return res.status(404).json({ message: 'Landlord profile not found' });
@@ -233,7 +233,7 @@ exports.deleteLandlordProfile = async (req, res) => {
         const { landlordId } = req.landlord;
 
         const landlordProfile = await LandlordProfile.findOne({
-            where: { landlordId },
+            where: { },
             include: [{
                 model: listingModel,
                 attributes: ['title', 'price', 'description'],
