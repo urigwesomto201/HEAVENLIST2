@@ -73,8 +73,8 @@ module.exports = {
         defaultValue: false
       },
       listingImage: {
-        // type: Sequelize.TEXT('long'), // JSON to store an array of objects
-        type: Sequelize.JSON, // JSON to store an array of objects
+        type: Sequelize.TEXT('long'), // JSON to store an array of objects
+        // type: Sequelize.JSON, // JSON to store an array of objects
         allowNull: false
       },
       createdAt: {
