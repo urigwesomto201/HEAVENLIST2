@@ -31,22 +31,13 @@ module.exports = {
         allowNull: false // Added to match the model
       },
       profileImage: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false
          // Added to match the model
       },
       isVerified: {
         type: Sequelize.BOOLEAN, // Changed to BOOLEAN to match the model
         defaultValue: false // Added default value
-      },
-      landlordId: {
-        type: Sequelize.UUID,
-        allowNull: false,
-        references: {
-          model: 'Landlords', // References the Landlords table
-          key: 'id'
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE'
       },
       createdAt: {
         allowNull: false,
