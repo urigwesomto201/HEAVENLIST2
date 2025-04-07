@@ -7,37 +7,36 @@ module.exports = {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV4 // Changed to UUID
         
       },
       fullName: {
         type: Sequelize.STRING,
-        allowNull: false // Added to match the model
+        allowNull: false 
       },
       email: {
         type: Sequelize.STRING,
-        allowNull: false // Added to match the model
+        allowNull: false 
       },
       street: {
         type: Sequelize.STRING,
-        allowNull: false // Added to match the model
+        allowNull: false 
       },
       locality: {
         type: Sequelize.STRING,
-        allowNull: false // Added to match the model
+        allowNull: false 
       },
       state: {
         type: Sequelize.STRING,
-        allowNull: false // Added to match the model
+        allowNull: false 
       },
       profileImage: {
         type: Sequelize.STRING,
         allowNull: false
-         // Added to match the model
+      
       },
       isVerified: {
-        type: Sequelize.BOOLEAN, // Changed to BOOLEAN to match the model
-        defaultValue: false // Added default value
+        type: Sequelize.BOOLEAN, 
+        defaultValue: false 
       },
       createdAt: {
         allowNull: false,
