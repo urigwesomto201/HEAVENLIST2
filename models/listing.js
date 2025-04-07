@@ -81,8 +81,7 @@ Listing.init(
     listingImage: {
       // type: DataTypes.JSON, // JSON can store arrays of objects
       type: DataTypes.TEXT('long'), // JSON can store arrays of objects
-      allowNull: false,
-      defaultValue: [] // Default to an empty array
+      allowNull: false
     },
     landlordId: {
       type: DataTypes.UUID,

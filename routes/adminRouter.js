@@ -221,8 +221,6 @@ router.post('/changeAdminPassword',adminAuthenticate, changeAdminPassword)
  *       - bearerAuth: []
  *     summary: Logout admin
  *     description: Logs out the currently authenticated admin by invalidating their session or token.
- *     security:
- *       - bearerAuth: [] # Requires authentication
  *     responses:
  *       200:
  *         description: Admin logged out successfully
