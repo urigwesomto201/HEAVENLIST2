@@ -286,9 +286,6 @@ exports.deleteListing = async (req, res) => {
             return res.status(400).json({message: 'listingId is required'})
         }
 
-        if(!landlordId) {
-            return res.status(400).json({message: 'landlordId is required'})
-        }
 
         const listing = await listingModel.findOne({ where: { id : listingId },
             include: [
