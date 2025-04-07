@@ -77,26 +77,6 @@ module.exports = {
         // type: Sequelize.JSON, // JSON to store an array of objects
         allowNull: false
       },
-      landlordId: {
-        type: Sequelize.UUID,
-        allowNull: false,
-        references: {
-          model: 'Landlords', // Corrected to match the actual table name in the database
-          key: 'id', // Column in the referenced table
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
-      },
-      landlordId: {
-        type: Sequelize.UUID,
-        allowNull: false,
-        references: {
-          model: 'LandlordProfiles',
-          key: 'id'
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE'
-      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
