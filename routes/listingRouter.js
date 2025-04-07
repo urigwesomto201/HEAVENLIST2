@@ -42,10 +42,66 @@ const upload = require('../utils/multer');
  *                 type: string
  *                 description: The title of the property listing
  *                 example: "Luxury 3-Bedroom Apartment in Lekki"
+ *               type:
+ *                 type: string
+ *                 enum: ["Houses", "Apartments"]
+ *                 description: The type of the property
+ *                 example: "Apartments"
+ *               bedrooms:
+ *                 type: string
+ *                 enum: ["1", "2", "3", "4", "5+"]
+ *                 description: Number of bedrooms
+ *                 example: "3"
+ *               bathrooms:
+ *                 type: string
+ *                 enum: ["1", "2", "3", "4", "5+"]
+ *                 description: Number of bathrooms
+ *                 example: "2"
+ *               toilets:
+ *                 type: string
+ *                 enum: ["1", "2", "3", "4", "5+"]
+ *                 description: Number of toilets
+ *                 example: "2"
+ *               minrent:
+ *                 type: string
+ *                 enum: ["500000", "600000", "700000", "800000", "900000", "1000000"]
+ *                 description: Minimum rent price
+ *                 example: "500000"
+ *               maxrent:
+ *                 type: string
+ *                 enum: ["1000000", "2000000", "3000000", "4000000", "5000000"]
+ *                 description: Maximum rent price
+ *                 example: "2000000"
+ *               state:
+ *                 type: string
+ *                 enum: ["Lagos"]
+ *                 description: The state where the property is located
+ *                 example: "Lagos"
  *               price:
  *                 type: number
  *                 description: The price of the property
- *                 example: 500000
+ *                 example: 1500000
+ *               area:
+ *                 type: string
+ *                 enum: ["Agege", "Ajeromi-Ifelodun", "Alimosho", "Amuwo Odofin", "Apapa", "Badagry", "Epe", "Eti-Osa", "Ibeju Lekki", "Ikeja", "Ikorodu", "Lagos Island", "Mushin", "Ojo", "Shomolu", "Surulere"]
+ *                 description: The area where the property is located
+ *                 example: "Ikeja"
+ *               street:
+ *                 type: string
+ *                 description: The street address of the property
+ *                 example: "123 Main Street"
+ *               description:
+ *                 type: string
+ *                 description: A description of the property
+ *                 example: "A beautiful 3-bedroom apartment in the heart of Lagos."
+ *               isVerified:
+ *                 type: boolean
+ *                 description: Whether the listing is verified
+ *                 example: false
+ *               isAvailable:
+ *                 type: boolean
+ *                 description: Whether the property is available for rent
+ *                 example: true
  *               listingImage:
  *                 type: array
  *                 items:
@@ -160,24 +216,17 @@ router.get('/getOneListing/:listingId', getOneListing);
  *         description: Internal server error
  */
 router.get('/getAllListingsByLandlord', landlordAuthenticate, getAllListingsByLandlord);
-
 /**
  * @swagger
  * /api/v1/updateListing/{listingId}:
  *   put:
  *     summary: Update a listing by landlord
+ *     description: Allows a landlord to update the details of a specific listing.
  *     tags:
  *       - Listings
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - name: landlordId
- *         in: path
- *         required: true
- *         description: The ID of the landlord updating the listing
- *         schema:
- *           type: string
- *           example: "12345"
  *       - name: listingId
  *         in: path
  *         required: true
@@ -196,6 +245,66 @@ router.get('/getAllListingsByLandlord', landlordAuthenticate, getAllListingsByLa
  *                 type: string
  *                 description: The title of the listing
  *                 example: "Spacious 3-bedroom apartment for rent"
+ *               type:
+ *                 type: string
+ *                 enum: ["Houses", "Apartments"]
+ *                 description: The type of the property
+ *                 example: "Apartments"
+ *               bedrooms:
+ *                 type: string
+ *                 enum: ["1", "2", "3", "4", "5+"]
+ *                 description: Number of bedrooms
+ *                 example: "3"
+ *               bathrooms:
+ *                 type: string
+ *                 enum: ["1", "2", "3", "4", "5+"]
+ *                 description: Number of bathrooms
+ *                 example: "2"
+ *               toilets:
+ *                 type: string
+ *                 enum: ["1", "2", "3", "4", "5+"]
+ *                 description: Number of toilets
+ *                 example: "2"
+ *               minrent:
+ *                 type: string
+ *                 enum: ["500000", "600000", "700000", "800000", "900000", "1000000"]
+ *                 description: Minimum rent price
+ *                 example: "500000"
+ *               maxrent:
+ *                 type: string
+ *                 enum: ["1000000", "2000000", "3000000", "4000000", "5000000"]
+ *                 description: Maximum rent price
+ *                 example: "2000000"
+ *               state:
+ *                 type: string
+ *                 enum: ["Lagos"]
+ *                 description: The state where the property is located
+ *                 example: "Lagos"
+ *               price:
+ *                 type: number
+ *                 description: The price of the property
+ *                 example: 1500000
+ *               area:
+ *                 type: string
+ *                 enum: ["Agege", "Ajeromi-Ifelodun", "Alimosho", "Amuwo Odofin", "Apapa", "Badagry", "Epe", "Eti-Osa", "Ibeju Lekki", "Ikeja", "Ikorodu", "Lagos Island", "Mushin", "Ojo", "Shomolu", "Surulere"]
+ *                 description: The area where the property is located
+ *                 example: "Ikeja"
+ *               street:
+ *                 type: string
+ *                 description: The street address of the property
+ *                 example: "123 Main Street"
+ *               description:
+ *                 type: string
+ *                 description: A description of the property
+ *                 example: "A beautiful 3-bedroom apartment in the heart of Lagos."
+ *               isVerified:
+ *                 type: boolean
+ *                 description: Whether the listing is verified
+ *                 example: false
+ *               isAvailable:
+ *                 type: boolean
+ *                 description: Whether the property is available for rent
+ *                 example: true
  *     responses:
  *       200:
  *         description: Listing updated successfully
@@ -245,7 +354,7 @@ router.delete('/deleteListing/:landlordId/:listingId', landlordAuthenticate, del
  * /api/v1/searchListing:
  *   get:
  *     summary: Search for listings based on specific criteria
- *     description: Allows the user to search for property listings based on various filters like locality, type, number of bedrooms, and rent range.
+ *     description: Allows the user to search for property listings based on various filters such as locality, type, number of bedrooms, bathrooms, price range, and availability.
  *     tags:
  *       - Listings
  *     parameters:
@@ -256,14 +365,92 @@ router.delete('/deleteListing/:landlordId/:listingId', landlordAuthenticate, del
  *         schema:
  *           type: string
  *           example: "Victoria Island"
+ *       - name: type
+ *         in: query
+ *         description: The type of the property (e.g., Houses, Apartments).
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: ["Houses", "Apartments"]
+ *           example: "Apartments"
+ *       - name: bedrooms
+ *         in: query
+ *         description: The number of bedrooms in the property.
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: ["1", "2", "3", "4", "5+"]
+ *           example: "3"
+ *       - name: bathrooms
+ *         in: query
+ *         description: The number of bathrooms in the property.
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: ["1", "2", "3", "4", "5+"]
+ *           example: "2"
+ *       - name: minPrice
+ *         in: query
+ *         description: The minimum price of the property.
+ *         required: false
+ *         schema:
+ *           type: number
+ *           example: 500000
+ *       - name: maxPrice
+ *         in: query
+ *         description: The maximum price of the property.
+ *         required: false
+ *         schema:
+ *           type: number
+ *           example: 2000000
+ *       - name: isAvailable
+ *         in: query
+ *         description: Filter by availability of the property.
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *           example: true
  *     responses:
  *       200:
  *         description: A list of listings that match the search criteria.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     example: "64a8e9b7b56c8d001c9a4b2d"
+ *                   title:
+ *                     type: string
+ *                     example: "Luxury 3-Bedroom Apartment in Lekki"
+ *                   type:
+ *                     type: string
+ *                     example: "Apartments"
+ *                   bedrooms:
+ *                     type: string
+ *                     example: "3"
+ *                   bathrooms:
+ *                     type: string
+ *                     example: "2"
+ *                   price:
+ *                     type: number
+ *                     example: 1500000
+ *                   locality:
+ *                     type: string
+ *                     example: "Victoria Island"
+ *                   isAvailable:
+ *                     type: boolean
+ *                     example: true
  *       404:
  *         description: No listings found for the specified criteria.
  *       500:
  *         description: Internal server error.
  */
+
+
 router.get('/searchListing', searchListing);
 
 /**
