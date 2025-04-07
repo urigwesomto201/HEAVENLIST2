@@ -45,10 +45,10 @@ exports.createListing = async (req, res) => {
             minrent, 
             maxrent, 
             street,
-            listingImage: {
+            listingImage: JSON.stringify({
                 imageUrl: result.secure_url,
                 publicId: result.public_id,
-            },
+            }),
             isVerified: false,
             isAvailable: false,
             isClicked: 0,
@@ -229,10 +229,10 @@ exports.updateListing = async (req, res) => {
             }
 
             const result = await cloudinary.uploader.upload(req.files[0].path);
-            updatedImage = {
+            updatedImage = JSON.stringify({
                 imageUrl: result.secure_url,
                 publicId: result.public_id,
-            };
+            })
         }
 
         await listingModel.update(
