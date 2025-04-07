@@ -15,7 +15,6 @@ exports.createLandlordProfile = async (req, res) => {
         const { landlordId } = req.params;
         const { fullName, email, state, street, locality} = req.body;
 
-        console.log("ID", landlordId);
 
         if (!fullName || !email || !state || !street || !locality) {
             return res.status(400).json({ message: 'Please input correct fields' });
