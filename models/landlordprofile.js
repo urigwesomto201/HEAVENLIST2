@@ -46,7 +46,7 @@ LandlordProfile.init(
     landlordId: {
       type: DataTypes.UUID,
       references: {
-        model: 'Landlords',
+        model: 'landlords',
         key: 'id'
       },
       onUpdate: 'CASCADE',
