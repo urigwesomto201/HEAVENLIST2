@@ -74,6 +74,7 @@ module.exports = {
       },
       listingImage: {
         type: Sequelize.TEXT('long'), // JSON to store an array of objects
+        // type: Sequelize.JSON, // JSON to store an array of objects
         allowNull: false,
         defaultValue: []
       },
@@ -81,11 +82,21 @@ module.exports = {
         type: Sequelize.UUID,
         allowNull: false,
         references: {
-          model: 'landlords', // Corrected to match the actual table name in the database
+          model: 'Landlords', // Corrected to match the actual table name in the database
           key: 'id', // Column in the referenced table
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
+      },
+      landlordId: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: {
+          model: 'LandlordProfiles',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
       },
       createdAt: {
         allowNull: false,

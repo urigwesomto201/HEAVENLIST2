@@ -192,7 +192,7 @@ router.get('/tenant-verify/:token', verifyTenantEmail)
 
 /**
  * @swagger
- * /api/v1/resendTenantVerificationEmail:
+ * /api/v1/tenant-verify:
  *   post:
  *     tags:
  *       - tenant
@@ -227,7 +227,7 @@ router.get('/tenant-verify/:token', verifyTenantEmail)
  */
 
 
-router.post('/resendTenantVerificationEmail', resendTenantVerificationEmail)
+router.post('/tenant-verify', resendTenantVerificationEmail)
 
 
 
@@ -273,7 +273,7 @@ router.post('/TenantForgotPassword', TenantForgotPassword)
 
 /**
  * @swagger
- * /api/v1/reset-tenantpassword:
+ * /api/v1/TenantResetPassword:
  *   post:
  *     tags:
  *       - tenant
@@ -327,7 +327,7 @@ router.post('/TenantForgotPassword', TenantForgotPassword)
  */
 
 
-router.post('/reset-tenantpassword', TenantResetPassword)
+router.post('/TenantResetPassword', TenantResetPassword)
 
 
 /**

@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { createLandlordProfile,deleteLandlordProfile,updateLandlordProfile,getLandlordProfile, getOneLandlordProfile} = require('../controller/landlordProfileController');
-const { landlordAuthenticate } = require('../middlewares/authentication')
+const { createLandlordProfile,deleteLandlordProfile,updateLandlordProfile,alllandlordProfiles, getOneLandlordProfile} = require('../controller/landlordProfileController');
+const { landlordAuthenticate,adminAuthenticate } = require('../middlewares/authentication')
 
 const upload = require('../utils/multer')
 /**
  * @swagger
- * /api/v1/landlord/createProfile:
+ * /api/v1/landlord/createProfile/{landlordId}:
  *   post:
  *     summary: Create a new landlord profile
  *     description: Allows a landlord to create their profile with personal details and an optional profile image.
@@ -181,10 +181,16 @@ router.post('/createProfile/:landlordId', landlordAuthenticate, upload.single('p
  *         description: "Error fetching landlord profile"
  */
 
-router.get('/landlord/:landlordId', getOneLandlordProfile);
+
+
+router.get('/getlandlordprofile/:landlordId', landlordAuthenticate, getOneLandlordProfile);
+
+
+
+
 /**
 * @swagger
- * /api/v1/landlords:
+ * /api/v1/getAllLandlordProfile:
  *   get:
  *     summary: "Get all landlords"
  *     description: "Fetch the list of all landlords along with their basic profile information."
@@ -234,7 +240,7 @@ router.get('/landlord/:landlordId', getOneLandlordProfile);
  *       500:
  *         description: "Internal server error"
 */
-router.get('/landlords', getLandlordProfile);
+router.get('/alllandlordProfiles', adminAuthenticate, alllandlordProfiles);
 
 /**
  * @swagger
@@ -333,7 +339,7 @@ router.get('/landlords', getLandlordProfile);
  *         description: "Error updating landlord profile"
  */
 
-router.put('/landlord/:landlordId', upload.single('profileImage'), updateLandlordProfile);
+router.put('/updateLandlordProfile/:landlordId', landlordAuthenticate, upload.single('profileImage'), updateLandlordProfile);
 
 /**
  * @swagger
@@ -369,6 +375,6 @@ router.put('/landlord/:landlordId', upload.single('profileImage'), updateLandlor
  *       500:
  *         description: "Error deleting landlord profile"
  */
-router.delete('/landlord/:landlordId', deleteLandlordProfile);
+router.delete('/deleteLandlordProfile',landlordAuthenticate, deleteLandlordProfile);
 
 module.exports = router;

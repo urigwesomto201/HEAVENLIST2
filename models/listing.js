@@ -79,6 +79,7 @@ Listing.init(
       defaultValue: false
     },
     listingImage: {
+      // type: DataTypes.JSON, // JSON can store arrays of objects
       type: DataTypes.TEXT('long'), // JSON can store arrays of objects
       allowNull: false,
       defaultValue: [] // Default to an empty array
@@ -87,7 +88,17 @@ Listing.init(
       type: DataTypes.UUID,
       allowNull: false,
       references: {
-        model: 'Landlords',
+        model: 'landlords',
+        key: 'id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
+    },
+    landlordId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: 'LandlordProfiles',
         key: 'id'
       },
       onUpdate: 'CASCADE',
@@ -102,5 +113,18 @@ Listing.init(
   },
 );
 
+LandlordProfile.hasMany(Listing, {
+  foreignKey: 'landlordId', // Ensure this matches the actual column name in the `listings` table
+  as: 'listings', 
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'// Alias for the relationship
+});
+
+Listing.belongsTo(LandlordProfile, {
+  foreignKey: 'landlordId', // Ensure this matches the actual column name in the `listings` table
+  as: 'landlordProfile',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE' // Alias for the relationship
+});
 
 module.exports = Listing;

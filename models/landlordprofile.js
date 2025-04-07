@@ -62,5 +62,8 @@ LandlordProfile.init(
   },
 );
 
+// Define associations after all models are initialized
+
+
 
 module.exports = LandlordProfile;

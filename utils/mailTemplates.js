@@ -93,7 +93,7 @@ exports.signUpTemplate = (verifyLink,firstName)=>{
 
 
 
-exports.forgotTemplate = (otp,firstName)=>{
+exports.forgotTemplate = (firstName, otp)=>{
     return `
     <!DOCTYPE html>
     <html lang="en">
@@ -185,7 +185,7 @@ exports.forgotTemplate = (otp,firstName)=>{
 
 
 
-exports.adminTemplate = (firstName)=>{
+exports.adminTemplate = (firstName, verifyLink)=>{
     return `
     <!DOCTYPE html>
     <html lang="en">
@@ -261,7 +261,12 @@ exports.adminTemplate = (firstName)=>{
                 <p>Hello Admin ${firstName},</p>
                 <p>You're welcome onboard.</p>
                 <p>We at havenlist strive to being the best at serving our clients one day at a time.</p>
-                <p>Best regards,<br>Havenlist</p>
+                <p>Please click the button below to verify your account:</p>
+                <div class="button-container">
+                    <a href="${verifyLink}" class="button">Verify My Account</a>
+                </div>
+                <p>If you did not sign up on our platform, kindly ignore this email.</p>
+                <p>Best regards,<br>Havenlist team</p>
             </div>
             <div class="footer">
                 <p>&copy; ${new Date().getFullYear()} . All rights reserved.</p>
