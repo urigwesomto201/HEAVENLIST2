@@ -43,6 +43,16 @@ LandlordProfile.init(
       type: DataTypes.BOOLEAN, // Changed to BOOLEAN to match the model
       defaultValue: false // Added default value
     },
+      landlordId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: Landlord, // Reference the Landlord model
+        key: 'id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
+    },
   },
   {
     // Other model options go here
