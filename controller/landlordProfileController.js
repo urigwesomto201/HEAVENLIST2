@@ -203,7 +203,7 @@ exports.updateLandlordProfile = async (req, res) => {
         existingLandlord.isVerified = true;
 
        
-        const updatedLandlord = await landlordModel.findOne({
+        const updatedLandlord = await LandlordProfile.findOne({
             where: { id: landlordId },
             include: [{
                 model: listingModel,
@@ -234,7 +234,7 @@ exports.deleteLandlordProfile = async (req, res) => {
     try {
         const { landlordId } = req.landlord;
 
-        const landlordProfile = await landlordModel.findOne({
+        const landlordProfile = await LandlordProfile.findOne({
             where: { },
             include: [{
                 model: listingModel,
