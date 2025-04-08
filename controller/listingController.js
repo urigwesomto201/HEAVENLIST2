@@ -43,11 +43,10 @@ exports.createListing = async (req, res) => {
             minrent, 
             maxrent, 
             street,
-            listingImage: JSON.stringify({
+            listingImage: {
                 imageUrl: result.secure_url,
                 publicId: result.public_id,
-            }),
-            landlordId,
+            },
             isVerified: false,
             isAvailable: false,
             isClicked: 0,
