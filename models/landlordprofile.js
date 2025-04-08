@@ -42,6 +42,15 @@ LandlordProfile.init(
     isVerified: {
       type: DataTypes.BOOLEAN, // Changed to BOOLEAN to match the model
       defaultValue: false // Added default value
+    },
+    landlordId: {
+      type: DataTypes.UUID,
+      references: {
+        model: Landlord, // Reference the Landlord model
+        key: 'id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
     }
   },
   {
@@ -53,7 +62,6 @@ LandlordProfile.init(
 );
 
 // Define associations after all models are initialized
-
 
 
 module.exports = LandlordProfile;

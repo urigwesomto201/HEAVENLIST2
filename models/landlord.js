@@ -46,6 +46,35 @@ Landlord.init(
 );
 
 // Define associations after all models are initialized
+// Landlord.hasOne(LandlordProfile, {
+//   foreignKey: 'landlordId',
+//   as: 'landlordProfile', // Singular form for one-to-one relationship
+//   onDelete: 'CASCADE',
+//   onUpdate: 'CASCADE'
+// });
+
+// Landlord.hasMany(Listing, {
+//   foreignKey: 'landlordId',
+//   as: 'listings', // Plural form for one-to-many relationship
+//   onDelete: 'CASCADE',
+//   onUpdate: 'CASCADE'
+// });
+
+// LandlordProfile.belongsTo(Landlord, {
+//   foreignKey: 'landlordId',
+//   as: 'landlord', // Singular form for consistency
+//   onDelete: 'CASCADE',
+//   onUpdate: 'CASCADE'
+// });
+
+// Listing.belongsTo(Landlord, {
+//   foreignKey: 'landlordId',
+//   as: 'landlord', // Singular form for consistency
+//   onDelete: 'CASCADE',
+//   onUpdate: 'CASCADE'
+// });
+
+
 Landlord.hasOne(LandlordProfile, {
   foreignKey: 'landlordId',
   as: 'landlordProfile', // Singular form for one-to-one relationship
@@ -74,7 +103,19 @@ Listing.belongsTo(Landlord, {
   onUpdate: 'CASCADE'
 });
 
+// Ensure LandlordProfile and Listing are properly associated with Landlord
+LandlordProfile.hasMany(Listing, {
+  foreignKey: 'landlordProfileId',
+  as: 'listings', // Plural form for one-to-many relationship
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
 
-
+Listing.belongsTo(LandlordProfile, {
+  foreignKey: 'landlordProfileId',
+  as: 'landlordProfile', // Singular form for consistency
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
 
 module.exports = Landlord;

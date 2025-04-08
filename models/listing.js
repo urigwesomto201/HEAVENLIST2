@@ -92,6 +92,15 @@ Listing.init(
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE'
     },
+    landlordProfileId: {
+      type: DataTypes.UUID,
+      references: {
+        model: LandlordProfile, // Reference the LandlordProfile model
+        key: 'id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
+    }
   },
   {
     // Other model options go here
@@ -101,19 +110,20 @@ Listing.init(
   },
 );
 
-LandlordProfile.hasMany(Listing, {
-  foreignKey: 'landlordId', // Ensure this matches the actual column name in the `listings` table
-  as: 'listings', 
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'// Alias for the relationship
-});
+// LandlordProfile.hasMany(Listing, {
+//   foreignKey: 'landlordId', // Ensure this matches the actual column name in the `listings` table
+//   as: 'listings', 
+//   onDelete: 'CASCADE',
+//   onUpdate: 'CASCADE'// Alias for the relationship
+// });
 
-Listing.belongsTo(LandlordProfile, {
-  foreignKey: 'landlordId', // Ensure this matches the actual column name in the `listings` table
-  as: 'landlordProfile',
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE' // Alias for the relationship
-});
+// Listing.belongsTo(LandlordProfile, {
+//   foreignKey: 'landlordId', // Ensure this matches the actual column name in the `listings` table
+//   as: 'landlordProfile',
+//   onDelete: 'CASCADE',
+//   onUpdate: 'CASCADE' // Alias for the relationship
+// });
+
 
 
 
