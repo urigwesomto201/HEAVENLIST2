@@ -85,7 +85,6 @@ Listing.init(
     },
     landlordId: {
       type: DataTypes.UUID,
-      allowNull: false,
       references: {
         model: 'landlords',
         key: 'id'
@@ -95,7 +94,6 @@ Listing.init(
     },
     landlordId: {
       type: DataTypes.UUID,
-      allowNull: false,
       references: {
         model: 'LandlordProfiles',
         key: 'id'
