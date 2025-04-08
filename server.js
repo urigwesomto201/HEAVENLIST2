@@ -2,6 +2,7 @@ const express = require('express')
 const sequelize = require('./database/sequelize')
 require('dotenv').config()
 const cors = require('cors')
+const morgan = require('morgan')
 const session = require('express-session');
 const passport = require('passport');
 require('./middlewares/passport');
@@ -15,13 +16,15 @@ const landlordRouter = require('./routes/landlordRouter')
 const adminRouter = require('./routes/adminRouter')
 const listingRouter = require('./routes/listingRouter')
 const landlordProfileRouter = require('./routes/landlordProfileRoute')
+const inspection = require('./routes/inspectionRoutes')
 const swaggerJSDOC = require('swagger-jsdoc');
 const swaggerUIEXPRESS = require('swagger-ui-express');
 
 const app = express()
 
-app.use(cors())
-app.use(express.json())
+app.use(cors({origin: "*"}));
+app.use(morgan('dev'));
+app.use(express.json());
 
 app.use(express.json());
 
@@ -96,6 +99,7 @@ app.use('/api/v1/',adminRouter)
 app.use('/api/v1/',listingRouter)
  app.use('/api/v1/',landlordProfileRouter)
 app.use('/api/v1/',transacRouter)
+app.use('/api/v1/',inspection)
 app.use((error, req, res, next) => {
   if(error){
      return res.status(400).json({message:  error.message})

@@ -1,48 +1,80 @@
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const FacebookStrategy = require('passport-facebook').Strategy;
 const passport = require('passport');
-const tenantModel = require('../models/tenant');
+const userModel = require('../models/landlord');
 
-passport.use(new GoogleStrategy(
-  {
+//Google Authentication
+passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: "http://localhost:5050/auth/google/login"
   },
   async (accessToken, refreshToken, profile, cb) => {
+ console.log("Profile: ",profile);
+    try {
+    let user = await userModel.findOne({email: profile.emails[0].value});
+    if(!user){
+        user = new userModel({
+            email: profile.emails[0].value,
+            fullName: profile.displayName,
+            isVerified: profile.emails[0].isVerified,
+            password:''
+
+        });
+        await user.save();
+    }
+    return cb(null,user);
+  } catch (error) {
+    return cb(error,null)
+  }
+  }
+));
+
+//Facebook Authentication
+passport.use(new FacebookStrategy({
+    clientID: process.env.FACEBOOK_CLIENT_ID,
+    clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+    callbackURL: "http://localhost:5050/auth/facebook/login",
+    profileFields: ['id', 'displayName', 'emails']
+  },
+  async (accessToken, refreshToken, profile, cb) => {
     console.log("Profile: ", profile);
     try {
-      let tenant = await tenantModel.findOne({ where: { email: profile.emails[0].value } }); // Fixed query
-      if (!tenant) {
-        tenant = new tenantModel({
-          email: profile.emails[0].value,
+      const email = profile.emails && profile.emails[0] && profile.emails[0].value;
+      let user = await userModel.findOne({ email });
+
+      if (!user) {
+        user = new userModel({
+          email,
           fullName: profile.displayName,
-          isVerified: profile.emails[0].verified || false, // Ensure `isVerified` is properly handled
-          password: '' // Empty password for OAuth users
+          isVerified: true, // Facebook doesn't always provide this
+          password: ''
         });
-        await tenant.save(); // Fixed typo from `uder.save()` to `tenant.save()`
+        await user.save();
       }
-      return cb(null, tenant);
+
+      return cb(null, user);
     } catch (error) {
       return cb(error, null);
     }
   }
 ));
 
-passport.serializeUser((tenant, cb) => { // Fixed method name
-  console.log('Tenant serialized:', tenant);
-  cb(null, tenant.id);
-});
+passport.serializeUser((user,cb) => {
+console.log('user serialized:',user);
+cb(null,user.id)
+})
 
-passport.deserializeUser(async (id, cb) => { // Fixed method name
-  try {
-    const tenant = await tenantModel.findByPk(id);
-    if (!tenant) {
-      return cb(new Error('Tenant not found'), null);
+
+passport.deserializeUser(async(id,cb)=>{
+    try {
+        const user = await userModel.findByPk(id);
+        if(!user){
+          return cb(new Error('User not found'),null)
+        }
+        cb(null,user)
+    } catch (error) {
+        cb(error,null)
     }
-    cb(null, tenant);
-  } catch (error) {
-    cb(error, null);
-  }
-});
-
-module.exports = passport;
+})
+module.exports = passport   

@@ -1,3 +1,6 @@
+const Landlord = require('./landlord');
+const Listing = require('./listing');
+const tenant = require('./tenant')
 'use strict';
 const { Sequelize, DataTypes, Model } = require('sequelize');
 const sequelize = require('../database/sequelize');
@@ -36,6 +39,38 @@ Transaction.init(
       type: DataTypes.DATE,
       allowNull: false
     },
+    transactionHistory: {
+      type: DataTypes.INTEGER, 
+      defaultValue: 0
+    },
+    landlordId: {
+          type: DataTypes.UUID,
+          references: {
+            model: Landlord,
+            key: 'id'
+          },
+          onUpdate: 'CASCADE',
+          onDelete: 'CASCADE'
+        },
+    tenantId: {
+          type: DataTypes.UUID,
+          references: {
+            model: tenant,
+            key: 'id'
+          },
+          onUpdate: 'CASCADE',
+          onDelete: 'CASCADE'
+        },
+    
+        ListingId: {
+          type: DataTypes.UUID,
+          references: {
+            model: Listing,
+            key: 'id'
+          },
+          onUpdate: 'CASCADE',
+          onDelete: 'CASCADE'
+        },
     
   },
   {
@@ -43,6 +78,9 @@ Transaction.init(
     modelName: 'Transaction', 
     tableName: 'Transactions' 
   }
+  
 );
+
+
 
 module.exports = Transaction;

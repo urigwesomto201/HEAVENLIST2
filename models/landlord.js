@@ -2,7 +2,9 @@ const { Sequelize, DataTypes, Model } = require('sequelize');
 const sequelize = require('../database/sequelize');
 const Listing = require('./listing');
 const LandlordProfile = require('./landlordprofile');
-
+const Transaction = require('./transaction')
+const Tenant = require('./tenant')
+const Inspection = require('./inspection');
 class Landlord extends Model {}
 
 Landlord.init(
@@ -81,6 +83,33 @@ Landlord.hasOne(LandlordProfile, {
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
 });
+Inspection.belongsTo(Tenant, {
+    foreignKey: 'tenantId',
+    as: 'tenant'
+    ,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+});
+
+Inspection.belongsTo(Listing, {
+    foreignKey: 'listingId',
+    as: 'listing',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+});
+
+Tenant.hasMany(Transaction, {
+  foreignKey: 'tenantId',
+  as: 'Transactions', // Plural form for one-to-many relationship
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+Tenant.hasMany(Inspection, {
+  foreignKey: 'tenantId',
+  as: 'inspections', // Plural form for one-to-many relationship
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
 
 Landlord.hasMany(Listing, {
   foreignKey: 'landlordId',
@@ -88,6 +117,7 @@ Landlord.hasMany(Listing, {
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
 });
+
 
 LandlordProfile.belongsTo(Landlord, {
   foreignKey: 'landlordId',
@@ -114,6 +144,18 @@ LandlordProfile.hasMany(Listing, {
 Listing.belongsTo(LandlordProfile, {
   foreignKey: 'landlordProfileId',
   as: 'landlordProfile', // Singular form for consistency
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+Transaction.belongsTo(Landlord, {
+  foreignKey: 'landlordId',
+  as: 'landlord', // Singular form for consistency
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+Transaction.belongsTo(Tenant, {
+  foreignKey: 'tenantId',
+  as: 'tenant', // Singular form for consistency
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
 });
