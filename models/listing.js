@@ -115,4 +115,7 @@ Listing.belongsTo(LandlordProfile, {
   onUpdate: 'CASCADE' // Alias for the relationship
 });
 
+
+
 module.exports = Listing;
+
