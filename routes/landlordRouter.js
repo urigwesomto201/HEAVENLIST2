@@ -2,7 +2,8 @@ const router = require('express').Router();
 
 const { registerlandlord, loginlandlord, verifylandlordEmail, landlordForgotPassword, landlordResetPassword, resendlandlordVerificationEmail, changelandlordPassword, logoutlandlord} = require('../controller/landlordController')
 const { landlordAuthenticate } = require('../middlewares/authentication')
-
+const jwt = require('jsonwebtoken');
+const passport = require('passport')
 /**
  * @swagger
  * /api/v1/registerlandlord:
@@ -391,6 +392,39 @@ router.post('/changelandlordPassword',landlordAuthenticate, changelandlordPasswo
 router.post('/logoutlandlord', landlordAuthenticate, logoutlandlord)
 
 
+
+router.get('/google-autheticate', passport.authenticate('google',{scope: ['profile','email']}));
+
+
+router.get('/auth/google/login', passport.authenticate('google'),async(req,res)=>{
+    console.log('Req User: ',req.user)
+    const token = await jwt.sign({userId: req.user._id, isVerified: req.user.isVerified}, process.env.JWT_SECRET,{expiresIn:'1day'});
+    res.status(200).json({
+        message: 'Google Auth Login Successful',
+        data:req.user,
+        token
+    })
+});
+
+
+// Facebook Login Route
+router.get("/auth-facebook", passport.authenticate("facebook", { scope: ["email"] }));
+
+// Facebook Callback Route
+router.get("/auth/facebook/login",
+    passport.authenticate("facebook", {
+      failureRedirect: "/login",  // Or wherever you want to redirect on failure
+    }),
+    async(req, res) => {
+        const token = await jwt.sign({userId: req.user._id, isVerified: req.user.isVerified}, process.env.JWT_SECRET,{expiresIn:'1day'});
+        res.status(200).json({
+            message: 'Facebook Auth Login Successful',
+            data:req.user,
+            token
+        })
+    
+    }
+  );
 
 
 

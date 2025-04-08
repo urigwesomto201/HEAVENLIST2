@@ -1,5 +1,7 @@
+const Transaction = require('./transaction');
 const { Sequelize, DataTypes, Model } = require('sequelize');
 const sequelize = require('../database/sequelize');
+const Inspection = require('./inspection');
 // const Post = require('./post');
 
 class Tenant extends Model {}
@@ -56,5 +58,12 @@ Tenant.init(
 //   foreignKey: 'id',
 //   as: 'User'
 // })
+// Tenant.hasMany(Inspection, {
+//   foreignKey: 'tenantId',
+//   as: 'inspections', // Plural form for one-to-many relationship
+//   onDelete: 'CASCADE',
+//   onUpdate: 'CASCADE'
+// });
+
 
 module.exports = Tenant

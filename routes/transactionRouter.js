@@ -1,5 +1,5 @@
 const transactionrouter = require("express").Router();
-const {initialPayment,verifyPayment}= require('../controller/transaction')
+const {initialPayment,verifyPayment,getLandlordTransactions}= require('../controller/transaction')
 
 
 
@@ -74,7 +74,7 @@ const {initialPayment,verifyPayment}= require('../controller/transaction')
  *                   example: Error initializing payment
  */
 
-transactionrouter.post("/initialize",initialPayment)
+transactionrouter.post("/initialize/:tenantid/:landlordid",initialPayment)
 
 /**
  * @swagger
@@ -140,6 +140,10 @@ transactionrouter.post("/initialize",initialPayment)
  */
 transactionrouter.get("/verify",verifyPayment)
 
+
+
+// routes/payment.js or routes/landlord.js
+transactionrouter.get('/landlord/:landlordId/transactions', getLandlordTransactions);
 module.exports = transactionrouter;
 
 

@@ -1,7 +1,9 @@
 const transactionModel = require('../models/transaction');
+const tenant = require('../models/tenant')
+const landlord = require('../models/landlord')
 const axios = require("axios");
 const otpGenerator = require('otp-generator');
-
+const nodemailer = require('nodemailer')
 // Generate OTP and reference
 const otp = otpGenerator.generate(12, { specialChars: false });
 const ref = `TCA-AF${otp}`;  // Use backticks for template literal
@@ -12,7 +14,7 @@ const formatDate = new Date().toLocaleString();
 exports.initialPayment = async (req, res) => {
   try {
     const { amount, email, name } = req.body;
-
+    const {tenantId,landlordId} = req.params;
     // Validate input fields
     if (!amount || !email || !name) {
       return res.status(400).json({ message: 'PLEASE INPUT ALL FIELDS' });
@@ -23,7 +25,8 @@ exports.initialPayment = async (req, res) => {
       amount,
       customer: { name, email },
       currency: 'NGN',
-      reference: ref
+      reference: ref,
+  
     };
 
     // Send request to Korapay API
@@ -45,7 +48,10 @@ exports.initialPayment = async (req, res) => {
       amount,
       name,
       reference: paymentData.reference,
-      paymentDate: formatDate
+      paymentDate: formatDate,
+      landlordId,
+      tenantId
+
     });
 
     // Return response to client
@@ -102,7 +108,27 @@ exports.verifyPayment = async (req, res) => {
           { status: 'success' },
           { where: { reference } }
         );
-  
+     const tenantEmail = await tenant.findOne({where:{id:existingTransaction.tenantId}})
+     const landlordEmail = await landlord.findOne({where:{id:existingTransaction.landlordId}})
+    if(tenant?.email){
+      const mailDetails = {
+                  subject: 'Payment successfully - You have Rented a property!',
+                  email: tenant.email,
+                  html
+                  
+              }
+              await sendEmail(mailDetails)
+    }
+    if (landlord?.email){
+      const mailDetails = {
+        subject: 'Your property Has Been Rented!',
+        email: landlord.email,
+        html
+        
+    }
+    await sendEmail(mailDetails)
+    }
+    
         res.status(200).json({
           message: 'Payment verification successful',
           reference,
@@ -123,3 +149,55 @@ exports.verifyPayment = async (req, res) => {
     }
   };
   
+
+
+
+
+  const { Op, fn, col } = require('sequelize');
+
+
+exports.getLandlordTransactions = async (req, res) => {
+  try {
+    const { landlordId } = req.params;
+
+    
+    const transactions = await transactionModel.findAll({
+      where: {
+        landlordId,
+        status: 'success'
+      },
+      order: [['paymentDate', 'DESC']]
+    });
+
+    
+    const totalResult = await transactionModel.findOne({
+      where: {
+        landlordId,
+        status: 'success'
+      },
+      attributes: [
+        [fn('SUM', col('amount')), 'totalAmount']
+      ],
+      raw: true
+    });
+
+    const totalAmount = parseFloat(totalResult.totalAmount) || 0;
+
+    
+    await landlord.update(
+      { transactionHistory: totalAmount },
+      { where: { id: landlordId } }
+    );
+
+  
+    res.status(200).json({
+      message: 'Landlord transaction history retrieved successfully',
+      totalAmount,
+      transactions
+    });
+
+  } catch (error) {
+    
+    res.status(500).json({ message: 'Error fetching landlord transactions', error: error.message });
+  }
+};
