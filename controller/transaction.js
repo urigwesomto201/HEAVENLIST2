@@ -110,7 +110,7 @@ exports.verifyPayment = async (req, res) => {
         );
      const tenantEmail = await tenant.findOne({where:{id:existingTransaction.tenantId}})
      const landlordEmail = await landlord.findOne({where:{id:existingTransaction.landlordId}})
-    if(tenant?.email){
+    if(tenantEmail?.email){
       const mailDetails = {
                   subject: 'Payment successfully - You have Rented a property!',
                   email: tenant.email,
@@ -119,7 +119,7 @@ exports.verifyPayment = async (req, res) => {
               }
               await sendEmail(mailDetails)
     }
-    if (landlord?.email){
+    if (landlordEmail?.email){
       const mailDetails = {
         subject: 'Your property Has Been Rented!',
         email: landlord.email,
