@@ -9,10 +9,12 @@ const cloudinary = require('../database/cloudinary')
 
 
 
+
 exports.createLandlordProfile = async (req, res) => {
     try {
         const { landlordId } = req.params;
-        const { fullName, email, state, street, locality } = req.body;
+        const { fullName, email, state, street, locality} = req.body;
+
 
         if (!fullName || !email || !state || !street || !locality) {
             return res.status(400).json({ message: 'Please input correct fields' });
@@ -22,11 +24,20 @@ exports.createLandlordProfile = async (req, res) => {
             return res.status(400).json({ message: 'Landlord ID is required' });
         }
 
-       
-        const existingLandlordProfile = await LandlordProfile.findOne({ where: { landlordId } });
+        const existingLandlord = await landlordModel.findOne({ where: { id: landlordId , email: email},
+            attributes: ['id', 'fullName']
 
-        if (existingLandlordProfile) {
-            return res.status(400).json({ message: 'A profile already exists for this landlord.' });
+         });
+
+        if (existingLandlord) {
+            if (req.file && fs.existsSync(req.file.path)) {
+                try {
+                    fs.unlinkSync(req.file.path);
+                } catch (err) {
+                    console.error("Error deleting file:", err.message);
+                }
+            }
+            return res.status(400).json({ message: 'Landlord profile already exists' });
         }
 
         if (!req.file) {
@@ -41,7 +52,7 @@ exports.createLandlordProfile = async (req, res) => {
             return res.status(400).json({ message: 'Error uploading image to Cloudinary' });
         }
 
-      
+        // Delete the file safely
         if (fs.existsSync(req.file.path)) {
             try {
                 fs.unlinkSync(req.file.path);
@@ -59,15 +70,15 @@ exports.createLandlordProfile = async (req, res) => {
             profileImage: result.secure_url
         });
 
-        newProfile.isVerified = true;
+        newProfile.isVerified = true; 
 
-        await newProfile.save();
+        await newProfile.save()
 
         res.status(201).json({ message: 'Landlord profile created successfully', data: newProfile });
 
     } catch (error) {
         console.error("Error:", error.message);
-
+        
         if (req.file && fs.existsSync(req.file.path)) {
             try {
                 fs.unlinkSync(req.file.path);
