@@ -43,7 +43,7 @@ LandlordProfile.init(
       type: DataTypes.BOOLEAN, // Changed to BOOLEAN to match the model
       defaultValue: false // Added default value
     },
-      landlordId: {
+    landlordId: {
       type: DataTypes.UUID,
       allowNull: false,
       references: {
