@@ -45,6 +45,7 @@ LandlordProfile.init(
     },
     landlordId: {
       type: DataTypes.UUID,
+      allowNull: false,
       references: {
         model: 'Landlords',
         key: 'id'
