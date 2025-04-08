@@ -64,7 +64,6 @@ exports.createLandlordProfile = async (req, res) => {
             fullName,
             email,
             state,
-            landlordId,
             street,
             locality,
             profileImage: result.secure_url
