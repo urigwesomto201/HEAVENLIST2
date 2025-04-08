@@ -23,7 +23,7 @@ exports.createLandlordProfile = async (req, res) => {
         }
 
        
-        const existingLandlordProfile = await LandlordProfile.findOne({ where: { landlordId } });
+        const existingLandlordProfile = await landlordModel.findOne({ where: { landlordId } });
 
         if (existingLandlordProfile) {
             return res.status(400).json({ message: 'A profile already exists for this landlord.' });
