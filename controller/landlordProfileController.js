@@ -62,6 +62,7 @@ exports.createLandlordProfile = async (req, res) => {
         }
 
         const newProfile = await LandlordProfile.create({
+            landlordId,
             fullName,
             email,
             state,
