@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('landlordProfiles', {
+    await queryInterface.createTable('LandlordProfiles', {
       id: {
         allowNull: false,
         primaryKey: true,
@@ -55,6 +55,15 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       },
+      listingId: {
+        type: Sequelize.UUID,
+        references: {
+          model: 'Listings', // Fixed: Use the table name as a string
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -66,6 +75,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('landlordProfiles');
+    await queryInterface.dropTable('LandlordProfiles');
   }
 };

@@ -640,7 +640,7 @@ router.delete('/admin/:id',adminAuthenticate, deleteAdmin);
  *                   type: string
  *                   example: "Error verifying a listing."
  */
-router.put('/verfiyAlisting/:landlordId/:listingId',adminAuthenticate, verfiyAlisting);
+router.put('/verfiyAlisting/:listingId/:landlordId',adminAuthenticate, verfiyAlisting);
 
 /**
  * @swagger
@@ -720,7 +720,7 @@ router.put('/verfiyAlisting/:landlordId/:listingId',adminAuthenticate, verfiyAli
  *                   example: 'Error unverifying listings'
  */
 
-router.put('/unverifyAlisting/:landlordId/:listingId', adminAuthenticate,unverifyAlisting)
+router.put('/unverifyAlisting/:listingId/:landlordId', adminAuthenticate,unverifyAlisting)
 
 
 

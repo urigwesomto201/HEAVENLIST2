@@ -1,9 +1,9 @@
-const Transaction = require('./transaction');
 const { Sequelize, DataTypes, Model } = require('sequelize'); // Ensure Sequelize and DataTypes are imported
 const sequelize = require('../database/sequelize'); // Import the sequelize instance
 const Landlord = require('./landlord'); // Import the Landlord model
 const LandlordProfile = require('./landlordprofile'); // Import 
 const Inspection = require('./inspection');
+const Transaction = require('./transaction');
 
 class Listing extends Model {}
 
@@ -93,15 +93,7 @@ Listing.init(
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE'
     },
-    landlordProfileId: {
-      type: DataTypes.UUID,
-      references: {
-        model: LandlordProfile, // Reference the LandlordProfile model
-        key: 'id'
-      },
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE'
-    }
+    
   },
   {
     // Other model options go here
@@ -125,12 +117,9 @@ Listing.init(
 //   onUpdate: 'CASCADE' // Alias for the relationship
 // });
 
-Listing.hasOne(Transaction, {
-  foreignKey: 'TransactionId',
-  as: 'Transaction', // Singular form for one-to-one relationship
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
-});
+
+
+
 // Listing.belongsTo(Inspection, {
 //   foreignKey: 'ListingId',
 //   as: 'landlord', // Plural form for one-to-many relationship

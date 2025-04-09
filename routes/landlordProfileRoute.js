@@ -381,4 +381,6 @@ router.put('/updateLandlordProfile/:landlordId', landlordAuthenticate, upload.si
  */
 router.delete('/deleteLandlordProfile',landlordAuthenticate, deleteLandlordProfile);
 
+
+
 module.exports = router;

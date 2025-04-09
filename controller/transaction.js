@@ -1,203 +1,247 @@
+const { Op, fn, col } = require('sequelize');
 const transactionModel = require('../models/transaction');
-const tenant = require('../models/tenant')
-const landlord = require('../models/landlord')
-const axios = require("axios");
+const tenantModel = require('../models/tenant');
+const landlordModel = require('../models/landlord');
+const axios = require('axios');
 const otpGenerator = require('otp-generator');
-const nodemailer = require('nodemailer')
-// Generate OTP and reference
+const nodemailer = require('nodemailer');
+const { tenentRentMessage, landlordRentMessage } = require('../utils/mailTemplates');
+const sendEmail = require('../middlewares/nodemailer');
+
+
 const otp = otpGenerator.generate(12, { specialChars: false });
-const ref = `TCA-AF${otp}`;  // Use backticks for template literal
+const ref = `TCA-AF${otp}`;
 const secret_key = process.env.koraPay_SECRET_KEY;
 const formatDate = new Date().toLocaleString();
 
-// Initial Payment Controller
+
 exports.initialPayment = async (req, res) => {
   try {
     const { amount, email, name } = req.body;
-    const {tenantId,landlordId} = req.params;
-    // Validate input fields
+    const { tenantId, landlordId, listingId } = req.params;
+
+    if (!tenantId || !landlordId || !listingId) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
     if (!amount || !email || !name) {
       return res.status(400).json({ message: 'PLEASE INPUT ALL FIELDS' });
     }
 
-    // Payment data to send to Korapay
+
     const paymentData = {
       amount,
       customer: { name, email },
       currency: 'NGN',
       reference: ref,
-  
+
     };
 
-    // Send request to Korapay API
+
     const response = await axios.post(
       'https://api.korapay.com/merchant/api/v1/charges/initialize',
       paymentData,
       {
         headers: {
-          Authorization: `Bearer ${secret_key}`  // Fix: Use backticks for the Authorization header
-        }
+          Authorization: `Bearer ${secret_key}`,
+        },
       }
     );
 
     const { data } = response?.data;
 
-    // Save transaction in the database
-    const payment = await transactionModel.create({
+  
+    await transactionModel.create({
       email,
       amount,
       name,
-      reference: paymentData.reference,
+      reference: data?.reference,
       paymentDate: formatDate,
+      status: 'pending',
       landlordId,
-      tenantId
+      tenantId,
+      listingId
+      
 
     });
 
-    // Return response to client
+  
     res.status(201).json({
-      message: "Payment initialized successfully",
+      message: 'Payment initialized successfully',
       data: {
         reference: data?.reference,
-        checkout_url: data?.checkout_url
-      }
+        checkout_url: data?.checkout_url,
+      },
     });
   } catch (error) {
     if (error.response?.status === 409) {
-        return res.status(409).json({ message: 'Transaction already exists or duplicate reference' });
-      }
+      return res.status(409).json({ message: 'Transaction already exists or duplicate reference' });
+    }
 
-    res.status(500).json({ message: "Error initializing payment",  }+ error.message);
+    res.status(500).json({ message: 'Error initializing payment', error: error.message });
   }
 };
 
+
+
+
+
 exports.verifyPayment = async (req, res) => {
-    try {
-      const { reference } = req.query;
-      const existingTransaction = await transactionModel.findOne({ where: { reference } });
+  try {
+    const { reference } = req.query;
 
-      if (!existingTransaction) {
-        return res.status(404).json({ message: 'Transaction not found' });
+    // Validate the reference parameter
+    if (!reference) {
+      return res.status(400).json({ message: 'Reference is required' });
+    }
+
+    // Find the existing transaction by reference
+    const existingTransaction = await transactionModel.findOne({ where: { reference } });
+
+    if (!existingTransaction) {
+      return res.status(404).json({ message: 'Transaction not found' });
+    }
+
+    // Check if the transaction has already been verified
+    if (existingTransaction.status === 'success') {
+      return res.status(400).json({ message: 'Payment has already been verified successfully' });
+    }
+
+    if (existingTransaction.status === 'failed') {
+      return res.status(400).json({ message: 'Payment verification already failed' });
+    }
+
+    // Verify payment with Korapay API
+    const response = await axios.get(
+      `https://api.korapay.com/merchant/api/v1/charges/${reference}`,
+      {
+        headers: {
+          Authorization: `Bearer ${secret_key}`,
+        },
       }
-  
-      // Check if the status is already 'success' or 'failed'
-      if (existingTransaction.status === 'success') {
-        return res.status(400).json({ message: 'Payment has already been verified successfully' });
-      }
-      
-      if (existingTransaction.status === 'failed') {
-        return res.status(400).json({ message: 'Payment verification already failed' });
-      }
-      // Send request to Korapay API to verify payment
-      const response = await axios.get(
-        `https://api.korapay.com/merchant/api/v1/charges/${reference}`,
-        {
-          headers: {
-            Authorization: `Bearer ${secret_key}`  // Ensure correct token usage
-          }
-        }
+    );
+
+    const data = response?.data;
+
+    // Check if the payment was successful
+    if (data?.data?.status === 'success') {
+      console.log('Payment successful');
+
+      // Update the transaction status to 'success'
+      await transactionModel.update(
+        { status: 'success' },
+        { where: { reference } }
       );
-  
-      const { data } = response;
-  
-      if (data.data.status && data.data.status === 'success') {
-        console.log('Payment successful');
-  
-        
-        await transactionModel.update(
-          { status: 'success' },
-          { where: { reference } }
-        );
-     const tenantEmail = await tenant.findOne({where:{id:existingTransaction.tenantId}})
-     const landlordEmail = await landlord.findOne({where:{id:existingTransaction.landlordId}})
-    if(tenantEmail?.email){
-      const mailDetails = {
-                  subject: 'Payment successfully - You have Rented a property!',
-                  email: tenant.email,
-                  html
-                  
-              }
-              await sendEmail(mailDetails)
-    }
-    if (landlordEmail?.email){
-      const mailDetails = {
-        subject: 'Your property Has Been Rented!',
-        email: landlord.email,
-        html
-        
-    }
-    await sendEmail(mailDetails)
-    }
-    
-        res.status(200).json({
-          message: 'Payment verification successful',
-          reference,
-        });
-      } else {
-        console.log('Payment failed');
-  
-        await transactionModel.update(
-          { status: 'failed' },
-          { where: { reference } }
-        );
-  
-        res.status(400).json({ message: 'Payment failed' });
-      }
-    } catch (error) {
+
+      // Fetch tenant and landlord details
+      const tenant = await tenantModel.findOne({ where: { id: existingTransaction.tenantId } });
+      const landlord = await landlordModel.findOne({ where: { id: existingTransaction.landlordId } });
+
+      const tenantname = tenant.fullName
+      const tenentamount = existingTransaction.amount
       
-      res.status(500).json({ message: "Error verifying payment",  }+error.message);
+      const tenanthtml = tenentRentMessage(tenentamount, tenantname)
+
+     
+      if (tenant?.email) {
+        const tenantMailDetails = {
+          subject: 'Payment Successful - Property Rented!',
+          email: tenant.email,
+          html: tenanthtml
+          // `
+          //   <p>Dear ${tenant.fullName || 'Tenant'},</p>
+          //   <p>Your payment of NGN ${existingTransaction.amount} was successful. You have successfully rented the property.</p>
+          //   <p>Thank you for using our service!</p>
+          // `,
+        };
+        await sendEmail(tenantMailDetails);
+      }
+
+      const firstName = landlord.fullName
+      const landlordamount = existingTransaction.amount
+      
+      const landlordhtml = landlordRentMessage(landlordamount, firstName)
+
+      // Send email to the landlord
+      if (landlord?.email) {
+        const landlordMailDetails = {
+          subject: 'Your Property Has Been Rented!',
+          email: landlord.email,
+          html: landlordhtml
+
+          // `
+          //   <p>Dear ${landlord.fullName || 'Landlord'},</p>
+          //   <p>Your property has been successfully rented. A payment of NGN ${existingTransaction.amount} has been made by the tenant.</p>
+          //   <p>Thank you for using our service!</p>
+          // `,
+        }
+        await sendEmail(landlordMailDetails);
+      }
+
+      // Respond with success
+      res.status(200).json({
+        message: 'Payment verification successful',
+        reference,
+      });
+    } else {
+      console.log('Payment failed');
+
+      // Update the transaction status to 'failed'
+      await transactionModel.update(
+        { status: 'failed' },
+        { where: { reference } }
+      );
+
+      res.status(400).json({ message: 'Payment failed' });
     }
-  };
-  
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error verifying payment', error: error.message });
+  }
+};
 
 
 
 
-  const { Op, fn, col } = require('sequelize');
+
+
 
 
 exports.getLandlordTransactions = async (req, res) => {
   try {
     const { landlordId } = req.params;
 
-    
+  
+    if (!landlordId) {
+      return res.status(400).json({ message: 'Landlord ID is required' });
+    }
+
+   
     const transactions = await transactionModel.findAll({
       where: {
         landlordId,
-        status: 'success'
+        status: 'success',
       },
-      order: [['paymentDate', 'DESC']]
+      order: [['paymentDate', 'DESC']],
     });
 
-    
-    const totalResult = await transactionModel.findOne({
-      where: {
-        landlordId,
-        status: 'success'
-      },
-      attributes: [
-        [fn('SUM', col('amount')), 'totalAmount']
-      ],
-      raw: true
-    });
-
-    const totalAmount = parseFloat(totalResult.totalAmount) || 0;
+   
+    const totalAmount = transactions.reduce((sum, transaction) => sum + transaction.amount, 0);
 
     
-    await landlord.update(
-      { transactionHistory: totalAmount },
+    await landlordModel.update(
+      { transactionHistory: totalAmount }, 
       { where: { id: landlordId } }
     );
 
-  
+   
     res.status(200).json({
       message: 'Landlord transaction history retrieved successfully',
-      totalAmount,
-      transactions
+      totalAmount, 
+      transactions,
     });
-
   } catch (error) {
-    
+    console.error(error);
     res.status(500).json({ message: 'Error fetching landlord transactions', error: error.message });
   }
 };

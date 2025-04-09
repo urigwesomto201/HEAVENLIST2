@@ -52,6 +52,15 @@ LandlordProfile.init(
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE'
     },
+    listingId: {
+      type: DataTypes.UUID,
+      references: {
+        model: Listing, // Fixed: Use the table name as a string
+        key: 'id',
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
+    },
   },
   {
     // Other model options go here
