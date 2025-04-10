@@ -114,11 +114,11 @@ exports.createLandlordProfile = async (req, res) => {
         return res.status(400).json({ message: 'A profile already exists for this landlord' });
       }
   
-      // Check if the landlord exists in the Landlords table
-      const existingLandlord = await landlordModel.findOne({ where: { id: landlordId } });
-      if (!existingLandlord) {
-        return res.status(404).json({ message: 'Landlord not found' });
-      }
+    //   // Check if the landlord exists in the Landlords table
+    //   const existingLandlord = await landlordModel.findOne({ where: { id: landlordId } });
+    //   if (!existingLandlord) {
+    //     return res.status(404).json({ message: 'Landlord not found' });
+    //   }
   
       // Check if a profile image is provided
       if (!req.file) {
