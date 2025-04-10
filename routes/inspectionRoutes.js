@@ -35,19 +35,15 @@ const { adminAuthenticate } = require('../middlewares/authentication')
  *         schema:
  *           type: object
  *           properties:
- *             date:
- *               type: string
- *               format: date
- *               description: The date of the inspection.
- *               example: "2025-04-15"
- *             time:
- *               type: string
- *               description: The time of the inspection.
- *               example: "10:00 AM"
- *             notes:
- *               type: string
- *               description: Additional notes for the inspection.
- *               example: "Please confirm availability before the scheduled time."
+ *                     days:
+ *                       type: string
+ *                       format: date
+ *                       description: The date of the inspection.
+ *                       example: "Monday"
+ *                     timeRange:
+ *                       type: string
+ *                       description: The time of the inspection.
+ *                       example: "10am-4pm"
  *     responses:
  *       201:
  *         description: Inspection scheduled successfully.
