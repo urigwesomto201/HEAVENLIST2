@@ -2,9 +2,10 @@ const { Sequelize, DataTypes, Model } = require('sequelize');
 const sequelize = require('../database/sequelize');
 const Listing = require('./listing');
 const LandlordProfile = require('./landlordprofile');
-const Transaction = require('./transaction')
-const Tenant = require('./tenant')
+const Transaction = require('./transaction');
+const Tenant = require('./tenant');
 const Inspection = require('./inspection');
+
 class Landlord extends Model {}
 
 Landlord.init(
@@ -13,151 +14,145 @@ Landlord.init(
       allowNull: false,
       primaryKey: true,
       type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4
+      defaultValue: DataTypes.UUIDV4,
     },
     fullName: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
     email: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
     isVerified: {
       type: DataTypes.BOOLEAN,
-      defaultValue: false
+      defaultValue: false,
     },
     isLoggedIn: {
       type: DataTypes.BOOLEAN,
-      defaultValue: false
+      defaultValue: false,
     },
     isAdmin: {
       type: DataTypes.BOOLEAN,
-      defaultValue: false
+      defaultValue: false,
     },
   },
   {
     sequelize,
     modelName: 'Landlord',
-    tableName: 'Landlords'
-  },
+    tableName: 'Landlords',
+  }
 );
 
-// Define associations after all models are initialized
-// Landlord.hasOne(LandlordProfile, {
-//   foreignKey: 'landlordId',
-//   as: 'landlordProfile', // Singular form for one-to-one relationship
-//   onDelete: 'CASCADE',
-//   onUpdate: 'CASCADE'
-// });
-
-// Landlord.hasMany(Listing, {
-//   foreignKey: 'landlordId',
-//   as: 'listings', // Plural form for one-to-many relationship
-//   onDelete: 'CASCADE',
-//   onUpdate: 'CASCADE'
-// });
-
-// LandlordProfile.belongsTo(Landlord, {
-//   foreignKey: 'landlordId',
-//   as: 'landlord', // Singular form for consistency
-//   onDelete: 'CASCADE',
-//   onUpdate: 'CASCADE'
-// });
-
-// Listing.belongsTo(Landlord, {
-//   foreignKey: 'landlordId',
-//   as: 'landlord', // Singular form for consistency
-//   onDelete: 'CASCADE',
-//   onUpdate: 'CASCADE'
-// });
-
-
+// Define associations
 Landlord.hasOne(LandlordProfile, {
   foreignKey: 'landlordId',
-  as: 'landlordProfile', // Singular form for one-to-one relationship
+  as: 'landlordProfile',
   onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
-});
-Inspection.belongsTo(Tenant, {
-    foreignKey: 'tenantId',
-    as: 'tenant'
-    ,
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
-});
-
-Inspection.belongsTo(Listing, {
-    foreignKey: 'listingId',
-    as: 'listing',
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
-});
-
-Tenant.hasMany(Transaction, {
-  foreignKey: 'tenantId',
-  as: 'Transactions', // Plural form for one-to-many relationship
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
-});
-Tenant.hasMany(Inspection, {
-  foreignKey: 'tenantId',
-  as: 'inspections', // Plural form for one-to-many relationship
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
+  onUpdate: 'CASCADE',
 });
 
 Landlord.hasMany(Listing, {
   foreignKey: 'landlordId',
-  as: 'listings', // Plural form for one-to-many relationship
+  as: 'listings',
   onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
+  onUpdate: 'CASCADE',
 });
-
 
 LandlordProfile.belongsTo(Landlord, {
   foreignKey: 'landlordId',
-  as: 'landlord', // Singular form for consistency
+  as: 'landlord',
   onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
+  onUpdate: 'CASCADE',
 });
 
 Listing.belongsTo(Landlord, {
   foreignKey: 'landlordId',
-  as: 'landlord', // Singular form for consistency
+  as: 'landlord',
   onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
+  onUpdate: 'CASCADE',
 });
 
-// Ensure LandlordProfile and Listing are properly associated with Landlord
-LandlordProfile.hasMany(Listing, {
-  foreignKey: 'landlordProfileId',
-  as: 'listings', // Plural form for one-to-many relationship
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
-});
+// LandlordProfile.hasMany(Listing, {
+//   foreignKey: 'landlordProfileId',
+//   as: 'listings',
+//   onDelete: 'CASCADE',
+//   onUpdate: 'CASCADE',
+// });
 
-Listing.belongsTo(LandlordProfile, {
-  foreignKey: 'landlordProfileId',
-  as: 'landlordProfile', // Singular form for consistency
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
-});
+// Listing.belongsTo(LandlordProfile, {
+//   foreignKey: 'landlordProfileId',
+//   as: 'landlordProfile',
+//   onDelete: 'CASCADE',
+//   onUpdate: 'CASCADE',
+// });
+
 Transaction.belongsTo(Landlord, {
   foreignKey: 'landlordId',
-  as: 'landlord', // Singular form for consistency
+  as: 'landlord',
   onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
+  onUpdate: 'CASCADE',
 });
+
 Transaction.belongsTo(Tenant, {
   foreignKey: 'tenantId',
-  as: 'tenant', // Singular form for consistency
+  as: 'tenant',
   onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
+  onUpdate: 'CASCADE',
+});
+
+// Removed Transaction.belongsTo(Inspection) because `inspectionId` is not defined in the Transaction model
+
+Transaction.belongsTo(Listing, {
+  foreignKey: 'listingId',
+  as: 'listing',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+
+// Fixed: Corrected the foreign key in Listing.hasOne(Transaction)
+Listing.hasOne(Transaction, {
+  foreignKey: 'listingId', // Fixed: Use 'listingId' to match the association in Transaction.belongsTo(Listing)
+  as: 'transaction', // Singular form for one-to-one relationship
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+
+Inspection.belongsTo(Tenant, {
+  foreignKey: 'tenantId',
+  as: 'tenant',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+
+Inspection.belongsTo(Listing, {
+  foreignKey: 'listingId',
+  as: 'listing',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+
+Tenant.hasMany(Transaction, {
+  foreignKey: 'tenantId',
+  as: 'transactions',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+
+Tenant.hasMany(Inspection, {
+  foreignKey: 'tenantId',
+  as: 'inspections',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
 });
 
 module.exports = Landlord;
+
+
+
+
+

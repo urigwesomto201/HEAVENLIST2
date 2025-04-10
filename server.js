@@ -97,7 +97,7 @@ app.use('/api/v1/',tenantRouter)
 app.use('/api/v1/',landlordRouter)
 app.use('/api/v1/',adminRouter)
 app.use('/api/v1/',listingRouter)
- app.use('/api/v1/',landlordProfileRouter)
+app.use('/api/v1/',landlordProfileRouter)
 app.use('/api/v1/',transacRouter)
 app.use('/api/v1/',inspection)
 app.use((error, req, res, next) => {

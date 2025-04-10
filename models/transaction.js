@@ -1,14 +1,15 @@
-const Landlord = require('./landlord');
-const Listing = require('./listing');
-const tenant = require('./tenant')
-'use strict';
-const { Sequelize, DataTypes, Model } = require('sequelize');
-const sequelize = require('../database/sequelize');
+const { Sequelize, DataTypes, Model } = require('sequelize'); // Ensure Sequelize and DataTypes are imported
+const sequelize = require('../database/sequelize'); // Import the sequelize instance
+const Landlord = require('./landlord'); // Import the Landlord model
+const LandlordProfile = require('./landlordprofile'); // Import 
+const Inspection = require('./inspection');
+
 
 class Transaction extends Model {}
 
 Transaction.init(
   {
+    // Model attributes are defined here
     id: {
       allowNull: false,
       primaryKey: true,
@@ -17,70 +18,71 @@ Transaction.init(
     },
     email: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
     name: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
     amount: {
       type: DataTypes.FLOAT,
-      allowNull: false
+      allowNull: false,
     },
     reference: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
+      unique: true,
     },
     status: {
       type: DataTypes.ENUM('pending', 'success', 'failed'),
-      defaultValue: 'pending'
+      defaultValue: 'pending',
     },
     paymentDate: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: false,
     },
     transactionHistory: {
-      type: DataTypes.INTEGER, 
-      defaultValue: 0
+      type: DataTypes.FLOAT,
+      defaultValue: 0.0,
     },
     landlordId: {
-          type: DataTypes.UUID,
-          references: {
-            model: Landlord,
-            key: 'id'
-          },
-          onUpdate: 'CASCADE',
-          onDelete: 'CASCADE'
-        },
+      type: DataTypes.UUID,
+      references: {
+        model: 'Landlords', // Fixed: Use the table name as a string
+        key: 'id',
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
+    },
     tenantId: {
-          type: DataTypes.UUID,
-          references: {
-            model: tenant,
-            key: 'id'
-          },
-          onUpdate: 'CASCADE',
-          onDelete: 'CASCADE'
-        },
-    
-        ListingId: {
-          type: DataTypes.UUID,
-          references: {
-            model: Listing,
-            key: 'id'
-          },
-          onUpdate: 'CASCADE',
-          onDelete: 'CASCADE'
-        },
-    
+      type: DataTypes.UUID,
+      references: {
+        model: 'Tenants', // Fixed: Use the table name as a string
+        key: 'id',
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
+    },
+    listingId: {
+      type: DataTypes.UUID,
+      references: {
+        model: 'Listings', // Fixed: Use the table name as a string
+        key: 'id',
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
+    },
   },
   {
-    sequelize, 
-    modelName: 'Transaction', 
-    tableName: 'Transactions' 
-  }
-  
+    // Other model options go here
+    sequelize, // Pass the connection instance
+    modelName: 'Transaction', // Define the model name
+    tableName: 'Transactions' // Define the table name
+  },
 );
 
 
 
+
 module.exports = Transaction;
+

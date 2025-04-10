@@ -5,7 +5,7 @@ const {initialPayment,verifyPayment,getLandlordTransactions}= require('../contro
 
 /**
  * @swagger
- * /api/v1/transaction/initialize:
+ * /api/v1/initialize/{tenantid}/{landlordid}/{listingId}:
  *   post:
  *     tags:
  *       - Transactions
@@ -74,11 +74,11 @@ const {initialPayment,verifyPayment,getLandlordTransactions}= require('../contro
  *                   example: Error initializing payment
  */
 
-transactionrouter.post("/initialize/:tenantid/:landlordid",initialPayment)
+transactionrouter.post("/initialize/:tenantId/:landlordId/:listingId", initialPayment)
 
 /**
  * @swagger
- * /api/v1/transaction/verify:
+ * /api/v1/charges/{reference}:
  *   get:
  *     tags:
  *       - Transactions
@@ -138,12 +138,85 @@ transactionrouter.post("/initialize/:tenantid/:landlordid",initialPayment)
  *                   type: string
  *                   example: Error verifying payment
  */
-transactionrouter.get("/verify",verifyPayment)
+transactionrouter.get("/charges/:reference",verifyPayment)
 
 
 
-// routes/payment.js or routes/landlord.js
-transactionrouter.get('/landlord/:landlordId/transactions', getLandlordTransactions);
+/**
+ * @swagger
+ * /api/v1/landlordtransactions/{landlordId}:
+ *   get:
+ *     tags:
+ *       - Transactions
+ *     summary: Get landlord transactions
+ *     description: This endpoint retrieves all transactions for a specific landlord.
+ *     parameters:
+ *       - in: path
+ *         name: landlordId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the landlord whose transactions are to be retrieved.
+ *         example: "123e4567-e89b-12d3-a456-426614174000"
+ *     responses:
+ *       200:
+ *         description: Landlord transactions retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Landlord transaction history retrieved successfully
+ *                 totalAmount:
+ *                   type: number
+ *                   description: The total amount of successful transactions.
+ *                   example: 5000.0
+ *                 transactions:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         description: The transaction ID.
+ *                         example: "123e4567-e89b-12d3-a456-426614174000"
+ *                       amount:
+ *                         type: number
+ *                         description: The transaction amount.
+ *                         example: 100.0
+ *                       status:
+ *                         type: string
+ *                         description: The transaction status.
+ *                         example: "success"
+ *       404:
+ *         description: Landlord not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Landlord not found
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Error fetching landlord transactions
+ */
+
+transactionrouter.get('/landlordtransactions/:landlordId', getLandlordTransactions);
+
+
+
+
 module.exports = transactionrouter;
 
 
