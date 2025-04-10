@@ -39,6 +39,7 @@ module.exports = {
       landlordId: {
         type: Sequelize.UUID,
         allowNull: false,
+        unique: true,
         references: {
           model: 'Landlords', // References the Landlords table
           key: 'id'
