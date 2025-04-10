@@ -99,7 +99,7 @@ exports.createLandlordProfile = async (req, res) => {
       const { landlordId } = req.params;
       const { fullName, email, state, street, locality } = req.body;
   
-      // Validate required fields
+
       if (!fullName || !email || !state || !street || !locality) {
         return res.status(400).json({ message: 'Please input correct fields' });
       }
@@ -108,33 +108,27 @@ exports.createLandlordProfile = async (req, res) => {
         return res.status(400).json({ message: 'Landlord ID is required' });
       }
   
-      // Check if a landlord profile already exists for the given landlordId
+
       const existingProfile = await landlordProfileModel.findOne({ where: { landlordId } });
       if (existingProfile) {
         return res.status(400).json({ message: 'A profile already exists for this landlord' });
       }
   
-    //   // Check if the landlord exists in the Landlords table
-    //   const existingLandlord = await landlordModel.findOne({ where: { id: landlordId } });
-    //   if (!existingLandlord) {
-    //     return res.status(404).json({ message: 'Landlord not found' });
-    //   }
-  
-      // Check if a profile image is provided
+
       if (!req.file) {
         return res.status(400).json({ message: 'Landlord profile image is required.' });
       }
   
       console.log("Uploading file:", req.file.path);
   
-      // Upload the profile image to Cloudinary
+
       const result = await cloudinary.uploader.upload(req.file.path, { resource_type: 'auto' });
   
       if (!result.secure_url) {
         return res.status(400).json({ message: 'Error uploading image to Cloudinary' });
       }
   
-      // Delete the local file after uploading to Cloudinary
+
       if (fs.existsSync(req.file.path)) {
         try {
           fs.unlinkSync(req.file.path);
@@ -143,7 +137,7 @@ exports.createLandlordProfile = async (req, res) => {
         }
       }
   
-      // Create the landlord profile
+
       const newProfile = await landlordProfileModel.create({
         landlordId,
         fullName,
@@ -162,7 +156,7 @@ exports.createLandlordProfile = async (req, res) => {
     } catch (error) {
       console.error("Error:", error.message);
   
-      // Delete the uploaded file in case of an error
+
       if (req.file && fs.existsSync(req.file.path)) {
         try {
           fs.unlinkSync(req.file.path);
@@ -178,19 +172,14 @@ exports.createLandlordProfile = async (req, res) => {
 
 
 
+
 // GET one Landlord Profile
 exports.getOneLandlordProfile = async (req, res) => {
     try {
         const { landlordId } = req.landlord
 
         const landlordProfile = await landlordProfileModel.findOne({ where: { },
-            include: [
-                {
-                    model: listingModel,
-                    as: 'listings',
-                    attributes: ['title', 'price', 'description'],
-                },
-            ],
+
         });
        
         if (!landlordProfile) {
@@ -212,16 +201,7 @@ exports.getOneLandlordProfile = async (req, res) => {
 exports.alllandlordProfiles = async (req, res) => {
     try {
 
-       const landlords = await landlordProfileModel.findAll({
-            include: [
-                {
-                    model: listingModel,
-                    as: 'listings',
-                    attributes: ['title', 'price', 'description'],
-                },
-            ],
-
-       });
+       const landlords = await landlordProfileModel.findAll({ });
 
         if (landlords.length === 0){
             return res.status(404).json({message:"no landlordsProfile found"})
@@ -285,14 +265,7 @@ exports.updateLandlordProfile = async (req, res) => {
         existingLandlord.isVerified = true;
 
        
-        const updatedLandlord = await landlordProfileModel.findOne({
-            where: { id: landlordId },
-            include: [{
-                model: listingModel,
-                attributes: ['title', 'price', 'description'],
-                as: 'listings'
-            }]
-        });
+        const updatedLandlord = await landlordProfileModel.findOne({});
 
         res.status(200).json({ message: 'Landlord profile updated successfully', data: updatedLandlord });
 
@@ -316,14 +289,7 @@ exports.deleteLandlordProfile = async (req, res) => {
     try {
         const { landlordId } = req.landlord;
 
-        const landlordProfile = await landlordProfileModel.findOne({
-            where: { },
-            include: [{
-                model: listingModel,
-                attributes: ['title', 'price', 'description'],
-                as: 'listings'
-            }]
-        });
+        const landlordProfile = await landlordProfileModel.findOne({ });
 
         if (!landlordProfile) {
             return res.status(404).json({ message: 'Landlord profile not found' });
