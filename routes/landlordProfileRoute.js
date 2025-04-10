@@ -121,7 +121,7 @@ router.post('/createProfile/:landlordId', landlordAuthenticate, upload.single('p
 
 /**
  * @swagger
- * /api/v1/landlord:
+ * /api/v1/getlandlordprofile:
  *   get:
  *     summary: "Get a landlord profile"
  *     description: "Fetch the details of a specific landlord profile by their ID."
