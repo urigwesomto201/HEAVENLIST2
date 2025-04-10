@@ -108,39 +108,16 @@ exports.createLandlordProfile = async (req, res) => {
         return res.status(400).json({ message: 'Landlord ID is required' });
       }
   
-      // Check if a landlord profile already exists for the given landlordId
-      const existingProfile = await landlordProfileModel.findOne({ where: { landlordId } });
-      if (existingProfile) {
-        return res.status(400).json({ message: 'A profile already exists for this landlord' });
-      }
-  
       // Check if the landlord exists in the Landlords table
       const existingLandlord = await landlordModel.findOne({ where: { id: landlordId } });
       if (!existingLandlord) {
         return res.status(404).json({ message: 'Landlord not found' });
       }
   
-      // Check if a profile image is provided
-      if (!req.file) {
-        return res.status(400).json({ message: 'Landlord profile image is required.' });
-      }
-  
-      console.log("Uploading file:", req.file.path);
-  
-      // Upload the profile image to Cloudinary
-      const result = await cloudinary.uploader.upload(req.file.path, { resource_type: 'auto' });
-  
-      if (!result.secure_url) {
-        return res.status(400).json({ message: 'Error uploading image to Cloudinary' });
-      }
-  
-      // Delete the local file after uploading to Cloudinary
-      if (fs.existsSync(req.file.path)) {
-        try {
-          fs.unlinkSync(req.file.path);
-        } catch (err) {
-          console.error("Error deleting file after Cloudinary upload:", err.message);
-        }
+      // Check if a landlord profile already exists for the given landlordId
+      const existingProfile = await landlordProfileModel.findOne({ where: { landlordId } });
+      if (existingProfile) {
+        return res.status(400).json({ message: 'A profile already exists for this landlord' });
       }
   
       // Create the landlord profile
@@ -151,31 +128,14 @@ exports.createLandlordProfile = async (req, res) => {
         state,
         street,
         locality,
-        profileImage: result.secure_url,
       });
-  
-      newProfile.isVerified = true;
-  
-      await newProfile.save();
   
       res.status(201).json({ message: 'Landlord profile created successfully', data: newProfile });
     } catch (error) {
-      console.error("Error:", error.message);
-  
-      // Delete the uploaded file in case of an error
-      if (req.file && fs.existsSync(req.file.path)) {
-        try {
-          fs.unlinkSync(req.file.path);
-        } catch (err) {
-          console.error("Error deleting file in catch:", err.message);
-        }
-      }
-  
+      console.error(error);
       res.status(500).json({ message: 'Error creating landlord profile', error: error.message });
     }
   };
-
-
 
 
 // GET one Landlord Profile
