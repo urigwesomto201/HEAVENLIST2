@@ -190,61 +190,6 @@ router.get('/getlandlordprofile', landlordAuthenticate, getOneLandlordProfile);
 
 
 /**
-* @swagger
- * /api/v1/getAllLandlordProfile:
- *   get:
- *     summary: "Get all landlords"
- *     description: "Fetch the list of all landlords along with their basic profile information."
- *     tags:
- *       - Landlord Profile
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: "Successfully fetched all landlords"
- *         content:
- *           application/json:
- *             schema:
- *               type: "object"
- *               properties:
- *                 message:
- *                   type: "string"
- *                   example: "Landlords fetched successfully"
- *                 data:
- *                   type: "array"
- *                   items:
- *                     type: "object"
- *                     properties:
- *                       id:
- *                         type: "string"
- *                         example: "1"
- *                       firstName:
- *                         type: "string"
- *                         example: "John"
- *                       lastName:
- *                         type: "string"
- *                         example: "Doe"
- *                       email:
- *                         type: "string"
- *                         example: "john.doe@example.com"
- *                       state:
- *                         type: "string"
- *                         example: "Lagos"
- *                       profileImage:
- *                         type: "object"
- *                         properties:
- *                           imageUrl:
- *                             type: "string"
- *                             example: "https://res.cloudinary.com/your-cloud-name/image/upload/v1/images/john-doe.jpg"
- *                           publicId:
- *                             type: "string"
- *                             example: "public-id-of-the-image"
- *       500:
- *         description: "Internal server error"
-*/
-router.get('/alllandlordProfiles', adminAuthenticate, alllandlordProfiles);
-
-/**
  * @swagger
  * /api/v1/landlord:
  *   put:
