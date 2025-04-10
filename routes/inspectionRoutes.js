@@ -74,19 +74,16 @@ const { adminAuthenticate } = require('../middlewares/authentication')
  *                       type: string
  *                       description: The ID of the listing.
  *                       example: "456e7890-e12b-34d5-a678-426614174001"
- *                     date:
+ *                     days:
  *                       type: string
  *                       format: date
  *                       description: The date of the inspection.
- *                       example: "2025-04-15"
- *                     time:
+ *                       example: "Monday"
+ *                     timeRange:
  *                       type: string
  *                       description: The time of the inspection.
- *                       example: "10:00 AM"
- *                     notes:
- *                       type: string
- *                       description: Additional notes for the inspection.
- *                       example: "Please confirm availability before the scheduled time."
+ *                       example: "10am-4pm"
+
  *       400:
  *         description: Bad request. Missing or invalid parameters.
  *         content:
