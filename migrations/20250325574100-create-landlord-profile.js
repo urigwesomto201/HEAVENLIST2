@@ -49,7 +49,6 @@ module.exports = {
       },
       listingId: {
         type: Sequelize.UUID,
-        allowNull: false,
         references: {
           model: 'Listings', // Fixed: Use the table name as a string
           key: 'id',
