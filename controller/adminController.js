@@ -2,7 +2,7 @@ const adminModel = require('../models/admin')
 const tenantModel = require('../models/tenant')
 const listingModel = require('../models/listing')
 const landlordModel = require('../models/landlord')
-const LandlordProfile = require('../models/landlordprofile')
+const landlordProfileModel = require('../models/landlordprofile')
 // const bcrypt  = require('bcryptjs')
 const sendEmail = require('../middlewares/nodemailer')
 const bcrypt  = require('bcrypt')
@@ -443,7 +443,7 @@ exports.getOneLandlord = async (req, res) => {
 exports.getOneLandlordProfile = async (req, res) => {
     try {
         const { landlordProfileId } = req.params;
-        const landlordProfile = await LandlordProfile.findOne({ where: { id: landlordProfileId
+        const landlordProfile = await landlordProfileModel.findOne({ where: { id: landlordProfileId
             },
             include: [
                 {
@@ -467,25 +467,25 @@ exports.getOneLandlordProfile = async (req, res) => {
 
 
 
-exports.getAllLandlordProfile = async (req, res) => {
+exports.alllandlordProfiles = async (req, res) => {
     try {
-        const landlordProfile = await LandlordProfile.findAll( { where: {
-            id: listingId },
-            include: [
-                {
-                    model: listingModel,
-                    attributes: ['area', 'description', 'type', 'isVerified', 'isAvailable'], 
-                    as: 'listings', 
-                },
-            ],
-    })
 
-        res.status(200).json({message: 'find all landlord profile below', total: landlordProfile.length, data: landlordProfile})
+       const landlords = await landlordProfileModel.findAll({ });
+
+        if (landlords.length === 0){
+            return res.status(404).json({message:"no landlordsProfile found"})
+        }
+
+  res.status(200).json({message:'landlords profile fetched successfully',  total: landlords.length, 
+    data:landlords
+  })
     } catch (error) {
-        console.error(error.message)
-        res.status(500).json({ message: 'Error getting all landlords' , error:error.message })
+        console.error("Error:", error.message);
+        res.status(500).json({ message: 'Error fetching landlord profile', error: error.message });
     }
-}
+};
+
+
 
 
 
@@ -493,7 +493,7 @@ exports.getAllLandlordProfile = async (req, res) => {
 exports.deleteLandlordProfile = async (req, res) => {
     try {
         const { landlordProfileId } = req.params;
-        const landlordProfile = await LandlordProfile.findOne({ where: { id: landlordProfileId,
+        const landlordProfile = await landlordProfileModel.findOne({ where: { id: landlordProfileId,
             id: listingId, isAvailable:true, isVerified:true },
                 include: [
                     {
