@@ -1,6 +1,6 @@
 const adminModel = require('../models/admin')
 const tenantModel = require('../models/tenant')
-const LandlordProfile = require('../models/landlordprofile')
+const landlordProfileModel = require('../models/landlordprofile')
 const bcrypt  = require('bcrypt')
 const fs = require('fs');
 const listingModel = require('../models/listing')
@@ -61,7 +61,9 @@ exports.createLandlordProfile = async (req, res) => {
             }
         }
 
-        const newProfile = await LandlordProfile.create({
+        const newProfile = await landlordProfileModel.create({
+            landlordId,
+            listingId,
             fullName,
             email,
             state,
@@ -99,7 +101,7 @@ exports.getOneLandlordProfile = async (req, res) => {
     try {
         const { landlordId } = req.landlord
 
-        const landlordProfile = await LandlordProfile.findOne({ where: { },
+        const landlordProfile = await landlordProfileModel.findOne({ where: { },
             include: [
                 {
                     model: listingModel,
@@ -128,7 +130,7 @@ exports.getOneLandlordProfile = async (req, res) => {
 exports.alllandlordProfiles = async (req, res) => {
     try {
 
-       const landlords = await LandlordProfile.findAll({
+       const landlords = await landlordProfileModel.findAll({
             include: [
                 {
                     model: listingModel,
@@ -162,7 +164,7 @@ exports.updateLandlordProfile = async (req, res) => {
         const { fullName, email, state, street, locality } = req.body;
 
 
-        const existingLandlord = await LandlordProfile.findOne({ where: {  } });
+        const existingLandlord = await landlordProfileModel.findOne({ where: {  } });
 
         if (!existingLandlord) {
             return res.status(404).json({ message: 'Landlord profile not found' });
@@ -201,7 +203,7 @@ exports.updateLandlordProfile = async (req, res) => {
         existingLandlord.isVerified = true;
 
        
-        const updatedLandlord = await LandlordProfile.findOne({
+        const updatedLandlord = await landlordProfileModel.findOne({
             where: { id: landlordId },
             include: [{
                 model: listingModel,
@@ -232,7 +234,7 @@ exports.deleteLandlordProfile = async (req, res) => {
     try {
         const { landlordId } = req.landlord;
 
-        const landlordProfile = await LandlordProfile.findOne({
+        const landlordProfile = await landlordProfileModel.findOne({
             where: { },
             include: [{
                 model: listingModel,
