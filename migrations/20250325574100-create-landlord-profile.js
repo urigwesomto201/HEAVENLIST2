@@ -6,14 +6,9 @@ module.exports = {
       id: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.UUID, // Changed to UUID
-        defaultValue: Sequelize.UUIDV4 // Added default value for UUID
+        type: Sequelize.UUID
       },
-      firstName: {
-        type: Sequelize.STRING,
-        allowNull: false // Added to match the model
-      },
-      lastName: {
+      fullName: {
         type: Sequelize.STRING,
         allowNull: false // Added to match the model
       },
@@ -22,10 +17,6 @@ module.exports = {
         allowNull: false // Added to match the model
       },
       state: {
-        type: Sequelize.STRING,
-        allowNull: false // Added to match the model
-      },
-      Password: {
         type: Sequelize.STRING,
         allowNull: false // Added to match the model
       },
@@ -57,6 +48,7 @@ module.exports = {
       },
       listingId: {
         type: Sequelize.UUID,
+        allowNull: false,
         references: {
           model: 'Listings', // Fixed: Use the table name as a string
           key: 'id',
