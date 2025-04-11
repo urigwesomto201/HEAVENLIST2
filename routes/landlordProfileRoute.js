@@ -6,7 +6,7 @@ const { landlordAuthenticate,adminAuthenticate } = require('../middlewares/authe
 const upload = require('../utils/multer')
 /**
  * @swagger
- * /api/v1/landlord/createProfile/{landlordId}:
+ * /api/v1/createProfile/{landlordId}:
  *   post:
  *     summary: Create a new landlord profile
  *     description: Allows a landlord to create their profile with personal details and an optional profile image.
@@ -191,7 +191,7 @@ router.get('/getlandlordprofile', landlordAuthenticate, getOneLandlordProfile);
 
 /**
  * @swagger
- * /api/v1/landlord:
+ * /api/v1/updateLandlordProfile:
  *   put:
  *     summary: "Update landlord profile"
  *     description: "Update the details of a specific landlord profile."
@@ -291,7 +291,7 @@ router.put('/updateLandlordProfile', landlordAuthenticate, upload.single('profil
 
 /**
  * @swagger
- * /api/v1/landlord/{landlordId}:
+ * /api/v1/deleteLandlordProfile:
  *   delete:
  *     summary: "Delete a landlord profile"
  *     description: "Delete a specific landlord profile by their ID."
