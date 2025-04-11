@@ -246,7 +246,7 @@ router.get('/alllandlordProfiles', adminAuthenticate, alllandlordProfiles);
 
 /**
  * @swagger
- * /api/v1/landlord/{landlordId}:
+ * /api/v1/landlord:
  *   put:
  *     summary: "Update landlord profile"
  *     description: "Update the details of a specific landlord profile."
@@ -342,7 +342,7 @@ router.get('/alllandlordProfiles', adminAuthenticate, alllandlordProfiles);
  *         description: "Error updating landlord profile"
  */
 
-router.put('/updateLandlordProfile/:landlordId', landlordAuthenticate, upload.single('profileImage'), updateLandlordProfile);
+router.put('/updateLandlordProfile', landlordAuthenticate, upload.single('profileImage'), updateLandlordProfile);
 
 /**
  * @swagger
