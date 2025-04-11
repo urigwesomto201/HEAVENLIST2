@@ -28,20 +28,73 @@ const { adminAuthenticate } = require('../middlewares/authentication')
  *             properties:
  *               fullName:
  *                 type: string
- *                 example: John Doe
+ *                 description: this is the full name of the user
+ *                 example: Alaekeka Ebuka
  *               email:
  *                 type: string
- *                 example: admin@example.com
+ *                 description: this is the email of the user
+ *                 example: alaekekaebuka200@gmail.com
  *               password:
  *                 type: string
- *                 example: StrongPassword123
+ *                 description: this is the password of the user
+ *                 example: Successtoall20$
+ *               confirmPassword:
+ *                 type: string
+ *                 description: this is the confirm password of the user
+ *                 example: Successtoall20$
  *     responses:
  *       201:
- *         description: Admin registered successfully
+ *         description: user created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 fullName:
+ *                   type: string
+ *                   description: this is the full name of the user
+ *                   example: Alaekeka Ebuka
+ *                 email:
+ *                   type: string
+ *                   description: this is the email of the user
+ *                   example: alaekekaebuka200@gmail.com
+ *                 password:
+ *                   type: string
+ *                   description: this is the password of the user
+ *                   example: Successtoall20$
+ *                 isVerified:
+ *                   type: boolean 
+ *                   description: this is the verification status of the user
+ *                   example: true
+ *                 isAdmin:
+ *                   type: boolean 
+ *                   description: this is the admin status of the user
+ *                   example: true
  *       400:
- *         description: Bad request due to invalid input
+ *        description: user with Email already exists
+ *        content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 email:
+ *                  type: string
+ *                  description: this is the email of the user
+ *                  example: alaekekaebuka200@gmail.com
  *       500:
- *         description: Internal server error
+ *         description: error registering user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: 
+ *                   type: string
+ *                   example: internal server error
+ * 
+ * 
+ * 
+ * 
  */
 
 
@@ -95,19 +148,47 @@ router.get('/admin-verify/:token', verifyAdminEmail)
  *           schema:
  *             type: object
  *             properties:
+ *             properties:
  *               email:
  *                 type: string
- *                 example: admin@example.com
+ *                 description: The email of the user
+ *                 example: alaekekaebuka200@gmail.com
  *               password:
  *                 type: string
- *                 example: StrongPassword123
+ *                 description: The password of the user
+ *                 example: Successtoall20$
  *     responses:
  *       200:
- *         description: Admin logged in successfully
+ *         description: user login successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 fullName:
+ *                   type: string
+ *                   description: this is the full name of the user
+ *                   example: Alaekeka Ebuka
+ *                 email:
+ *                   type: string
+ *                   description: this is the email of the user
+ *                   example: alaekekaebuka200@gmail.com
+ *                 isVerified:
+ *                   type: boolean
+ *                   description: this is the verification status of the user
+ *                   example: true
  *       401:
- *         description: Invalid credentials
+ *         description: Invalid email or password
  *       500:
- *         description: Internal server error
+ *         description: failed to login user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: 
+ *                   type: string
+ *                   example: internal server error
  */
 router.post('/loginAdmin', loginAdmin)
 
@@ -130,14 +211,23 @@ router.post('/loginAdmin', loginAdmin)
  *             properties:
  *               email:
  *                 type: string
- *                 example: admin@example.com
+ *                 description: The email of the user to reset password
+ *                 example: alaekekaebuka200@gmail.com
  *     responses:
  *       200:
- *         description: Password reset link sent successfully
- *       404:
- *         description: Admin not found
+ *         description: Password reset email sent successfully
+ *       400:
+ *         description: User not found
  *       500:
- *         description: Internal server error
+ *         description: Forgot password failed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: 
+ *                   type: string
+ *                   example: internal server error
  */
 
 router.post('/adminForgotPassword', adminForgotPassword)
@@ -159,20 +249,40 @@ router.post('/adminForgotPassword', adminForgotPassword)
  *           schema:
  *             type: object
  *             properties:
- *               token:
+ *               email:
  *                 type: string
- *                 example: resetToken123
- *               newPassword:
+ *                 description: The email of the user to reset password
+ *                 example: alaekekaebuka200@gmail.com
+ *               otp:
  *                 type: string
- *                 example: NewStrongPassword123
+ *                 description: The OTP sent to the user's email
+ *                 example: 6759
+ *               password:
+ *                 type: string
+ *                 description: The new password for the user
+ *                 example: brown
+ *               confirmPassword:
+ *                  type: string
+ *                  description: this is the confirm password of the user
+ *                  example: brown
  *     responses:
  *       200:
  *         description: Password reset successfully
  *       400:
- *         description: Invalid token or input
+ *         description: Invalid or expired token
  *       500:
- *         description: Internal server error
+ *         description: reset password failed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: 
+ *                   type: string
+ *                   example: internal server error
  */
+
+
 
 router.post('/adminResetPassword', adminResetPassword)
 
@@ -195,19 +305,28 @@ router.post('/adminResetPassword', adminResetPassword)
  *             properties:
  *               oldPassword:
  *                 type: string
- *                 example: OldPassword123
+ *                 description: The current password of the user
+ *                 example: oldpassword123
  *               newPassword:
  *                 type: string
- *                 example: NewStrongPassword123
+ *                 description: The new password for the user
+ *                 example: Successtoall20$
+ *               confirmPassword:
+ *                 type: string
+ *                 description: The confirmation of the new password
+ *                 example: Successtoall20$
  *     responses:
  *       200:
  *         description: Password changed successfully
+ *       400:
+ *         description: Validation error or incorrect old password
  *       401:
- *         description: Unauthorized or invalid old password
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
  *       500:
  *         description: Internal server error
  */
-
 router.post('/changeAdminPassword',adminAuthenticate, changeAdminPassword)
 
 
@@ -393,7 +512,7 @@ router.get('/getOneLandlordProfile/:landlordProfileId',adminAuthenticate, getOne
 
 /**
 * @swagger
- * /api/v1/getAllLandlordProfile:
+ * /api/v1/getAllLandlordProfiles:
  *   get:
  *     summary: "Get all landlords"
  *     description: "Fetch the list of all landlords along with their basic profile information."
@@ -486,7 +605,7 @@ router.delete('/deleteLandlordProfile/:landlordProfileId',adminAuthenticate, del
 
 /**
  * @swagger
- * /api/v1/getadmin/{id}:
+ * /api/v1/getoneadmin/{id}:
  *   get:
  *     tags:
  *       - Admin
@@ -509,7 +628,7 @@ router.delete('/deleteLandlordProfile/:landlordProfileId',adminAuthenticate, del
  *         description: Internal server error
  */
 
-router.get('/getadmin/:id',adminAuthenticate, getAdmin); 
+router.get('/getoneadmin/:id',adminAuthenticate, getAdmin); 
 
 
 
@@ -535,7 +654,7 @@ router.get('/getAllAdmins',adminAuthenticate, getAllAdmins);
 
 /**
  * @swagger
- * /api/v1/admin/{id}:
+ * /api/v1/deleteadmin/{id}:
  *   delete:
  *     tags:
  *       - Admin
@@ -579,7 +698,7 @@ router.get('/getAllAdmins',adminAuthenticate, getAllAdmins);
  *               example: Detailed error message
  */
 
-router.delete('/admin/:id',adminAuthenticate, deleteAdmin); 
+router.delete('/deleteadmin/:id',adminAuthenticate, deleteAdmin); 
 
 
 
