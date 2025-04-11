@@ -63,6 +63,10 @@ Listing.init(
       type: DataTypes.STRING,
       allowNull: false
     },
+    year: {
+      type: DataTypes.ENUM('1year', '2years', '3years+'),
+      allowNull: false
+    },
     isClicked: {
       type: DataTypes.INTEGER, 
       defaultValue: 0
@@ -71,13 +75,13 @@ Listing.init(
       type: DataTypes.STRING,
       allowNull: false
     },
-    isVerified: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
-    },
     isAvailable: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
+    },
+    status: {
+      type: DataTypes.ENUM('pending', 'accepted', 'rejected'),
+      defaultValue: 'pending',
     },
     listingImage: {
       // type: DataTypes.JSON, // JSON can store arrays of objects

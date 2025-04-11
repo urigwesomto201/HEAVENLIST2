@@ -11,8 +11,13 @@ exports.createListing = async (req, res) => {
     try {
         const { landlordId } = req.params
         const { title, type, bedrooms,bathrooms,price,toilets,
-            state,area,description, minrent, maxrent, street
+            state,area,description, minrent, maxrent, street, year
          } = req.body
+
+         if(!title || !type || !bedrooms || !bathrooms || !price || !toilets ||
+            !state || !area || !description || !minrent || !maxrent || !street || !year ) {
+                return res.status(400).json({message: 'please input all fields'})
+            }
 
         if(!landlordId) {
             return res.status(400).json({message: 'landlordId is required'})
@@ -45,14 +50,15 @@ exports.createListing = async (req, res) => {
             minrent, 
             maxrent, 
             street,
+            year,
             listingImage: JSON.stringify({
                 imageUrl: result.secure_url,
                 publicId: result.public_id,
             }),
             landlordId,
-            isVerified: false,
             isAvailable: false,
             isClicked: 0,
+            status : 'pending'
             
             
         })
@@ -60,7 +66,7 @@ exports.createListing = async (req, res) => {
         res.status(201).json({message: 'listing created successfully', data: newListing})
 
     } catch (error) {
-       
+        console.error(error.message)
         res.status(500).json({ message: 'Error creating listing',   error:error.message})
          
     }
@@ -73,7 +79,7 @@ exports.getAllListings = async (req, res) => {
     try {
         
         const listings = await listingModel.findAll({
-            where: {isVerified: true, isAvailable: true},
+            where: { isAvailable: true , status: 'accepted'},
             include: [
                 {
                 model: landlordModel,
@@ -83,10 +89,15 @@ exports.getAllListings = async (req, res) => {
             ],
         });
 
+        if (!listings || listings.length === 0) {
+            return res.status(404).json({ message: 'No listings found' });
+        }
+      
+
         res.status(200).json({message: 'find all Listing below', total: listings.length, data: listings})
 
     } catch (error) {
-       
+        console.error(error.message)
         res.status(500).json({ message: 'Error fetching listings',   error:error.message})
     }
 }
@@ -139,7 +150,7 @@ exports.getOneListing = async (req, res) => {
         }
 
         const listing = await listingModel.findOne({
-            where: { id: listingId, isAvailable:true, isVerified:true },
+            where: { id: listingId, isAvailable:true, status: 'accepted' },
             include: [
                 {
                     model: landlordModel,
@@ -161,7 +172,7 @@ exports.getOneListing = async (req, res) => {
         res.status(200).json({message: 'find listing by id below', data: listing})
         
     } catch (error) {
-      
+        console.error(error.message)
         res.status(500).json({ message: 'Error fetching listing',   error:error.message})
     }
 }
@@ -250,6 +261,7 @@ exports.updateListing = async (req, res) => {
             minrent, 
             maxrent, 
             street,
+            year,
             listingImage: updatedImage,
             },
             { where: { id: listingId } } 
@@ -341,7 +353,7 @@ exports.searchListing = async (req, res) => {
             where: {
                 ...queryCondition,
                 isAvailable: true,
-                isVerified: true,
+                status: 'accepted'
             },
             include: [
                 {
@@ -373,7 +385,7 @@ exports.getClicksbyListing = async (req, res) => {
             return res.status(400).json({message: 'listingId is required'})
         }
 
-        const listing = await listingModel.findOne({ where: { id : listingId, isAvailable:true, isVerified:true },
+        const listing = await listingModel.findOne({ where: { id : listingId, isAvailable:true, status: 'accepted' },
             attributes: ['id', 'title', 'price', 'description', 'area', 'isClicked']
         });
 

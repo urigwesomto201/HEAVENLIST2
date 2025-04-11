@@ -158,7 +158,7 @@ exports.loginAdmin = async (req, res) => {
        
         const isPasswordCorrect = await bcrypt.compare(password, admin.password);
         if (!isPasswordCorrect) {
-            return res.status(400).json({ message: 'Incorrect password' });
+            return res.status(400).json({ message: 'invalid credentials' });
         }
 
         admin.isLoggedIn = true;
@@ -301,7 +301,7 @@ exports.changeAdminPassword = async (req, res) => {
         const isPasswordCorrect = await bcrypt.compare(oldPassword, admin.password);
 
         if (!isPasswordCorrect) {
-            return res.status(400).json({ message: 'Incorrect old password' });
+            return res.status(400).json({ message: 'invalid credentials' });
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -648,94 +648,122 @@ exports.deleteAdmin = async (req, res) => {
 
 
 
-
-exports.verfiyAlisting = async (req, res) => {
+exports.verifyAlisting = async (req, res) => {
     try {
-        const {listingId, landlordId} = req.params
+      const { listingId, landlordId } = req.params;
+      const { status } = req.body;
+  
 
-        if(!listingId) {
-            return res.status(400).json({message: 'listing id is required'})
+      if (!status) {
+        return res.status(400).json({ message: 'Status is required in the request body' });
+      }
+  
+      if (!listingId) {
+        return res.status(400).json({ message: 'Listing ID is required' });
+      }
+  
+      if (!landlordId) {
+        return res.status(400).json({ message: 'Landlord ID is required' });
+      }
+  
+
+      const listing = await listingModel.findOne({
+        where: { id: listingId, landlordId },
+        include: [
+          {
+            model: landlordModel,
+            attributes: ['id', 'fullName'],
+            as: 'landlord',
+          },
+        ],
+      });
+  
+      if (!listing) {
+        return res.status(404).json({ message: 'Listing not found or does not belong to the specified landlord' });
+      }
+  
+
+      if (status === 'accepted') {
+        if (listing.status === 'accepted') {
+          return res.status(400).json({ message: 'Listing has already been accepted' });
         }
-
-        if (!landlordId) {
-            return res.status(400).json({ message: 'Landlord ID is required' });
-        }
- 
-        const listing = await listingModel.findOne({
-            where: { id: listingId, landlordId}, 
-            include: [
-                {
-                    model: landlordModel,
-                    attributes: ['id', 'fullName'], 
-                    as: 'landlord', 
-                },
-            ],
-        });
-
-        if (!listing) {
-            return res.status(404).json({ message: 'Listing not found or does not belong to the specified landlord' });
-        }
-
-        if(listing.isVerified === true){
-            return res.status(400).json({message:'listing has already been verified'})
-        }
-
-        listing.isVerified = true
-        listing.isAvailable = true
-
-        await listing.save()
-
-        res.status(200).json({message:'listing has been verified',data: listing})
+        listing.status = 'accepted';
+        listing.isAvailable = true 
         
+      } else if (status === 'rejected') {
+        if (listing.status === 'rejected') {
+          return res.status(400).json({ message: 'Listing has already been rejected' });
+        }
+        listing.status = 'rejected';
+        listing.isAvailable = false;
+        
+      } else {
+        return res.status(400).json({ message: 'Invalid status. Use "accepted" or "rejected".' });
+      }
+  
+      await listing.save();
+  
+      res.status(200).json({ message: `Listing status updated to ${status}`, data: listing });
     } catch (error) {
-        console.error(error.message)
-        res.status(500).json({ message: 'Error verifying a listing', error: error.message })
+      console.error(error.message);
+      res.status(500).json({ message: 'Error updating listing status', error: error.message });
     }
-}
+  };
 
 
 
 
-exports.unverifyAlisting = async (req, res) => {
+  exports.unverifyAlisting = async (req, res) => {
     try {
-        const {listingId, landlordId} = req.params
-
-        if(!listingId) {
-            return res.status(400).json({message: 'listing id is required'})
+      const { listingId, landlordId } = req.params;
+      const { status } = req.body;
+  
+      // Validate input fields
+      if (!status) {
+        return res.status(400).json({ message: 'Status is required in the request body' });
+      }
+  
+      if (!listingId) {
+        return res.status(400).json({ message: 'Listing ID is required' });
+      }
+  
+      if (!landlordId) {
+        return res.status(400).json({ message: 'Landlord ID is required' });
+      }
+  
+      // Fetch the listing
+      const listing = await listingModel.findOne({
+        where: { id: listingId, landlordId },
+        include: [
+          {
+            model: landlordModel,
+            attributes: ['id', 'fullName'],
+            as: 'landlord',
+          },
+        ],
+      });
+  
+      if (!listing) {
+        return res.status(404).json({ message: 'Listing not found or does not belong to the specified landlord' });
+      }
+  
+      // Update the listing status dynamically
+      if (status === 'rejected') {
+        if (listing.status === 'rejected') {
+          return res.status(400).json({ message: 'Listing has already been rejected' });
         }
-
-        if (!landlordId) {
-            return res.status(400).json({ message: 'Landlord ID is required' });
-        }
- 
-        const listing = await listingModel.findOne({
-            where: { id: listingId, landlordId}, 
-            include: [
-                {
-                    model: landlordModel,
-                    attributes: ['id', 'fullName'], 
-                    as: 'landlord', 
-                },
-            ],
-        });
-
-        if (!listing) {
-            return res.status(404).json({ message: 'Listing not found or does not belong to the specified landlord' });
-        }
-
-        if(listing.isVerified === false){
-            return res.status(400).json({message:'listing has already been unverified'})
-        }
-
-        listing.isVerified = false
-        listing.isAvailable = false
-
-        await listing.save()
-
-        res.status(200).json({message:'listing has been unverified',data: listing})
+        listing.status = 'rejected';
+        listing.isAvailable = false;
         
+      } else {
+        return res.status(400).json({ message: 'Invalid status. Use "rejected" to unverify a listing.' });
+      }
+  
+      await listing.save();
+  
+      res.status(200).json({ message: `Listing status updated to ${status}`, data: listing });
     } catch (error) {
-        console.error(error.message)
-        res.status(500).json({ message: 'Error unverifying listings', error: error.message })
+      console.error(error.message);
+      res.status(500).json({ message: 'Error updating listing status', error: error.message });
     }
-}
+  };

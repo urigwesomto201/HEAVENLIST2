@@ -49,6 +49,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      year: {
+        type: Sequelize.ENUM('1year', '2years', '3years+'),
+        allowNull: false,
+      },
       isClicked: {
         type: Sequelize.INTEGER,
         defaultValue: 0,
@@ -57,13 +61,13 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      isVerified: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
-      },
       isAvailable: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
+      },
+      status: {
+        type: Sequelize.ENUM('pending', 'accepted', 'rejected'),
+        defaultValue: 'pending',
       },
       listingImage: {
         type: Sequelize.TEXT('long'), // JSON to store an array of objects
