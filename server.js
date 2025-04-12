@@ -61,6 +61,7 @@ const swaggerDefinition = {
     },
   },
 },
+
 security: [
   {
     bearerAuth: [],
