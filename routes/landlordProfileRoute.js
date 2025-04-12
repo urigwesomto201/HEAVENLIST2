@@ -1,9 +1,24 @@
 const express = require('express');
 const router = express.Router();
 const { createLandlordProfile,deleteLandlordProfile,updateLandlordProfile,alllandlordProfiles, getOneLandlordProfile} = require('../controller/landlordProfileController');
-const { landlordAuthenticate,adminAuthenticate } = require('../middlewares/authentication')
+const { landlordAuthenticate,adminAuthenticate} = require('../middlewares/authentication')
 
 const upload = require('../utils/multer')
+
+
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     landlordBearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
+
+
+
+
 /**
  * @swagger
  * /api/v1/createProfile/{landlordId}:
@@ -13,7 +28,7 @@ const upload = require('../utils/multer')
  *     tags:
  *       - Landlord Profile
  *     security:
- *       - bearerAuth: []
+ *       - landlordBearerAuth: [] # Requires landlord authentication
  *     requestBody:
  *       required: true
  *       content:
@@ -128,7 +143,7 @@ router.post('/createProfile/:landlordId', landlordAuthenticate, upload.single('p
 *     tags:
  *       - Landlord Profile
  *     security:
- *       - bearerAuth: []
+ *       - landlordBearerAuth: [] # Requires landlord authentication
  *     parameters:
  *       - name: "landlordId"
  *         in: "path"
@@ -198,7 +213,7 @@ router.get('/getlandlordprofile', landlordAuthenticate, getOneLandlordProfile);
 *     tags:
  *       - Landlord Profile
  *     security:
- *       - bearerAuth: []
+ *       - landlordBearerAuth: [] # Requires landlord authentication
  *     parameters:
  *       - name: "landlordId"
  *         in: "path"
@@ -298,7 +313,7 @@ router.put('/updateLandlordProfile', landlordAuthenticate, upload.single('profil
 *     tags:
  *       - Landlord Profile
  *     security:
- *       - bearerAuth: []
+ *       - landlordBearerAuth: [] # Requires landlord authentication
  *     parameters:
  *       - name: "landlordId"
  *         in: "path"

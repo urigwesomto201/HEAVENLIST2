@@ -26,30 +26,15 @@ module.exports = {
       },
       landlordId: {
         type: Sequelize.UUID,
-        references: {
-          model: 'Landlords', // Correct table name
-          key: 'id',
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
+        allowNull: false,
       },
       tenantId: {
         type: Sequelize.UUID,
-        references: {
-          model: 'Tenants', // Correct table name
-          key: 'id',
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
+        allowNull: false,
       },
       listingId: {
         type: Sequelize.UUID,
-        references: {
-          model: 'Listings', // Correct table name
-          key: 'id',
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,

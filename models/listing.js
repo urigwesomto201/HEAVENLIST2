@@ -21,7 +21,7 @@ Listing.init(
       allowNull: false
     },
     type: {
-      type: DataTypes.ENUM('Houses', 'Apartments')
+      type: DataTypes.ENUM('Bungalow','Flat','Duplex')
   
     },
     bedrooms: {
@@ -90,6 +90,7 @@ Listing.init(
     },
     landlordId: {
       type: DataTypes.UUID,
+      allowNull: false,
       references: {
         model: Landlord,
         key: 'id'

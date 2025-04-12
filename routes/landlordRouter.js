@@ -4,6 +4,23 @@ const { registerlandlord, loginlandlord, verifylandlordEmail, landlordForgotPass
 const { landlordAuthenticate } = require('../middlewares/authentication')
 const jwt = require('jsonwebtoken');
 const passport = require('passport')
+
+
+
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     landlordBearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
+
+
+
+
+
 /**
  * @swagger
  * /api/v1/registerlandlord:
@@ -336,9 +353,9 @@ router.post('/landlordResetPassword', landlordResetPassword)
  *   post:
  *     tags:
  *       - landlord
- *     summary: Change user password
  *     security:
- *       - bearerAuth: []
+ *       - landlordBearerAuth: [] # landlord token is required for authentication
+ *     summary: Change user password
  *     requestBody:
  *       required: true
  *       content:
@@ -349,7 +366,7 @@ router.post('/landlordResetPassword', landlordResetPassword)
  *               oldPassword:
  *                 type: string
  *                 description: The current password of the user
- *                 example: oldpassword123
+ *                 example: Successtoall20$
  *               newPassword:
  *                 type: string
  *                 description: The new password for the user
@@ -380,14 +397,14 @@ router.post('/changelandlordPassword',landlordAuthenticate, changelandlordPasswo
  *       - landlord
  *     summary: Log out user
  *     security:
- *       - bearerAuth: []
+ *       - landlordBearerAuth: [] # landlord token is required for authentication
  *     responses:
  *       200:
  *         description: User logged out successfully
  *       401:
  *         description: Unauthorized
  *       500:
- *         description: Internal server error
+ *         description: error logging out user
  */
 router.post('/logoutlandlord', landlordAuthenticate, logoutlandlord)
 

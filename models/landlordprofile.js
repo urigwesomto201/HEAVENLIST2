@@ -56,6 +56,7 @@ LandlordProfile.init(
     },
     listingId: {
       type: DataTypes.UUID,
+      allowNull: false,
       references: {
         model: Listing, // Fixed: Use the table name as a string
         key: 'id',

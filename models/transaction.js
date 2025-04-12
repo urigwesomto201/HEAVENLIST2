@@ -3,6 +3,8 @@ const sequelize = require('../database/sequelize'); // Import the sequelize inst
 const Landlord = require('./landlord'); // Import the Landlord model
 const LandlordProfile = require('./landlordprofile'); // Import 
 const Inspection = require('./inspection');
+const Tenant = require('./tenant');
+const Listing = require('./listing');
 
 
 class Transaction extends Model {}
@@ -47,8 +49,9 @@ Transaction.init(
     },
     landlordId: {
       type: DataTypes.UUID,
+      allowNull: false,
       references: {
-        model: 'Landlords', // Fixed: Use the table name as a string
+        model: Landlord, // Fixed: Use the table name as a string
         key: 'id',
       },
       onUpdate: 'CASCADE',
@@ -56,8 +59,9 @@ Transaction.init(
     },
     tenantId: {
       type: DataTypes.UUID,
+      allowNull: false,
       references: {
-        model: 'Tenants', // Fixed: Use the table name as a string
+        model: Tenant, // Fixed: Use the table name as a string
         key: 'id',
       },
       onUpdate: 'CASCADE',
@@ -65,8 +69,9 @@ Transaction.init(
     },
     listingId: {
       type: DataTypes.UUID,
+      allowNull: false,
       references: {
-        model: 'Listings', // Fixed: Use the table name as a string
+        model: Listing, // Fixed: Use the table name as a string
         key: 'id',
       },
       onUpdate: 'CASCADE',

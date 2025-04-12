@@ -4,6 +4,18 @@ const  {scheduleInspection, confirmSchedule}= require('../controller/inspectionC
 const { adminAuthenticate } = require('../middlewares/authentication')
 
 
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     AdminBearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
+
+
+
 
 /**
  * @swagger
@@ -114,6 +126,9 @@ router.post('/schedule/:tenantId/:listingId', scheduleInspection);
  *       - Inspections
  *     summary: Confirm or update the status of an inspection
  *     description: This endpoint allows a landlord or admin to confirm or update the status of a scheduled inspection.
+ *     security:
+ *       - landlordBearerAuth: [] # Optional landlord token
+ *       - AdminBearerAuth: []    # Optional admin token
  *     parameters:
  *       - in: path
  *         name: inspectionId
@@ -197,5 +212,8 @@ router.post('/schedule/:tenantId/:listingId', scheduleInspection);
 
 
 router.post('/confirmSchedule/:inspectionId',adminAuthenticate, confirmSchedule);
+
+
+
 
 module.exports = router;

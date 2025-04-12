@@ -13,6 +13,20 @@ const {
 const { landlordAuthenticate, adminAuthenticate } = require('../middlewares/authentication');
 const upload = require('../utils/multer');
 
+
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     landlordBearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
+
+
+
+
 /**
  * @swagger
  * /api/v1/createlisting/{landlordId}:
@@ -22,7 +36,7 @@ const upload = require('../utils/multer');
  *     summary: Create a new property listing
  *     description: Allows a verified landlord to create a new property listing with details and images.
  *     security:
- *       - bearerAuth: []
+ *       - landlordBearerAuth: [] # Requires landlord authentication
  *     parameters:
  *       - name: landlordId
  *         in: path
@@ -44,9 +58,9 @@ const upload = require('../utils/multer');
  *                 example: "Luxury 3-Bedroom Apartment in Lekki"
  *               type:
  *                 type: string
- *                 enum: ["Houses", "Apartments"]
+ *                 enum: ["Bungalow", "Flat","Duplex"]
  *                 description: The type of the property
- *                 example: "Apartments"
+ *                 example: "Bungalow"
  *               bedrooms:
  *                 type: string
  *                 enum: ["1", "2", "3", "4", "5+"]
@@ -90,6 +104,11 @@ const upload = require('../utils/multer');
  *                 type: string
  *                 description: The street address of the property
  *                 example: "123 Main Street"
+ *               year:
+ *                 type: string
+ *                 enum: ["1year", "2years", "3years+"]
+ *                 description: the year of the rent of the property
+ *                 example: "1year"
  *               description:
  *                 type: string
  *                 description: A description of the property
@@ -111,6 +130,7 @@ const upload = require('../utils/multer');
  *         description: Internal server error
  */
 router.post('/createlisting/:landlordId', landlordAuthenticate, upload.array('listingImage', 8), createListing);
+
 
 /**
  * @swagger
@@ -138,7 +158,7 @@ router.get('/getAllListings', getAllListings);
  *     tags:
  *       - Listings
  *     security:
- *       - bearerAuth: []
+ *       - landlordBearerAuth: [] # Requires landlord authentication
  *     parameters:
  *       - name: landlordId
  *         in: path
@@ -183,6 +203,8 @@ router.get('/getOneListingByLandlord/:listingId', landlordAuthenticate, getOneLi
  */
 router.get('/getOneListing/:listingId', getOneListing);
 
+
+
 /**
  * @swagger
  * /api/v1/getAllListingsByLandlord:
@@ -192,7 +214,7 @@ router.get('/getOneListing/:listingId', getOneListing);
  *     tags:
  *       - Listings
  *     security:
- *       - bearerAuth: []
+ *       - landlordBearerAuth: [] # Requires landlord authentication
  *     parameters:
  *       - name: landlordId
  *         in: path
@@ -210,6 +232,9 @@ router.get('/getOneListing/:listingId', getOneListing);
  *         description: Internal server error
  */
 router.get('/getAllListingsByLandlord', landlordAuthenticate, getAllListingsByLandlord);
+
+
+
 /**
  * @swagger
  * /api/v1/updateListing/{listingId}:
@@ -219,7 +244,7 @@ router.get('/getAllListingsByLandlord', landlordAuthenticate, getAllListingsByLa
  *     tags:
  *       - Listings
  *     security:
- *       - bearerAuth: []
+ *       - landlordBearerAuth: [] # Requires landlord authentication
  *     parameters:
  *       - name: listingId
  *         in: path
@@ -241,9 +266,9 @@ router.get('/getAllListingsByLandlord', landlordAuthenticate, getAllListingsByLa
  *                 example: "Spacious 3-bedroom apartment for rent"
  *               type:
  *                 type: string
- *                 enum: ["Houses", "Apartments"]
+ *                 enum: ["Bungalow", "Flat","Duplex"]
  *                 description: The type of the property
- *                 example: "Apartments"
+ *                 example: "Bungalow"
  *               bedrooms:
  *                 type: string
  *                 enum: ["1", "2", "3", "4", "5+"]
@@ -308,6 +333,8 @@ router.get('/getAllListingsByLandlord', landlordAuthenticate, getAllListingsByLa
  */
 router.put('/updateListing/:listingId', landlordAuthenticate, upload.array('listingImage', 8), updateListing);
 
+
+
 /**
  * @swagger
  * /api/v1/deleteListing/{listingId}:
@@ -316,7 +343,7 @@ router.put('/updateListing/:listingId', landlordAuthenticate, upload.array('list
  *     tags:
  *       - Listings
  *     security:
- *       - bearerAuth: []
+ *       - landlordBearerAuth: [] # Requires landlord authentication
  *     parameters:
  *       - name: landlordId
  *         in: path
@@ -342,6 +369,8 @@ router.put('/updateListing/:listingId', landlordAuthenticate, upload.array('list
  */
 router.delete('/deleteListing/:listingId', landlordAuthenticate, deleteListing);
 
+
+
 /**
  * @swagger
  * /api/v1/searchListing:
@@ -365,8 +394,8 @@ router.delete('/deleteListing/:listingId', landlordAuthenticate, deleteListing);
  *         required: false
  *         schema:
  *           type: string
- *           enum: ["Houses", "Apartments"]
- *           example: "Apartments"
+ *           enum: ["Bungalow", "Flat","Duplex"]
+ *           example: "Bungalow"
  *       - name: bedrooms
  *         in: query
  *         description: The number of bedrooms in the property.

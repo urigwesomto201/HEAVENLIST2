@@ -13,7 +13,7 @@ module.exports = {
         allowNull: false,
       },
       type: {
-        type: Sequelize.ENUM('Houses', 'Apartments'),
+        type: Sequelize.ENUM('Bungalow','Flat','Duplex'),
       },
       bedrooms: {
         type: Sequelize.ENUM('1', '2', '3', '4', '5+'),
@@ -75,12 +75,7 @@ module.exports = {
       },
       landlordId: {
         type: Sequelize.UUID,
-        references: {
-          model: 'Landlords', // Fixed: Use the table name as a string
-          key: 'id',
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
+        allowNull: false,
       },
       
       createdAt: {

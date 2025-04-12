@@ -6,7 +6,22 @@ const {registerAdmin, loginAdmin, adminForgotPassword, adminResetPassword,change
     getOneTenant, getOneLandlord, getOneLandlordProfile,deleteLandlordProfile, alllandlordProfiles
 
 } = require('../controller/adminController')
-const { adminAuthenticate } = require('../middlewares/authentication')
+const { adminAuthenticate, eitherAuthenticate } = require('../middlewares/authentication')
+
+
+
+
+
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     AdminBearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
+
 
 
 
@@ -139,8 +154,7 @@ router.get('/admin-verify/:token', verifyAdminEmail)
  *     tags:
  *       - Admin
   *     security: [] # No authentication required
- *     summary: Admin login
- *     description: Authenticate an admin with email and password.
+ *     summary: Login admin
  *     requestBody:
  *       required: true
  *       content:
@@ -148,18 +162,17 @@ router.get('/admin-verify/:token', verifyAdminEmail)
  *           schema:
  *             type: object
  *             properties:
- *             properties:
  *               email:
  *                 type: string
- *                 description: The email of the user
+ *                 description: The email of the admin
  *                 example: alaekekaebuka200@gmail.com
  *               password:
  *                 type: string
- *                 description: The password of the user
+ *                 description: The password of the admin
  *                 example: Successtoall20$
  *     responses:
  *       200:
- *         description: user login successfully
+ *         description: admin login successfully
  *         content:
  *           application/json:
  *             schema:
@@ -167,15 +180,15 @@ router.get('/admin-verify/:token', verifyAdminEmail)
  *               properties:
  *                 fullName:
  *                   type: string
- *                   description: this is the full name of the user
+ *                   description: this is the full name of the admin
  *                   example: Alaekeka Ebuka
  *                 email:
  *                   type: string
- *                   description: this is the email of the user
+ *                   description: this is the email of the admin
  *                   example: alaekekaebuka200@gmail.com
  *                 isVerified:
  *                   type: boolean
- *                   description: this is the verification status of the user
+ *                   description: this is the verification status of the admin
  *                   example: true
  *       401:
  *         description: Invalid email or password
@@ -188,8 +201,10 @@ router.get('/admin-verify/:token', verifyAdminEmail)
  *               properties:
  *                 message: 
  *                   type: string
- *                   example: internal server error
+ *                   example: failed to login admin
  */
+
+
 router.post('/loginAdmin', loginAdmin)
 
 
@@ -293,7 +308,7 @@ router.post('/adminResetPassword', adminResetPassword)
  *     tags:
  *       - Admin
  *     security:
- *       - bearerAuth: []
+ *       - AdminBearerAuth: [] # Requires admin authentication
  *     summary: Change admin password
  *     description: Change the admin's password after authentication.
  *     requestBody:
@@ -338,7 +353,7 @@ router.post('/changeAdminPassword',adminAuthenticate, changeAdminPassword)
  *     tags:
  *       - Admin
  *     security:
- *       - bearerAuth: []
+ *       - AdminBearerAuth: [] # Requires admin authentication
  *     summary: Logout admin
  *     description: Logs out the currently authenticated admin by invalidating their session or token.
  *     responses:
@@ -386,7 +401,7 @@ router.post('/logoutAdmin',adminAuthenticate, logoutAdmin)
  *     tags:
  *       - Admin
  *     security:
- *       - bearerAuth: []
+ *       - AdminBearerAuth: [] # Requires admin authentication
  *     summary: Get all tenants
  *     description: Retrieve a list of all tenants.
  *     responses:
@@ -406,7 +421,7 @@ router.get('/getAllTenants',adminAuthenticate, getAllTenants)
  *     tags:
  *       - Admin
  *     security:
- *       - bearerAuth: []
+ *       - AdminBearerAuth: [] # Requires admin authentication
  *     summary: Get a single tenant
  *     description: Retrieve details of a specific tenant by ID.
  *     parameters:
@@ -436,7 +451,7 @@ router.get('/getOneTenant/:tenantId',adminAuthenticate, getOneTenant)
  *     tags:
  *       - Admin
  *     security:
- *       - bearerAuth: []
+ *       - AdminBearerAuth: [] # Requires admin authentication
  *     summary: Get all landlords
  *     description: Retrieve a list of all landlords
  *     responses:
@@ -456,7 +471,7 @@ router.get('/getAllLandlords',adminAuthenticate, getAllLandlords)
  *     tags:
  *       - Admin
  *     security:
- *       - bearerAuth: []
+ *       - AdminBearerAuth: [] # Requires admin authentication
  *     summary: Get one landlord
  *     description: Retrieve details of a specific landlord by ID
  *     parameters:
@@ -485,7 +500,7 @@ router.get('/getOneLandlord/:landlordId',adminAuthenticate, getOneLandlord)
  *     tags:
  *       - Admin
  *     security:
- *       - bearerAuth: []
+ *       - AdminBearerAuth: [] # Requires admin authentication
  *     summary: Get one landlord profile
  *     description: Retrieve details of a specific landlord profile by ID
  *     parameters:
@@ -519,7 +534,7 @@ router.get('/getOneLandlordProfile/:landlordProfileId',adminAuthenticate, getOne
  *     tags:
  *       - Landlord Profile
  *     security:
- *       - bearerAuth: []
+ *       - AdminBearerAuth: [] # Requires admin authentication
  *     responses:
  *       200:
  *         description: "Successfully fetched all landlords"
@@ -575,7 +590,7 @@ router.get('/alllandlordProfiles', adminAuthenticate, alllandlordProfiles);
  *     tags:
  *       - Admin
  *     security:
- *       - bearerAuth: []
+ *       - AdminBearerAuth: [] # Requires admin authentication
  *     summary: Delete a landlord profile
  *     description: Delete a specific landlord profile by ID
  *     parameters:
@@ -610,7 +625,7 @@ router.delete('/deleteLandlordProfile/:landlordProfileId',adminAuthenticate, del
  *     tags:
  *       - Admin
  *     security:
- *       - bearerAuth: []
+ *       - AdminBearerAuth: [] # Requires admin authentication
  *     summary: Get a single admin
  *     description: Retrieve details of a specific admin by ID
  *     parameters:
@@ -639,7 +654,7 @@ router.get('/getoneadmin/:id',adminAuthenticate, getAdmin);
  *     tags:
  *       - Admin
  *     security:
- *       - bearerAuth: []
+ *       - AdminBearerAuth: [] # Requires admin authentication
  *     summary: Get all admins
  *     description: Retrieve a list of all admins
  *     responses:
@@ -659,7 +674,7 @@ router.get('/getAllAdmins',adminAuthenticate, getAllAdmins);
  *     tags:
  *       - Admin
  *     security:
- *       - bearerAuth: []
+ *       - AdminBearerAuth: [] # Requires admin authentication
  *     summary: Delete an admin
  *     description: Delete a specific admin by ID
  *     parameters:
@@ -709,7 +724,7 @@ router.delete('/deleteadmin/:id',adminAuthenticate, deleteAdmin);
  *     tags:
  *       - Admin
  *     security:
- *       - bearerAuth: []
+ *       - AdminBearerAuth: [] # Requires admin authentication
  *     summary: Verify a listing by a admin
  *     description: This endpoint allows an admin to verify a listing.
  *     parameters:
@@ -805,7 +820,7 @@ router.put('/verifyAlisting/:listingId/:landlordId',adminAuthenticate, verifyAli
  *     tags:
  *       - Admin
  *     security:
- *       - bearerAuth: []
+ *       - AdminBearerAuth: [] # Requires admin authentication
  *     summary: Verify a unverify by a admin
  *     description: This endpoint allows an admin to unverify a listing.
  *     parameters:

@@ -186,7 +186,7 @@ exports.loginTenant = async (req, res) => {
         }
 
         
-        const token = jwt.sign({ tenantId: tenant.id, isLoggedIn: true }, process.env.JWT_SECRET,{ expiresIn: '2d' });
+        const token = await jwt.sign({ tenantId: tenant.id, isLoggedIn: true }, process.env.JWT_SECRET,{ expiresIn: '2d' });
         
         tenant.isLoggedIn = true;
         await tenant.save();
