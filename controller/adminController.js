@@ -711,8 +711,6 @@ exports.verifyAlisting = async (req, res) => {
   };
 
 
-
-
   exports.unverifyAlisting = async (req, res) => {
     try {
       const { listingId, landlordId } = req.params;
