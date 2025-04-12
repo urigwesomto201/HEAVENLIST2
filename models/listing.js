@@ -90,7 +90,6 @@ Listing.init(
     },
     landlordId: {
       type: DataTypes.UUID,
-      allowNull: false,
       references: {
         model: Landlord,
         key: 'id'

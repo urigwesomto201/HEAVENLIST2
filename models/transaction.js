@@ -49,7 +49,6 @@ Transaction.init(
     },
     landlordId: {
       type: DataTypes.UUID,
-      allowNull: false,
       references: {
         model: Landlord, // Fixed: Use the table name as a string
         key: 'id',
@@ -59,7 +58,6 @@ Transaction.init(
     },
     tenantId: {
       type: DataTypes.UUID,
-      allowNull: false,
       references: {
         model: Tenant, // Fixed: Use the table name as a string
         key: 'id',
@@ -69,7 +67,6 @@ Transaction.init(
     },
     listingId: {
       type: DataTypes.UUID,
-      allowNull: false,
       references: {
         model: Listing, // Fixed: Use the table name as a string
         key: 'id',

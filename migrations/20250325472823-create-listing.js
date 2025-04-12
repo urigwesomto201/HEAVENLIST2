@@ -75,7 +75,12 @@ module.exports = {
       },
       landlordId: {
         type: Sequelize.UUID,
-        allowNull: false,
+        references: {
+          model: 'Landlords', // Fixed: Use the table name as a string
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       
       createdAt: {
