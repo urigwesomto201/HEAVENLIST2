@@ -34,9 +34,9 @@ const upload = require('../utils/multer');
  *     tags:
  *       - Listings
  *     summary: Create a new property listing
- *     description: Allows a verified landlord or admin to create a new property listing with details and images.
+ *     description: Allows a verified landlord to create a new property listing with details and images.
  *     security:
- *       - landlordBearerAuth: [] # Requires authentication landlord 
+ *       - landlordBearerAuth: [] # Requires landlord authentication
  *     parameters:
  *       - name: landlordId
  *         in: path

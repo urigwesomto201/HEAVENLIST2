@@ -3,6 +3,7 @@ const listingModel = require('../models/listing')
 const cloudinary = require('../database/cloudinary')
 const landlordModel = require('../models/landlord')
 const { Op } = require('sequelize')
+
 const fs = require('fs')
 
 
