@@ -34,9 +34,9 @@ const upload = require('../utils/multer');
  *     tags:
  *       - Listings
  *     summary: Create a new property listing
- *     description: Allows a verified landlord to create a new property listing with details and images.
+ *     description: Allows a verified landlord or admin to create a new property listing with details and images.
  *     security:
- *       - landlordBearerAuth: [] # Requires landlord authentication
+ *       - landlordBearerAuth: [] # Requires authentication landlord 
  *     parameters:
  *       - name: landlordId
  *         in: path
@@ -58,7 +58,7 @@ const upload = require('../utils/multer');
  *                 example: "Luxury 3-Bedroom Apartment in Lekki"
  *               type:
  *                 type: string
- *                 enum: ["Bungalow", "Flat","Duplex"]
+ *                 enum: ["Bungalow", "Flat", "Duplex"]
  *                 description: The type of the property
  *                 example: "Bungalow"
  *               bedrooms:
@@ -78,12 +78,10 @@ const upload = require('../utils/multer');
  *                 example: "2"
  *               minrent:
  *                 type: string
- *                 enum: ["500000", "600000", "700000", "800000", "900000", "1000000"]
  *                 description: Minimum rent price
  *                 example: "500000"
  *               maxrent:
  *                 type: string
- *                 enum: ["1000000", "2000000", "3000000", "4000000", "5000000"]
  *                 description: Maximum rent price
  *                 example: "2000000"
  *               state:
@@ -107,7 +105,7 @@ const upload = require('../utils/multer');
  *               year:
  *                 type: string
  *                 enum: ["1year", "2years", "3years+"]
- *                 description: the year of the rent of the property
+ *                 description: The year of the rent of the property
  *                 example: "1year"
  *               description:
  *                 type: string
@@ -122,12 +120,47 @@ const upload = require('../utils/multer');
  *     responses:
  *       201:
  *         description: Listing created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Listing created successfully"
+ *                 data:
+ *                   type: object
+ *                   description: Details of the created listing
  *       400:
  *         description: Bad request, missing or invalid fields
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid input data"
  *       404:
  *         description: Landlord not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Landlord not found"
  *       500:
  *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
  */
 router.post('/createlisting/:landlordId', landlordAuthenticate, upload.array('listingImage', 8), createListing);
 
