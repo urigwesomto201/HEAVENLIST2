@@ -179,7 +179,7 @@ exports.loginlandlord = async (req, res) => {
        
         const isPasswordCorrect = await bcrypt.compare(password, landlord.password);
         if (!isPasswordCorrect) {
-            return res.status(400).json({ message: 'Incorrect password' });
+            return res.status(400).json({ message: 'invalid credentials' });
         }
 
         
@@ -327,7 +327,7 @@ exports.changelandlordPassword = async (req, res) => {
         const isPasswordCorrect = await bcrypt.compare(oldPassword, landlord.password);
 
         if (!isPasswordCorrect) {
-            return res.status(400).json({ message: 'Incorrect old password' });
+            return res.status(400).json({ message: 'invalid credentials' });
         }
 
         const salt = await bcrypt.genSalt(10);

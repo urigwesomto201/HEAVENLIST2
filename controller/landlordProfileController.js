@@ -17,7 +17,7 @@ exports.createLandlordProfile = async (req, res) => {
   
 
       if (!fullName || !email || !state || !street || !locality) {
-        return res.status(400).json({ message: 'Please input correct fields' });
+        return res.status(400).json({ message: 'Please input all fields' });
       }
   
       if (!landlordId) {
