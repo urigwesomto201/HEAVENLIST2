@@ -1,4 +1,6 @@
 const landlordModel = require('../models/landlord')
+const transactionModel = require('../models/transaction');
+const tenantModel = require('../models/tenant')
 // const bcrypt  = require('bcryptjs')
 const sendEmail = require('../middlewares/nodemailer')
 const bcrypt  = require('bcrypt')
@@ -377,3 +379,41 @@ exports.logoutlandlord = async (req, res) => {
 
 
 
+exports.getLandlordTransactions = async (req, res) => {
+    try {
+      const { landlordId } = req.params;
+  
+    
+      if (!landlordId) {
+        return res.status(400).json({ message: 'Landlord ID is required' });
+      }
+  
+     
+      const transactions = await transactionModel.findAll({
+        where: {
+          landlordId,
+          status: 'success',
+        },
+        order: [['paymentDate', 'DESC']],
+      });
+  
+     
+      const totalAmount = transactions.reduce((sum, transaction) => sum + transaction.amount, 0);
+  
+      
+      await landlordModel.update(
+        { transactionHistory: totalAmount }, 
+        { where: { id: landlordId } }
+      );
+  
+     
+      res.status(200).json({
+        message: 'Landlord transaction history retrieved successfully',
+        totalAmount, 
+        transactions,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Error fetching landlord transactions', error: error.message });
+    }
+  };

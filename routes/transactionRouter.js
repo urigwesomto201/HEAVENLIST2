@@ -1,5 +1,5 @@
 const transactionrouter = require("express").Router();
-const {initialPayment,verifyPayment,getLandlordTransactions}= require('../controller/transaction')
+const {initialPayment,verifyPayment}= require('../controller/transaction')
 
 
 
@@ -11,6 +11,28 @@ const {initialPayment,verifyPayment,getLandlordTransactions}= require('../contro
  *       - Transactions
  *     summary: Initialize a payment
  *     description: This endpoint initializes a payment process by generating a transaction reference and saving the transaction details.
+ *     parameters:
+ *       - in: path
+ *         name: tenantid
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the tenant initiating the payment.
+ *         example: "123e4567-e89b-12d3-a456-426614174000"
+ *       - in: path
+ *         name: landlordid
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the landlord receiving the payment.
+ *         example: "456e7890-e89b-12d3-a456-426614174111"
+ *       - in: path
+ *         name: listingId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the listing for which the payment is being made.
+ *         example: "789e1234-e89b-12d3-a456-426614174222"
  *     requestBody:
  *       required: true
  *       content:
@@ -21,15 +43,15 @@ const {initialPayment,verifyPayment,getLandlordTransactions}= require('../contro
  *               amount:
  *                 type: number
  *                 description: The amount to be paid.
- *                 example: 100.0
+ *                 example: 5000
  *               email:
  *                 type: string
  *                 description: The email of the customer.
- *                 example: "customer@example.com"
+ *                 example: "alaekekaebuka200@gmail.com"
  *               name:
  *                 type: string
  *                 description: The name of the customer.
- *                 example: "John Doe"
+ *                 example: "alaekeka ebuka"
  *     responses:
  *       201:
  *         description: Payment initialized successfully.
@@ -73,7 +95,6 @@ const {initialPayment,verifyPayment,getLandlordTransactions}= require('../contro
  *                   type: string
  *                   example: Error initializing payment
  */
-
 transactionrouter.post("/initialize/:tenantId/:landlordId/:listingId", initialPayment)
 
 /**
@@ -142,77 +163,7 @@ transactionrouter.get("/charges/:reference",verifyPayment)
 
 
 
-/**
- * @swagger
- * /api/v1/landlordtransactions/{landlordId}:
- *   get:
- *     tags:
- *       - Transactions
- *     summary: Get landlord transactions
- *     description: This endpoint retrieves all transactions for a specific landlord.
- *     parameters:
- *       - in: path
- *         name: landlordId
- *         required: true
- *         schema:
- *           type: string
- *         description: The ID of the landlord whose transactions are to be retrieved.
- *         example: "123e4567-e89b-12d3-a456-426614174000"
- *     responses:
- *       200:
- *         description: Landlord transactions retrieved successfully.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Landlord transaction history retrieved successfully
- *                 totalAmount:
- *                   type: number
- *                   description: The total amount of successful transactions.
- *                   example: 5000.0
- *                 transactions:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: string
- *                         description: The transaction ID.
- *                         example: "123e4567-e89b-12d3-a456-426614174000"
- *                       amount:
- *                         type: number
- *                         description: The transaction amount.
- *                         example: 100.0
- *                       status:
- *                         type: string
- *                         description: The transaction status.
- *                         example: "success"
- *       404:
- *         description: Landlord not found.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Landlord not found
- *       500:
- *         description: Internal server error.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Error fetching landlord transactions
- */
 
-transactionrouter.get('/landlordtransactions/:landlordId', getLandlordTransactions);
 
 
 
