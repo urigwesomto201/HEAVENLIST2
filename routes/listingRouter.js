@@ -401,7 +401,7 @@ router.delete('/deleteListing/:listingId', landlordAuthenticate, deleteListing);
  *     description: Allows the user to search for property listings based on various filters such as locality, type, number of bedrooms, bathrooms, price range, and availability.
  *     tags:
  *       - Listings
-  *     security: [] # No authentication required
+ *     security: [] # No authentication required
  *     parameters:
  *       - name: area
  *         in: query
@@ -416,7 +416,7 @@ router.delete('/deleteListing/:listingId', landlordAuthenticate, deleteListing);
  *         required: false
  *         schema:
  *           type: string
- *           enum: ["Bungalow", "Flat","Duplex"]
+ *           enum: ["Bungalow", "Flat", "Duplex"]
  *           example: "Bungalow"
  *       - name: bedrooms
  *         in: query
@@ -439,15 +439,17 @@ router.delete('/deleteListing/:listingId', landlordAuthenticate, deleteListing);
  *         description: The minimum price of the property.
  *         required: false
  *         schema:
- *           type: number
- *           example: 500000
+ *           type: string
+ *           enum: ["500000", "600000", "700000", "800000", "900000", "1000000"]
+ *           example: "500000"
  *       - name: maxrent
  *         in: query
  *         description: The maximum price of the property.
  *         required: false
  *         schema:
- *           type: number
- *           example: 2000000
+ *           type: string
+ *           enum: ["1000000", "2000000", "3000000", "4000000", "5000000"]
+ *           example: "2000000"
  *     responses:
  *       200:
  *         description: A list of listings that match the search criteria.
@@ -466,7 +468,7 @@ router.delete('/deleteListing/:listingId', landlordAuthenticate, deleteListing);
  *                     example: "Luxury 3-Bedroom Apartment in Lekki"
  *                   type:
  *                     type: string
- *                     example: "Apartments"
+ *                     example: "Flat"
  *                   bedrooms:
  *                     type: string
  *                     example: "3"
@@ -476,9 +478,9 @@ router.delete('/deleteListing/:listingId', landlordAuthenticate, deleteListing);
  *                   price:
  *                     type: number
  *                     example: 1500000
- *                   locality:
+ *                   area:
  *                     type: string
- *                     example: "Victoria Island"
+ *                     example: "Ikeja"
  *                   isAvailable:
  *                     type: boolean
  *                     example: true
@@ -487,7 +489,6 @@ router.delete('/deleteListing/:listingId', landlordAuthenticate, deleteListing);
  *       500:
  *         description: Internal server error.
  */
-
 
 router.get('/searchListing', searchListing);
 
