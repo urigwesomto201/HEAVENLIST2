@@ -30,7 +30,7 @@ LandlordProfile.init(
     locality: {
       type: DataTypes.STRING,
       allowNull: false // Added to match the model
-    },
+    },     
     state: {
       type: DataTypes.STRING,
       allowNull: false // Added to match the model

@@ -159,7 +159,6 @@ exports.updateLandlordProfile = async (req, res) => {
         });
 
         existingLandlord.isVerified = true;
-
        
         const updatedLandlord = await landlordProfileModel.findOne({});
 
