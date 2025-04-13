@@ -160,7 +160,7 @@ const upload = require('../utils/multer');
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Internal server error"
+ *                   example: "error creating listing"
  */
 router.post('/createlisting/:landlordId', landlordAuthenticate, upload.array('listingImage', 8), createListing);
 
@@ -178,9 +178,10 @@ router.post('/createlisting/:landlordId', landlordAuthenticate, upload.array('li
  *       200:
  *         description: A list of available and verified listings
  *       500:
- *         description: Internal server error while fetching listings
+ *         description: error while fetching all listings
  */
 router.get('/getAllListings', getAllListings);
+
 
 /**
  * @swagger
@@ -206,7 +207,7 @@ router.get('/getAllListings', getAllListings);
  *       404:
  *         description: Listing not found
  *       500:
- *         description: Internal server error
+ *         description: error while fetching listing by landlord
  */
 router.get('/getOneListingByLandlord/:listingId', landlordAuthenticate, getOneListingByLandlord);
 
@@ -233,7 +234,7 @@ router.get('/getOneListingByLandlord/:listingId', landlordAuthenticate, getOneLi
  *       404:
  *         description: Listing not found
  *       500:
- *         description: Internal server error
+ *         description: error while fetching one listing
  */
 router.get('/getOneListing/:listingId', getOneListing);
 
@@ -255,7 +256,7 @@ router.get('/getOneListing/:listingId', getOneListing);
  *       404:
  *         description: No listings found for the given landlordId
  *       500:
- *         description: Internal server error
+ *         description: error while fetching all listings by landlord
  */
 router.get('/getAllListingsByLandlord', landlordAuthenticate, getAllListingsByLandlord);
 
@@ -357,7 +358,7 @@ router.get('/getAllListingsByLandlord', landlordAuthenticate, getAllListingsByLa
  *       404:
  *         description: Listing or landlord not found
  *       500:
- *         description: Internal server error while updating listing
+ *         description: error while updating listing
  */
 router.put('/updateListing/:listingId', landlordAuthenticate, upload.array('listingImage', 8), updateListing);
 
@@ -387,7 +388,7 @@ router.put('/updateListing/:listingId', landlordAuthenticate, upload.array('list
  *       404:
  *         description: Listing not found or does not belong to the specified landlord
  *       500:
- *         description: Internal server error
+ *         description: error while deleting listing
  */
 router.delete('/deleteListing/:listingId', landlordAuthenticate, deleteListing);
 
@@ -505,7 +506,7 @@ router.delete('/deleteListing/:listingId', landlordAuthenticate, deleteListing);
  *                   type: string
  *                   example: "No listings found for the specified criteria"
  *       500:
- *         description: Internal server error.
+ *         description: error while searching for listings.
  *         content:
  *           application/json:
  *             schema:
@@ -513,7 +514,7 @@ router.delete('/deleteListing/:listingId', landlordAuthenticate, deleteListing);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Internal server error."
+ *                   example: "Error while searching for listings"
  */
 router.get('/searchListing', searchListing);
 
@@ -542,7 +543,7 @@ router.get('/searchListing', searchListing);
  *       404:
  *         description: Listing not found.
  *       500:
- *         description: Internal server error while retrieving the listing clicks.
+ *         description: error while fetching clicks for the listing.
  */
 router.get('/getClicksbyListing/:listingId', landlordAuthenticate, getClicksbyListing);
 
