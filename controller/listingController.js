@@ -345,11 +345,11 @@ exports.deleteListing = async (req, res) => {
 
 exports.searchListing = async (req, res) => {
     try {
-        const { area, type, bedrooms, minrent, maxrent } = req.body;
+        const { area, type, bedrooms, minrent, maxrent } = req.query;
 
 
-        if (!area) {
-            return res.status(400).json({ message: 'Please provide the area search criteria' });
+        if (!area && !type && !bedrooms && !minrent && !maxrent) {
+            return res.status(400).json({ message: 'Please provide at least one search criterion' });
         }
 
         const queryCondition = {};
