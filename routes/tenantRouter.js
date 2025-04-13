@@ -4,6 +4,22 @@ const { registerTenant, loginTenant, verifyTenantEmail, TenantForgotPassword, ge
     TenantResetPassword, resendTenantVerificationEmail, changeTenantPassword, logoutTenant} = require('../controller/tenantController')
 const { tenantAuthenticate } = require('../middlewares/authentication')
 
+
+
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     tenantBearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
+
+
+
+
+
 /**
  * @swagger
  * /api/v1/registerTenant:  
@@ -11,7 +27,7 @@ const { tenantAuthenticate } = require('../middlewares/authentication')
  *     tags:
  *       - tenant
   *     security: [] # No authentication required
- *     summary: this is the register or signup route
+ *     summary: this is the register or signup route of the tenant
  *     requestBody:
  *       required: true
  *       content:
@@ -59,6 +75,14 @@ const { tenantAuthenticate } = require('../middlewares/authentication')
  *                   type: boolean 
  *                   description: this is the verification status of the user
  *                   example: false
+ *                 isloggedIn:
+ *                   type: boolean 
+ *                   description: this is the login status of the user
+ *                   example: false
+ *                 isAdmin:
+ *                   type: boolean 
+ *                   description: this is the admin status of the user
+ *                   example: false
  *       400:
  *        description: user with Email already exists
  *        content:
@@ -71,7 +95,7 @@ const { tenantAuthenticate } = require('../middlewares/authentication')
  *                  description: this is the email of the user
  *                  example: alaekekaebuka200@gmail.com
  *       500:
- *         description: error registering user
+ *         description: error registering tenant
  *         content:
  *           application/json:
  *             schema:
@@ -79,7 +103,7 @@ const { tenantAuthenticate } = require('../middlewares/authentication')
  *               properties:
  *                 message: 
  *                   type: string
- *                   example: internal server error
+ *                   example: error registering tenant
  * 
  * 
  * 
@@ -144,7 +168,7 @@ router.post('/registerTenant', registerTenant)
  *               properties:
  *                 message: 
  *                   type: string
- *                   example: internal server error
+ *                   example: failed to login user
  */
 
 
@@ -180,7 +204,7 @@ router.post('/loginTenant', loginTenant)
  *               properties:
  *                 message: 
  *                   type: string
- *                   example: internal server error
+ *                   example: error verifying user
  */
 
 
@@ -223,7 +247,7 @@ router.get('/tenant-verify/:token', verifyTenantEmail)
  *               properties:
  *                 message: 
  *                   type: string
- *                   example: internal server error
+ *                   example: error resending verification mail
  */
 
 
@@ -238,7 +262,7 @@ router.post('/tenant-verify', resendTenantVerificationEmail)
  *     tags:
  *       - tenant
   *     security: [] # No authentication required
- *     summary: Send password reset email
+ *     summary: Send password forgot email
  *     requestBody:
  *       required: true
  *       content:
@@ -264,7 +288,7 @@ router.post('/tenant-verify', resendTenantVerificationEmail)
  *               properties:
  *                 message: 
  *                   type: string
- *                   example: internal server error
+ *                   example: Forgot password failed
  */
 
 router.post('/TenantForgotPassword', TenantForgotPassword)
@@ -277,15 +301,8 @@ router.post('/TenantForgotPassword', TenantForgotPassword)
  *   post:
  *     tags:
  *       - tenant
-  *     security: [] # No authentication required
+ *     security: [] # No authentication required
  *     summary: Reset user password
- *     parameters:
- *       - name: token
- *         in: path
- *         required: true
- *         description: Password reset token sent to the user's email
- *         schema:
- *           type: string
  *     requestBody:
  *       required: true
  *       content:
@@ -304,18 +321,18 @@ router.post('/TenantForgotPassword', TenantForgotPassword)
  *               password:
  *                 type: string
  *                 description: The new password for the user
- *                 example: brown
+ *                 example: Successtoall20$
  *               confirmPassword:
- *                  type: string
- *                  description: this is the confirm password of the user
- *                  example: brown
+ *                 type: string
+ *                 description: The confirmation of the new password
+ *                 example: Successtoall20$
  *     responses:
  *       200:
  *         description: Password reset successfully
  *       400:
- *         description: Invalid or expired token
+ *         description: Invalid or expired OTP
  *       500:
- *         description: reset password failed
+ *         description: Reset password failed
  *         content:
  *           application/json:
  *             schema:
@@ -323,11 +340,11 @@ router.post('/TenantForgotPassword', TenantForgotPassword)
  *               properties:
  *                 message: 
  *                   type: string
- *                   example: internal server error
+ *                   example: Reset password failed
  */
-
-
 router.post('/TenantResetPassword', TenantResetPassword)
+
+
 
 
 /**
@@ -336,9 +353,9 @@ router.post('/TenantResetPassword', TenantResetPassword)
  *   post:
  *     tags:
  *       - tenant
- *     summary: Change user password
  *     security:
- *       - bearerAuth: []
+ *       - tenantBearerAuth: [] # Tenant token is required for authentication
+ *     summary: Change user password
  *     requestBody:
  *       required: true
  *       content:
@@ -349,7 +366,7 @@ router.post('/TenantResetPassword', TenantResetPassword)
  *               oldPassword:
  *                 type: string
  *                 description: The current password of the user
- *                 example: oldpassword123
+ *                 example: Successtoall20$
  *               newPassword:
  *                 type: string
  *                 description: The new password for the user
@@ -380,14 +397,14 @@ router.post('/changeTenantPassword',tenantAuthenticate, changeTenantPassword)
  *       - tenant
  *     summary: Log out user
  *     security:
- *       - bearerAuth: []
+ *       - tenantBearerAuth: [] # Tenant token is required for authentication
  *     responses:
  *       200:
  *         description: User logged out successfully
  *       401:
  *         description: Unauthorized
  *       500:
- *         description: Internal server error
+ *         description: error logging out user
  */
 router.post('/logoutTenant', tenantAuthenticate, logoutTenant)
 

@@ -32,6 +32,7 @@ Inspection.init(
     },
     landlordId: {
       type: DataTypes.UUID,
+      allowNull: false,
       references: {
         model: 'Landlords', // Fixed: Use the table name as a string
         key: 'id',
@@ -41,6 +42,7 @@ Inspection.init(
     },
     tenantId: {
       type: DataTypes.UUID,
+      allowNull: false,
       references: {
         model: 'Tenants', // Fixed: Use the table name as a string
         key: 'id',
@@ -50,6 +52,7 @@ Inspection.init(
     },
     listingId: {
       type: DataTypes.UUID,
+      allowNull: false,
       references: {
         model: 'Listings', // Fixed: Use the table name as a string
         key: 'id',
