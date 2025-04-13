@@ -24,46 +24,50 @@ const upload = require('../utils/multer')
  * /api/v1/createProfile/{landlordId}:
  *   post:
  *     summary: Create a new landlord profile
- *     description: Allows a landlord to create their profile with personal details and an optional profile image.
+ *     description: Allows a landlord to create their profile with personal details and a profile image.
  *     tags:
  *       - Landlord Profile
  *     security:
  *       - landlordBearerAuth: [] # Requires landlord authentication
+ *     parameters:
+ *       - in: path
+ *         name: landlordId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the landlord creating the profile.
+ *         example: "123e4567-e89b-12d3-a456-426614174000"
  *     requestBody:
  *       required: true
  *       content:
  *         multipart/form-data:
  *           schema:
  *             type: object
- *             required:
- *               - firstName
- *               - lastName
- *               - email
- *               - state
- *               - street
- *               - locality
  *             properties:
- *               firstName:
+ *               fullName:
  *                 type: string
- *                 example: "John"
- *               lastName:
- *                 type: string
- *                 example: "Doe"
+ *                 description: The first name of the landlord.
+ *                 example: "alaekeka ebuka"
  *               email:
  *                 type: string
- *                 example: "johndoe@example.com"
+ *                 description: The email address of the landlord.
+ *                 example: "alaekekaebuka200@gmail.com"
  *               state:
  *                 type: string
- *                 example: "California"
+ *                 description: The state where the landlord resides.
+ *                 example: "lagos"
  *               street:
  *                 type: string
- *                 example: "123 Main St"
+ *                 description: The street address of the landlord.
+ *                 example: "123 Main St,Olodi,Apapa"
  *               locality:
  *                 type: string
- *                 example: "Los Angeles"
+ *                 description: The locality or city where the landlord resides.
+ *                 example: "Ajeromi-Ifelodun"
  *               profileImage:
  *                 type: string
  *                 format: binary
+ *                 description: The profile image of the landlord.
  *     responses:
  *       201:
  *         description: Landlord profile created successfully
@@ -80,34 +84,33 @@ const upload = require('../utils/multer')
  *                   properties:
  *                     id:
  *                       type: string
+ *                       description: The unique ID of the landlord profile.
  *                       example: "12345"
- *                     firstName:
+ *                     fullName:
  *                       type: string
- *                       example: "John"
- *                     lastName:
- *                       type: string
- *                       example: "Doe"
+ *                       description: The first name of the landlord.
+ *                       example: "alaekeka ebuka"
  *                     email:
  *                       type: string
- *                       example: "johndoe@example.com"
+ *                       description: The email address of the landlord.
+ *                       example: "alaekekaebuka200@gmail.com"
  *                     state:
  *                       type: string
- *                       example: "California"
+ *                       description: The state where the landlord resides.
+ *                       example: "lagos"
  *                     street:
  *                       type: string
- *                       example: "123 Main St"
+ *                       description: The street address of the landlord.
+ *                       example: "123 Main St,olodi,Apapa"
  *                     locality:
  *                       type: string
- *                       example: "Los Angeles"
+ *                       description: The locality or city where the landlord resides.
+ *                       example: "Ajeromi-Ifelodun"
  *                     profileImage:
- *                       type: object
- *                       properties:
- *                         imageUrl:
  *                           type: string
+ *                           description: The URL of the uploaded profile image.
  *                           example: "https://res.cloudinary.com/example/image.jpg"
- *                         publicId:
- *                           type: string
- *                           example: "profile123"
+
  *       400:
  *         description: Bad request, missing required fields
  *         content:
@@ -130,7 +133,6 @@ const upload = require('../utils/multer')
  *                   example: "Error creating profile"
  */
 
-// Route to create landlord profile
 router.post('/createProfile/:landlordId', landlordAuthenticate, upload.single('profileImage'), createLandlordProfile);
 
 
@@ -138,65 +140,62 @@ router.post('/createProfile/:landlordId', landlordAuthenticate, upload.single('p
  * @swagger
  * /api/v1/getlandlordprofile:
  *   get:
- *     summary: "Get a landlord profile"
- *     description: "Fetch the details of a specific landlord profile by their ID."
-*     tags:
+ *     summary: Get a landlord profile
+ *     description: Fetch the details of a specific landlord profile by their ID.
+ *     tags:
  *       - Landlord Profile
  *     security:
  *       - landlordBearerAuth: [] # Requires landlord authentication
  *     parameters:
- *       - name: "landlordId"
- *         in: "path"
- *         description: "ID of the landlord to fetch the profile"
+ *       - name: landlordId
+ *         in: query
+ *         description: ID of the landlord to fetch the profile
  *         required: true
  *         schema:
- *           type: "string"
+ *           type: string
  *     responses:
  *       200:
- *         description: "Successfully fetched the landlord profile"
+ *         description: Successfully fetched the landlord profile
  *         content:
  *           application/json:
  *             schema:
- *               type: "object"
+ *               type: object
  *               properties:
  *                 message:
- *                   type: "string"
+ *                   type: string
  *                   example: "Landlord profile fetched successfully"
  *                 data:
- *                   type: "object"
+ *                   type: object
  *                   properties:
  *                     id:
- *                       type: "string"
- *                       example: "1"
- *                     firstName:
- *                       type: "string"
- *                       example: "John"
- *                     lastName:
- *                       type: "string"
- *                       example: "Doe"
+ *                       type: string
+ *                       example: "12345"
+ *                     fullName:
+ *                       type: string
+ *                       example: "Alaekeka Ebuka"
  *                     email:
- *                       type: "string"
- *                       example: "john.doe@example.com"
+ *                       type: string
+ *                       example: "alaekekaebuka200@gmail.com"
  *                     state:
- *                       type: "string"
+ *                       type: string
  *                       example: "Lagos"
+ *                     street:
+ *                       type: string
+ *                       example: "123 Main St, Olodi, Apapa"
+ *                     locality:
+ *                       type: string
+ *                       example: "Ajeromi-Ifelodun"
  *                     profileImage:
- *                       type: "object"
- *                       properties:
- *                         imageUrl:
- *                           type: "string"
- *                           example: "https://res.cloudinary.com/your-cloud-name/image/upload/v1/images/john-doe.jpg"
- *                         publicId:
- *                           type: "string"
- *                           example: "public-id-of-the-image"
- *       400:
- *         description: "Landlord ID is required"
- *       404:
- *         description: "Landlord profile not found"
- *       500:
- *         description: "Error fetching landlord profile"
- */
+ *                           type: string
+ *                           example: "https://res.cloudinary.com/example/image.jpg"
 
+ *       400:
+ *         description: Landlord ID is required
+ *       404:
+ *         description: Landlord profile not found
+ *       500:
+ *         description: Error fetching landlord profile
+ */
 
 
 router.get('/getlandlordprofile', landlordAuthenticate, getOneLandlordProfile);
@@ -208,136 +207,81 @@ router.get('/getlandlordprofile', landlordAuthenticate, getOneLandlordProfile);
  * @swagger
  * /api/v1/updateLandlordProfile:
  *   put:
- *     summary: "Update landlord profile"
- *     description: "Update the details of a specific landlord profile."
-*     tags:
+ *     summary: Update landlord profile
+ *     description: Update the details of a specific landlord profile.
+ *     tags:
  *       - Landlord Profile
  *     security:
  *       - landlordBearerAuth: [] # Requires landlord authentication
- *     parameters:
- *       - name: "landlordId"
- *         in: "path"
- *         description: "ID of the landlord to update the profile"
- *         required: true
- *         schema:
- *           type: "string"
- *       - name: "profileImage"
- *         in: "formData"
- *         description: "Profile image file"
- *         required: false
- *         type: "file"
- *       - name: "firstName"
- *         in: "body"
- *         description: "First name of the landlord"
- *         required: false
- *         schema:
- *           type: "string"
- *       - name: "lastName"
- *         in: "body"
- *         description: "Last name of the landlord"
- *         required: false
- *         schema:
- *           type: "string"
- *       - name: "email"
- *         in: "body"
- *         description: "Email address of the landlord"
- *         required: false
- *         schema:
- *           type: "string"
- *       - name: "Password"
- *         in: "body"
- *         description: "New password for the landlord"
- *         required: false
- *         schema:
- *           type: "string"
- *       - name: "confirmPassword"
- *         in: "body"
- *         description: "Confirm new password"
- *         required: false
- *         schema:
- *           type: "string"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               fullName:
+ *                 type: string
+ *                 description: The full name of the landlord.
+ *                 example: "Alaekeka Ebuka"
+ *               email:
+ *                 type: string
+ *                 description: The email address of the landlord.
+ *                 example: "alaekekaebuka200@gmail.com"
+ *               state:
+ *                 type: string
+ *                 description: The state where the landlord resides.
+ *                 example: "Lagos"
+ *               street:
+ *                 type: string
+ *                 description: The street address of the landlord.
+ *                 example: "123 Main St, Olodi, Apapa"
+ *               locality:
+ *                 type: string
+ *                 description: The locality or city where the landlord resides.
+ *                 example: "Ajeromi-Ifelodun"
+ *               profileImage:
+ *                 type: string
+ *                 format: binary
+ *                 description: The profile image of the landlord.
  *     responses:
  *       200:
- *         description: "Successfully updated the landlord profile"
- *         content:
- *           application/json:
- *             schema:
- *               type: "object"
- *               properties:
- *                 message:
- *                   type: "string"
- *                   example: "Landlord profile updated successfully"
- *                 data:
- *                   type: "object"
- *                   properties:
- *                     id:
- *                       type: "string"
- *                       example: "1"
- *                     firstName:
- *                       type: "string"
- *                       example: "John"
- *                     lastName:
- *                       type: "string"
- *                       example: "Doe"
- *                     email:
- *                       type: "string"
- *                       example: "john.doe@example.com"
- *                     state:
- *                       type: "string"
- *                       example: "Lagos"
- *                     profileImage:
- *                       type: "object"
- *                       properties:
- *                         imageUrl:
- *                           type: "string"
- *                           example: "https://res.cloudinary.com/your-cloud-name/image/upload/v1/images/john-doe.jpg"
- *                         publicId:
- *                           type: "string"
- *                           example: "public-id-of-the-image"
+ *         description: Successfully updated the landlord profile
  *       400:
- *         description: "Missing required fields or passwords do not match"
+ *         description: Missing required fields or invalid data
  *       404:
- *         description: "Landlord profile not found"
+ *         description: Landlord profile not found
  *       500:
- *         description: "Error updating landlord profile"
+ *         description: Error updating landlord profile
  */
-
 router.put('/updateLandlordProfile', landlordAuthenticate, upload.single('profileImage'), updateLandlordProfile);
 
 /**
  * @swagger
  * /api/v1/deleteLandlordProfile:
  *   delete:
- *     summary: "Delete a landlord profile"
- *     description: "Delete a specific landlord profile by their ID."
-*     tags:
+ *     summary: Delete a landlord profile
+ *     description: Delete a specific landlord profile by their ID.
+ *     tags:
  *       - Landlord Profile
  *     security:
  *       - landlordBearerAuth: [] # Requires landlord authentication
  *     parameters:
- *       - name: "landlordId"
- *         in: "path"
- *         description: "ID of the landlord to delete the profile"
+ *       - name: landlordId
+ *         in: query
+ *         description: ID of the landlord to delete the profile
  *         required: true
  *         schema:
- *           type: "string"
+ *           type: string
  *     responses:
  *       200:
- *         description: "Successfully deleted the landlord profile"
- *         content:
- *           application/json:
- *             schema:
- *               type: "object"
- *               properties:
- *                 message:
- *                   type: "string"
- *                   example: "Landlord profile deleted successfully"
+ *         description: Successfully deleted the landlord profile
  *       400:
- *         description: "Landlord ID is required"
+ *         description: Landlord ID is required
  *       404:
- *         description: "Landlord profile not found"
+ *         description: Landlord profile not found
  *       500:
- *         description: "Error deleting landlord profile"
+ *         description: Error deleting landlord profile
  */
 router.delete('/deleteLandlordProfile',landlordAuthenticate, deleteLandlordProfile);
 
