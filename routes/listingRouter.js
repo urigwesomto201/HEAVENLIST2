@@ -187,19 +187,12 @@ router.get('/getAllListings', getAllListings);
  * /api/v1/getOneListingByLandlord/{listingId}:
  *   get:
  *     summary: Get a specific listing owned by a landlord
- *     description: Retrieves a single listing based on the landlord's ID and the listing's ID. Requires authentication.
+ *     description: Retrieves a single listing based on the landlord's ID and the listing's ID. Requires landlord authentication.
  *     tags:
  *       - Listings
  *     security:
  *       - landlordBearerAuth: [] # Requires landlord authentication
  *     parameters:
- *       - name: landlordId
- *         in: path
- *         required: true
- *         description: ID of the landlord who owns the listing
- *         schema:
- *           type: string
- *         example: "123456"
  *       - name: listingId
  *         in: path
  *         required: true
@@ -225,7 +218,15 @@ router.get('/getOneListingByLandlord/:listingId', landlordAuthenticate, getOneLi
  *     description: This endpoint retrieves a specific listing by its ID. The listing must be verified and available.
  *     tags:
  *       - Listings
-  *     security: [] # No authentication required
+ *     security: [] # No authentication required
+ *     parameters:
+ *       - name: listingId
+ *         in: path
+ *         required: true
+ *         description: ID of the listing to retrieve
+ *         schema:
+ *           type: string
+ *         example: "789012"
  *     responses:
  *       200:
  *         description: Listing retrieved successfully
@@ -243,19 +244,11 @@ router.get('/getOneListing/:listingId', getOneListing);
  * /api/v1/getAllListingsByLandlord:
  *   get:
  *     summary: Get all listings by a specific landlord
- *     description: Fetch all available and verified listings created by the landlord specified by `landlordId`.
+ *     description: Fetch all available and verified listings created by the landlord specified by `landlordId`. Requires authentication.
  *     tags:
  *       - Listings
  *     security:
  *       - landlordBearerAuth: [] # Requires landlord authentication
- *     parameters:
- *       - name: landlordId
- *         in: path
- *         required: true
- *         description: The ID of the landlord whose listings you want to retrieve.
- *         schema:
- *           type: string
- *           example: "12345"
  *     responses:
  *       200:
  *         description: A list of listings by the landlord
@@ -273,7 +266,7 @@ router.get('/getAllListingsByLandlord', landlordAuthenticate, getAllListingsByLa
  * /api/v1/updateListing/{listingId}:
  *   put:
  *     summary: Update a listing by landlord
- *     description: Allows a landlord to update the details of a specific listing.
+ *     description: Allows a landlord to update the details of a specific listing. Requires landlord authentication.
  *     tags:
  *       - Listings
  *     security:
@@ -289,17 +282,17 @@ router.get('/getAllListingsByLandlord', landlordAuthenticate, getAllListingsByLa
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
  *               title:
  *                 type: string
- *                 description: The title of the listing
- *                 example: "Spacious 3-bedroom apartment for rent"
+ *                 description: The title of the property listing
+ *                 example: "Luxury 3-Bedroom Apartment in Lekki"
  *               type:
  *                 type: string
- *                 enum: ["Bungalow", "Flat","Duplex"]
+ *                 enum: ["Bungalow", "Flat", "Duplex"]
  *                 description: The type of the property
  *                 example: "Bungalow"
  *               bedrooms:
@@ -319,12 +312,10 @@ router.get('/getAllListingsByLandlord', landlordAuthenticate, getAllListingsByLa
  *                 example: "2"
  *               minrent:
  *                 type: string
- *                 enum: ["500000", "600000", "700000", "800000", "900000", "1000000"]
  *                 description: Minimum rent price
  *                 example: "500000"
  *               maxrent:
  *                 type: string
- *                 enum: ["1000000", "2000000", "3000000", "4000000", "5000000"]
  *                 description: Maximum rent price
  *                 example: "2000000"
  *               state:
@@ -345,6 +336,11 @@ router.get('/getAllListingsByLandlord', landlordAuthenticate, getAllListingsByLa
  *                 type: string
  *                 description: The street address of the property
  *                 example: "123 Main Street"
+ *               year:
+ *                 type: string
+ *                 enum: ["1year", "2years", "3years+"]
+ *                 description: The year of the rent of the property
+ *                 example: "1year"
  *               description:
  *                 type: string
  *                 description: A description of the property
@@ -355,7 +351,6 @@ router.get('/getAllListingsByLandlord', landlordAuthenticate, getAllListingsByLa
  *                   type: string
  *                   format: binary
  *                 description: Upload up to 8 images of the property
-
  *     responses:
  *       200:
  *         description: Listing updated successfully
@@ -373,18 +368,12 @@ router.put('/updateListing/:listingId', landlordAuthenticate, upload.array('list
  * /api/v1/deleteListing/{listingId}:
  *   delete:
  *     summary: Delete a listing by listing ID
+ *     description: Allows a landlord to delete the details of a specific listing. Requires landlord authentication.
  *     tags:
  *       - Listings
  *     security:
  *       - landlordBearerAuth: [] # Requires landlord authentication
  *     parameters:
- *       - name: landlordId
- *         in: path
- *         required: true
- *         description: The ID of the landlord who owns the listing
- *         schema:
- *           type: string
- *         example: "12345"
  *       - name: listingId
  *         in: path
  *         required: true
@@ -414,13 +403,13 @@ router.delete('/deleteListing/:listingId', landlordAuthenticate, deleteListing);
  *       - Listings
   *     security: [] # No authentication required
  *     parameters:
- *       - name: locality
+ *       - name: area
  *         in: query
  *         description: The locality of the property to search for.
  *         required: false
  *         schema:
  *           type: string
- *           example: "Victoria Island"
+ *           example: "Ikeja"
  *       - name: type
  *         in: query
  *         description: The type of the property (e.g., Houses, Apartments).
@@ -445,27 +434,20 @@ router.delete('/deleteListing/:listingId', landlordAuthenticate, deleteListing);
  *           type: string
  *           enum: ["1", "2", "3", "4", "5+"]
  *           example: "2"
- *       - name: minPrice
+ *       - name: minrent
  *         in: query
  *         description: The minimum price of the property.
  *         required: false
  *         schema:
  *           type: number
  *           example: 500000
- *       - name: maxPrice
+ *       - name: maxrent
  *         in: query
  *         description: The maximum price of the property.
  *         required: false
  *         schema:
  *           type: number
  *           example: 2000000
- *       - name: isAvailable
- *         in: query
- *         description: Filter by availability of the property.
- *         required: false
- *         schema:
- *           type: boolean
- *           example: true
  *     responses:
  *       200:
  *         description: A list of listings that match the search criteria.
@@ -514,10 +496,11 @@ router.get('/searchListing', searchListing);
  * /api/v1/getClicksbyListing/{listingId}:
  *   get:
  *     summary: Get the number of clicks/views for a specific listing
- *     description: Retrieve the number of times a specific listing has been viewed (clicked).
+ *     description: Retrieve the number of times a specific listing has been viewed (clicked). Requires landlord authentication.
  *     tags:
  *       - Listings
-  *     security: [] # No authentication required
+ *     security:
+ *       - landlordBearerAuth: [] # Requires landlord authentication
  *     parameters:
  *       - name: listingId
  *         in: path
@@ -534,6 +517,6 @@ router.get('/searchListing', searchListing);
  *       500:
  *         description: Internal server error while retrieving the listing clicks.
  */
-router.get('/getClicksbyListing/:listingId', getClicksbyListing);
+router.get('/getClicksbyListing/:listingId', landlordAuthenticate, getClicksbyListing);
 
 module.exports = router;

@@ -219,8 +219,13 @@ exports.updateListing = async (req, res) => {
 
 
         const { title, type, bedrooms,bathrooms,price,toilets,
-            state,area,description, minrent, maxrent, street
+            state,area,description, minrent, maxrent, street, year,
         } = req.body
+
+        if(!title || !type || !bedrooms || !bathrooms || !price || !toilets ||
+            !state || !area || !description || !minrent || !maxrent || !street || !year ) {
+            return res.status(400).json({message: 'please input all fields'})
+        }
 
         if(!listingId) {
             return res.status(400).json({message: 'listingId is required'})

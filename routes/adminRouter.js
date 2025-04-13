@@ -719,7 +719,7 @@ router.delete('/deleteadmin/:id',adminAuthenticate, deleteAdmin);
 
 /**
  * @swagger
- * /api/v1/verifyAlisting/{landlordId}/{listingId}:
+ * /api/v1/verifyAlisting/{listingId}/{landlordId}:
  *   put:
  *     tags:
  *       - Admin
@@ -742,18 +742,6 @@ router.delete('/deleteadmin/:id',adminAuthenticate, deleteAdmin);
  *         schema:
  *           type: string
  *           example: "12345"
- *     requestBody:
- *       description: The body contains the status to update the listing.
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               status:
- *                 type: string
- *                 description: The new status of the listing (e.g., "accepted").
- *                 example: "accepted"
  *     responses:
  *       200:
  *         description: Listing has been successfully verified and updated.
@@ -767,16 +755,7 @@ router.delete('/deleteadmin/:id',adminAuthenticate, deleteAdmin);
  *                   example: "Listing has been verified."
  *                 data:
  *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                       example: "12345"
- *                     title:
- *                       type: string
- *                       example: "Luxury Apartment for Rent"
- *                     isAvailable:
- *                       type: boolean
- *                       example: true
+ *                   description: Details of the verified listing
  *       400:
  *         description: Listing has already been verified or invalid input.
  *         content:
@@ -812,10 +791,9 @@ router.put('/verifyAlisting/:listingId/:landlordId', adminAuthenticate, verifyAl
 
 
 
-
 /**
  * @swagger
- * /api/v1/unverifyAlisting/{landlordId}/{listingId}:
+ * /api/v1/unverifyAlisting/{listingId}/{landlordId}:
  *   put:
  *     tags:
  *       - Admin
@@ -838,18 +816,6 @@ router.put('/verifyAlisting/:listingId/:landlordId', adminAuthenticate, verifyAl
  *         schema:
  *           type: string
  *           example: "12345"
- *     requestBody:
- *       description: The body contains the status to update the listing.
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               status:
- *                 type: string
- *                 description: The new status of the listing (e.g., "rejected").
- *                 example: "rejected"
  *     responses:
  *       200:
  *         description: Listing has been successfully unverified and updated.
@@ -863,16 +829,7 @@ router.put('/verifyAlisting/:listingId/:landlordId', adminAuthenticate, verifyAl
  *                   example: "Listing has been unverified."
  *                 data:
  *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                       example: "12345"
- *                     title:
- *                       type: string
- *                       example: "Luxury Apartment for Rent"
- *                     isAvailable:
- *                       type: boolean
- *                       example: false
+ *                   description: Details of the unverified listing
  *       400:
  *         description: Listing has already been unverified or invalid input.
  *         content:
