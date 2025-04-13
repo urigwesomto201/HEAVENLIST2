@@ -20,7 +20,7 @@ const { adminAuthenticate } = require('../middlewares/authentication')
 /**
  * @swagger
  * /schedule/{tenantId}/{listingId}:
- *   get:
+ *   post:
  *     tags:
  *       - Inspections
  *     summary: Schedule an inspection
@@ -111,7 +111,7 @@ const { adminAuthenticate } = require('../middlewares/authentication')
  *                   type: string
  *                   example: Error scheduling inspection.
  */
-router.get('/schedule/:tenantId/:listingId', scheduleInspection);
+router.post('/schedule/:tenantId/:listingId', scheduleInspection);
 
 
 
@@ -122,10 +122,9 @@ router.get('/schedule/:tenantId/:listingId', scheduleInspection);
  *     tags:
  *       - Inspections
  *     summary: Confirm or update the status of an inspection
- *     description: This endpoint allows a landlord or admin to confirm or update the status of a scheduled inspection.
+ *     description: This endpoint allows an admin to confirm or update the status of a scheduled inspection.
  *     security:
- *       - landlordBearerAuth: [] # Optional landlord token
- *       - AdminBearerAuth: []    # Optional admin token
+ *       - AdminBearerAuth: [] # Requires admin token
  *     parameters:
  *       - in: path
  *         name: inspectionId
@@ -134,17 +133,14 @@ router.get('/schedule/:tenantId/:listingId', scheduleInspection);
  *           type: string
  *         description: The ID of the inspection to confirm or update.
  *         example: "789e1234-e56b-78d9-a012-426614174002"
- *       - in: body
- *         name: statusDetails
+ *       - in: query
+ *         name: status
  *         required: true
- *         description: The details of the status update.
  *         schema:
- *           type: object
- *           properties:
- *             status:
- *               type: string
- *               description: The new status of the inspection (e.g., "confirmed", "cancelled").
- *               example: "confirmed"
+ *           type: string
+ *           enum: ["confirmed", "cancelled"]
+ *         description: The new status of the inspection.
+ *         example: "confirmed"
  *     responses:
  *       200:
  *         description: Inspection status updated successfully.
@@ -207,8 +203,7 @@ router.get('/schedule/:tenantId/:listingId', scheduleInspection);
  *                   example: Cannot confirm schedule date.
  */
 
-
-router.post('/confirmSchedule/:inspectionId',adminAuthenticate, confirmSchedule);
+router.post('/confirmSchedule/:inspectionId', confirmSchedule);
 
 
 
