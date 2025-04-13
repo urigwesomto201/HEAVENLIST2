@@ -397,7 +397,7 @@ exports.getAllLandlords = async (req, res) => {
         }, include: [
             {
                 model: listingModel,
-                attributes: ['area', 'description', 'type', 'isVerified', 'isAvailable'], 
+                attributes: ['area', 'description', 'type', 'isAvailable'], 
                 as: 'listings', 
             },
         ],
@@ -420,7 +420,7 @@ exports.getOneLandlord = async (req, res) => {
             include: [
                 {
                     model: listingModel,
-                    attributes: ['area', 'description', 'type', 'isVerified', 'isAvailable'], 
+                    attributes: ['area', 'description', 'type', 'isAvailable'], 
                     as: 'listings', 
                 },
             ], 
@@ -448,7 +448,7 @@ exports.getOneLandlordProfile = async (req, res) => {
             include: [
                 {
                     model: listingModel,
-                    attributes: ['area', 'description', 'type', 'isVerified', 'isAvailable'], 
+                    attributes: ['area', 'description', 'type', 'isAvailable'], 
                     as: 'listings', 
                 },
             ], 
@@ -494,11 +494,11 @@ exports.deleteLandlordProfile = async (req, res) => {
     try {
         const { landlordProfileId } = req.params;
         const landlordProfile = await landlordProfileModel.findOne({ where: { id: landlordProfileId,
-            id: listingId, isAvailable:true, isVerified:true },
+            id: listingId, isAvailable:true },
                 include: [
                     {
                         model: listingModel,
-                        attributes: ['area', 'description', 'category', 'type', 'isVerified', 'isAvailable'], 
+                        attributes: ['area', 'description', 'category', 'type', 'isAvailable'], 
                         as: 'listing', 
                     },
                 ],

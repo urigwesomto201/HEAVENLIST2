@@ -90,19 +90,19 @@ exports.verifyPayment = async (req, res) => {
   try {
     const { reference } = req.query;
 
-    // Validate the reference parameter
+
     if (!reference) {
       return res.status(400).json({ message: 'Reference is required' });
     }
 
-    // Find the existing transaction by reference
+
     const existingTransaction = await transactionModel.findOne({ where: { reference } });
 
     if (!existingTransaction) {
       return res.status(404).json({ message: 'Transaction not found' });
     }
 
-    // Check if the transaction has already been verified
+
     if (existingTransaction.status === 'success') {
       return res.status(400).json({ message: 'Payment has already been verified successfully' });
     }
@@ -111,7 +111,7 @@ exports.verifyPayment = async (req, res) => {
       return res.status(400).json({ message: 'Payment verification already failed' });
     }
 
-    // Verify payment with Korapay API
+
     const response = await axios.get(
       `https://api.korapay.com/merchant/api/v1/charges/${reference}`,
       {
@@ -123,11 +123,11 @@ exports.verifyPayment = async (req, res) => {
 
     const data = response?.data;
 
-    // Check if the payment was successful
+ 
     if (data?.data?.status === 'success') {
       console.log('Payment successful');
 
-      // Update the transaction status to 'success'
+  
       await transactionModel.update(
         { status: 'success' },
         { where: { reference } }
