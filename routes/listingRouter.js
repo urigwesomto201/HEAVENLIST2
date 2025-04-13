@@ -398,7 +398,7 @@ router.delete('/deleteListing/:listingId', landlordAuthenticate, deleteListing);
  * /api/v1/searchListing:
  *   get:
  *     summary: Search for listings based on specific criteria
- *     description: Allows the user to search for property listings based on various filters such as locality, type, number of bedrooms, bathrooms, price range, and availability. At least one search criterion must be provided.
+ *     description: Allows the user to search for property listings based on various filters such as locality, type, number of bedrooms, bathrooms, price range, and availability. At least one search criteria must be provided.
  *     tags:
  *       - Listings
  *     security: [] # No authentication required
@@ -406,14 +406,12 @@ router.delete('/deleteListing/:listingId', landlordAuthenticate, deleteListing);
  *       - name: area
  *         in: query
  *         description: The locality of the property to search for.
- *         required: false
  *         schema:
  *           type: string
  *           example: "Ikeja"
  *       - name: type
  *         in: query
- *         description: The type of the property (e.g., Houses, Apartments).
- *         required: false
+ *         description: The type of the property.
  *         schema:
  *           type: string
  *           enum: ["Bungalow", "Flat", "Duplex"]
@@ -421,7 +419,6 @@ router.delete('/deleteListing/:listingId', landlordAuthenticate, deleteListing);
  *       - name: bedrooms
  *         in: query
  *         description: The number of bedrooms in the property.
- *         required: false
  *         schema:
  *           type: string
  *           enum: ["1", "2", "3", "4", "5+"]
@@ -429,7 +426,6 @@ router.delete('/deleteListing/:listingId', landlordAuthenticate, deleteListing);
  *       - name: bathrooms
  *         in: query
  *         description: The number of bathrooms in the property.
- *         required: false
  *         schema:
  *           type: string
  *           enum: ["1", "2", "3", "4", "5+"]
@@ -437,17 +433,17 @@ router.delete('/deleteListing/:listingId', landlordAuthenticate, deleteListing);
  *       - name: minrent
  *         in: query
  *         description: The minimum price of the property.
- *         required: false
  *         schema:
- *           type: number
- *           example: 500000
+ *           type: string
+ *           enum: ["500000", "600000", "700000", "800000", "900000", "1000000"]
+ *           example: "500000"
  *       - name: maxrent
  *         in: query
  *         description: The maximum price of the property.
- *         required: false
  *         schema:
- *           type: number
- *           example: 2000000
+ *           type: string
+ *           enum: ["1000000", "2000000", "3000000", "4000000", "5000000"]
+ *           example: "2000000"
  *     responses:
  *       200:
  *         description: A list of listings that match the search criteria.
@@ -514,6 +510,7 @@ router.delete('/deleteListing/:listingId', landlordAuthenticate, deleteListing);
  *                   example: "Internal server error."
  */
 router.get('/searchListing', searchListing);
+
 
 
 /**
