@@ -347,6 +347,12 @@ exports.searchListing = async (req, res) => {
     try {
         const { area, type, bedrooms, minrent, maxrent } = req.body;
 
+
+        if (!area) {
+            return res.status(400).json({ message: 'Please provide the area search criteria' });
+        }
+
+        
         const queryCondition = {};
         if (area) queryCondition.area = area.toLowerCase();
         if (type) queryCondition.type = type;
@@ -379,6 +385,9 @@ exports.searchListing = async (req, res) => {
         res.status(500).json({ message: 'Error getting listings by criteria', error: error.message });
     }
 };
+
+
+
 
 
 
