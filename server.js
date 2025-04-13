@@ -68,7 +68,7 @@ security: [
 ],
   servers: [
     {
-      url: 'https://heavenlist2.onrender.com',
+      url: 'https://heavenlist2-zaz3.onrender.com',
       description: 'Production server',
     },
     {
