@@ -20,7 +20,7 @@ const { adminAuthenticate } = require('../middlewares/authentication')
 /**
  * @swagger
  * /schedule/{tenantId}/{listingId}:
- *   get:
+ *   post:
  *     tags:
  *       - Inspections
  *     summary: Schedule an inspection
@@ -40,22 +40,25 @@ const { adminAuthenticate } = require('../middlewares/authentication')
  *           type: string
  *         description: The ID of the listing for which the inspection is being scheduled.
  *         example: "456e7890-e12b-34d5-a678-426614174001"
- *       - in: query
- *         name: days
- *         required: true
- *         schema:
- *           type: string
- *           enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
- *         description: The day of the week for the inspection.
- *         example: "Monday"
- *       - in: query
- *         name: timeRange
- *         required: true
- *         schema:
- *           type: string
- *           enum: ["10am-4pm"]
- *         description: The time range for the inspection.
- *         example: "10am-4pm"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               days:
+ *                 type: string
+ *                 enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+ *                 description: The day of the week for the inspection.
+ *                 required: false
+ *                 example: "Monday"
+ *               timeRange:
+ *                 type: string
+ *                 enum: ["10am-4pm"]
+ *                 description: The time range for the inspection.
+ *                 required: false
+ *                 example: "10am-4pm"
  *     responses:
  *       201:
  *         description: Inspection scheduled successfully.
@@ -89,10 +92,10 @@ const { adminAuthenticate } = require('../middlewares/authentication')
  *                     timeRange:
  *                       type: string
  *                       description: The time range of the inspection.
- *                       example: "9am-12pm"
+ *                       example: "10am-4pm"
  *                     status:
  *                       type: string
- *                       description: The time status of the inspection.
+ *                       description: The status of the inspection.
  *                       example: "scheduled"
  *       400:
  *         description: Bad request. Missing or invalid parameters.
@@ -115,7 +118,7 @@ const { adminAuthenticate } = require('../middlewares/authentication')
  *                   type: string
  *                   example: Error scheduling inspection.
  */
-router.get('/schedule/:tenantId/:listingId', scheduleInspection);
+router.post('/schedule/:tenantId/:listingId', scheduleInspection);
 
 
 

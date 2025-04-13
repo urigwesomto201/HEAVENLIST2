@@ -11,7 +11,7 @@ const { Op } = require('sequelize');
 
 exports.scheduleInspection = async (req, res) => {
   try {
-    const { timeRange, days } = req.query;
+    const { timeRange, days } = req.body;
     const { tenantId, listingId } = req.params;
 
 
