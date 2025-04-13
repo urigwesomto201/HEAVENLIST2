@@ -725,32 +725,35 @@ router.delete('/deleteadmin/:id',adminAuthenticate, deleteAdmin);
  *       - Admin
  *     security:
  *       - AdminBearerAuth: [] # Requires admin authentication
- *     summary: Verify a listing by a admin
- *     description: This endpoint allows an admin to verify a listing.
+ *     summary: Verify a listing
+ *     description: This endpoint allows an admin to verify a listing by updating its status to "accepted".
  *     parameters:
  *       - name: landlordId
  *         in: path
- *         description: The ID of the landlord verifying the listing
+ *         description: The ID of the landlord who owns the listing
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
+ *           example: "64a8e9b7b56c8d001c9a4b2d"
  *       - name: listingId
  *         in: path
  *         description: The ID of the listing to be verified
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
+ *           example: "12345"
  *     requestBody:
- *       description: The body contains the landlordId and listingId in the path parameters.
+ *       description: The body contains the status to update the listing.
+ *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
  *             properties:
- *             status:
- *               type: string
- *               description: The new status of the listing (e.g., "accepted", "rejected").
- *               example: "accepted"
+ *               status:
+ *                 type: string
+ *                 description: The new status of the listing (e.g., "accepted").
+ *                 example: "accepted"
  *     responses:
  *       200:
  *         description: Listing has been successfully verified and updated.
@@ -766,17 +769,11 @@ router.delete('/deleteadmin/:id',adminAuthenticate, deleteAdmin);
  *                   type: object
  *                   properties:
  *                     id:
- *                       type: integer
- *                       example: 1
- *                     location:
  *                       type: string
- *                       example: "Downtown Apartment"
+ *                       example: "12345"
  *                     title:
  *                       type: string
  *                       example: "Luxury Apartment for Rent"
- *                     isVerified:
- *                       type: boolean
- *                       example: true
  *                     isAvailable:
  *                       type: boolean
  *                       example: true
@@ -811,7 +808,10 @@ router.delete('/deleteadmin/:id',adminAuthenticate, deleteAdmin);
  *                   type: string
  *                   example: "Error verifying a listing."
  */
-router.put('/verifyAlisting/:listingId/:landlordId',adminAuthenticate, verifyAlisting);
+router.put('/verifyAlisting/:listingId/:landlordId', adminAuthenticate, verifyAlisting);
+
+
+
 
 /**
  * @swagger
@@ -821,35 +821,38 @@ router.put('/verifyAlisting/:listingId/:landlordId',adminAuthenticate, verifyAli
  *       - Admin
  *     security:
  *       - AdminBearerAuth: [] # Requires admin authentication
- *     summary: Verify a unverify by a admin
- *     description: This endpoint allows an admin to unverify a listing.
+ *     summary: Unverify a listing
+ *     description: This endpoint allows an admin to unverify a listing by updating its status to "rejected".
  *     parameters:
  *       - name: landlordId
  *         in: path
- *         description: The ID of the landlord unverify the listing
+ *         description: The ID of the landlord who owns the listing
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
+ *           example: "64a8e9b7b56c8d001c9a4b2d"
  *       - name: listingId
  *         in: path
- *         description: The ID of the listing to be unverify
+ *         description: The ID of the listing to be unverified
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
+ *           example: "12345"
  *     requestBody:
- *       description: The body contains the landlordId and listingId in the path parameters.
+ *       description: The body contains the status to update the listing.
+ *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
  *             properties:
- *             status:
- *               type: string
- *               description: The new status of the listing (e.g., "accepted", "rejected").
- *               example: "rejected"
+ *               status:
+ *                 type: string
+ *                 description: The new status of the listing (e.g., "rejected").
+ *                 example: "rejected"
  *     responses:
  *       200:
- *         description: Listing has been successfully unverify and updated.
+ *         description: Listing has been successfully unverified and updated.
  *         content:
  *           application/json:
  *             schema:
@@ -862,22 +865,16 @@ router.put('/verifyAlisting/:listingId/:landlordId',adminAuthenticate, verifyAli
  *                   type: object
  *                   properties:
  *                     id:
- *                       type: integer
- *                       example: 1
- *                     location:
  *                       type: string
- *                       example: "Downtown Apartment"
+ *                       example: "12345"
  *                     title:
  *                       type: string
  *                       example: "Luxury Apartment for Rent"
- *                     isVerified:
- *                       type: boolean
- *                       example: true
  *                     isAvailable:
  *                       type: boolean
- *                       example: true
+ *                       example: false
  *       400:
- *         description: Listing has already been unverify or invalid input.
+ *         description: Listing has already been unverified or invalid input.
  *         content:
  *           application/json:
  *             schema:
@@ -885,7 +882,7 @@ router.put('/verifyAlisting/:listingId/:landlordId',adminAuthenticate, verifyAli
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Listing has already been unverify."
+ *                   example: "Listing has already been unverified."
  *       404:
  *         description: Listing not found or does not belong to the specified landlord.
  *         content:
@@ -907,8 +904,7 @@ router.put('/verifyAlisting/:listingId/:landlordId',adminAuthenticate, verifyAli
  *                   type: string
  *                   example: "Error unverifying a listing."
  */
-router.put('/unverifyAlisting/:listingId/:landlordId', adminAuthenticate,unverifyAlisting)
-
+router.put('/unverifyAlisting/:listingId/:landlordId', adminAuthenticate, unverifyAlisting);
 
 
 module.exports = router;
