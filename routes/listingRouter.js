@@ -398,7 +398,7 @@ router.delete('/deleteListing/:listingId', landlordAuthenticate, deleteListing);
  * /api/v1/searchListing:
  *   get:
  *     summary: Search for listings based on specific criteria
- *     description: Allows the user to search for property listings based on various filters such as locality, type, number of bedrooms, bathrooms, price range, and availability.
+ *     description: Allows the user to search for property listings based on various filters such as locality, type, number of bedrooms, bathrooms, price range, and availability. At least one search criterion must be provided.
  *     tags:
  *       - Listings
  *     security: [] # No authentication required
@@ -417,7 +417,7 @@ router.delete('/deleteListing/:listingId', landlordAuthenticate, deleteListing);
  *         schema:
  *           type: string
  *           enum: ["Bungalow", "Flat", "Duplex"]
- *           example: "Bungalow"
+ *           example: "Flat"
  *       - name: bedrooms
  *         in: query
  *         description: The number of bedrooms in the property.
@@ -439,17 +439,15 @@ router.delete('/deleteListing/:listingId', landlordAuthenticate, deleteListing);
  *         description: The minimum price of the property.
  *         required: false
  *         schema:
- *           type: string
- *           enum: ["500000", "600000", "700000", "800000", "900000", "1000000"]
- *           example: "500000"
+ *           type: number
+ *           example: 500000
  *       - name: maxrent
  *         in: query
  *         description: The maximum price of the property.
  *         required: false
  *         schema:
- *           type: string
- *           enum: ["1000000", "2000000", "3000000", "4000000", "5000000"]
- *           example: "2000000"
+ *           type: number
+ *           example: 2000000
  *     responses:
  *       200:
  *         description: A list of listings that match the search criteria.
@@ -484,13 +482,39 @@ router.delete('/deleteListing/:listingId', landlordAuthenticate, deleteListing);
  *                   isAvailable:
  *                     type: boolean
  *                     example: true
+ *       400:
+ *         description: No search criteria provided.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Please provide at least one search criterion"
  *       404:
  *         description: No listings found for the specified criteria.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No listings found for the specified criteria"
  *       500:
  *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error."
  */
-
 router.get('/searchListing', searchListing);
+
 
 /**
  * @swagger
