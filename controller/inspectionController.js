@@ -16,9 +16,9 @@ exports.scheduleInspection = async (req, res) => {
     const { timeRange, days } = req.query;
 
 
-    // if (!timeRange || !days) {
-    //   return res.status(400).json({ message: 'All fields are required' });
-    // }
+    if (!timeRange || !days) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
 
     const validDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     if (!validDays.includes(days)) {
