@@ -137,7 +137,7 @@ exports.scheduleInspection = async (req, res) => {
 exports.confirmSchedule = async (req, res) => {
   try {
     const { inspectionId } = req.params;
-    const { status } = req.body;
+    const { status } = req.query;
 
 
     if (!status) {
