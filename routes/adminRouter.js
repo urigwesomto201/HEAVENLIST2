@@ -532,7 +532,7 @@ router.get('/getOneLandlordProfile/:landlordProfileId',adminAuthenticate, getOne
  *     summary: "Get all landlords"
  *     description: "Fetch the list of all landlords along with their basic profile information."
  *     tags:
- *       - Landlord Profile
+ *       - Admin
  *     security:
  *       - AdminBearerAuth: [] # Requires admin authentication
  *     responses:
