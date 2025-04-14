@@ -40,25 +40,22 @@ const { adminAuthenticate } = require('../middlewares/authentication')
  *           type: string
  *         description: The ID of the listing for which the inspection is being scheduled.
  *         example: "456e7890-e12b-34d5-a678-426614174001"
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             properties:
- *               days:
- *                 type: string
- *                 enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
- *                 description: The day of the week for the inspection.
- *                 required: false
- *                 example: "Monday"
- *               timeRange:
- *                 type: string
- *                 enum: ["10am-4pm"]
- *                 description: The time range for the inspection.
- *                 required: false
- *                 example: "10am-4pm"
+ *       - in: query
+ *         name: days
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+ *         description: The day of the week for the inspection.
+ *         example: "Monday"
+ *       - in: query
+ *         name: timeRange
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: ["10am-4pm"]
+ *         description: The time range for the inspection.
+ *         example: "10am-4pm"
  *     responses:
  *       201:
  *         description: Inspection scheduled successfully.
