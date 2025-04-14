@@ -272,11 +272,11 @@ router.post('/adminForgotPassword', adminForgotPassword)
  *               password:
  *                 type: string
  *                 description: The new password for the user
- *                 example: brown
+ *                 example: Successtoall20$
  *               confirmPassword:
  *                  type: string
  *                  description: this is the confirm password of the user
- *                  example: brown
+ *                  example: Successtoall20$
  *     responses:
  *       200:
  *         description: Password reset successfully
