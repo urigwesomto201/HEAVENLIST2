@@ -202,73 +202,80 @@ exports.loginTenant = async (req, res) => {
 
 exports.TenantForgotPassword = async (req, res) => {
     try {
-        
-        const validated = await validate(req.body , forgotPasswordSchema)
+        const validated = await validate(req.body, forgotPasswordSchema);
+        const { email } = validated;
 
-        const {email} = validated
-
-        if(!email) {
-            return res.status(400).json({message: 'please enter email address'})
+        if (!email) {
+            return res.status(400).json({ message: 'Please enter an email address' });
         }
 
-        
-        const tenant = await tenantModel.findOne({ where: { email: email.toLowerCase() } })
-        
-        if(!tenant) {
-            return res.status(404).json({message: 'tenant not found'})
+        const tenant = await tenantModel.findOne({ where: { email: email.toLowerCase() } });
+
+        if (!tenant) {
+            return res.status(404).json({ message: 'Tenant not found' });
         }
-        
-        const secret = `${process.env.OTP_SECRET}${email.toLowerCase()}`
+
+        const secret = `${process.env.OTP_SECRET}${email.toLowerCase()}`;
         const otp = totp.generate(secret);
-        
 
-        const firstName = tenant.fullName.split(' ')[0]
+        const resetLink = `${req.protocol}://${req.get('host')}/api/v1/reset-tenantpassword/${otp}`;
 
-        const html = forgotTemplate( firstName, otp)
+        const firstName = tenant.fullName.split(' ')[0];
+        const html = forgotTemplate(firstName, otp, resetLink);
 
         const mailOptions = {
-            subject: ' tenant reset password',
+            subject: 'Tenant Reset Password',
             email: tenant.email,
-            html 
-        }
+            html,
+        };
 
-        await sendEmail(mailOptions)
+        await sendEmail(mailOptions);
 
-        res.status(200).json({message: 'otp has been sent, please check mail box'})
-
+        res.status(200).json({ message: 'Reset password link has been sent, please check your mailbox for otp code' });
     } catch (error) {
-        console.log(error.message)
-        res.status(500).json({message: 'error initializing forget password:' , error:error.message})
+        console.error(error.message);
+        res.status(500).json({ message: 'Error initializing forgot password', error: error.message });
     }
-}
-
+};
 
 
 
 exports.TenantResetPassword = async (req, res) => {
     try {
 
+        const { otp } = req.params;
+
+        if (!otp) {
+            return res.status(400).json({ message: 'OTP not found' });
+        }
+
         const validated = await validate(req.body, resetPasswordschema);
 
-        const { email, otp, password, confirmPassword } = validated;
-
+        const { password, confirmPassword } = validated;
     
+        if (!password || !confirmPassword) {
+            return res.status(400).json({ message: 'Please provide both password and confirmPassword' });
+        }
+
+        
         if (password !== confirmPassword) {
             return res.status(400).json({ message: 'Passwords do not match' });
         }
 
-        const secret = `${process.env.OTP_SECRET}${email.toLowerCase()}`;
-        const isValidOTP = totp.check(otp, secret);
-  
-        if (!isValidOTP) {
-           return res.status(400).json({ message: 'Invalid or expired OTP' });
+        const tenants = await tenantModel.findAll(); 
+        let tenant = null;
+
+        for (const t of tenants) {
+            const secret = `${process.env.OTP_SECRET}${t.email.toLowerCase()}`;
+            if (totp.check(otp, secret)) {
+                tenant = t;
+                break;
+            }
         }
 
 
-        const tenant = await tenantModel.findOne({ where: { email: email.toLowerCase() } });
-
         if (!tenant) {
-            return res.status(404).json({ message: 'tenant not found' });
+            return res.status(404).json({ message: 'Invalid or expired OTP' });
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -282,11 +289,7 @@ exports.TenantResetPassword = async (req, res) => {
 
         
     } catch (error) {
-        console.log(error.message);
-        if (error instanceof jwt.JsonWebTokenError) {
-          return res.status(400).json({message: 'Session expired. Please enter your email to resend link'})
-        }  
-        
+        console.log(error.message);   
        res.status(500).json({message: 'Error resetting password', error: error.message});
     }
 }

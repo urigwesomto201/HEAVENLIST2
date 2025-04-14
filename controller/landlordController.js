@@ -227,9 +227,10 @@ exports.landlordForgotPassword = async (req, res) => {
         const otp = totp.generate(secret);
 
       
-        const firstName = landlord.fullName.split(' ')[0]
+        const resetLink = `${req.protocol}://${req.get('host')}/api/v1/reset-landlordpassword/${otp}`;
 
-        const html = forgotTemplate(firstName,otp)
+        const firstName = landlord.fullName.split(' ')[0];
+        const html = forgotTemplate(firstName, otp, resetLink);
 
         const mailOptions = {
             subject: 'landlord reset password',
@@ -253,24 +254,38 @@ exports.landlordForgotPassword = async (req, res) => {
 exports.landlordResetPassword = async (req, res) => {
     try {
 
-        const validated = await validate(req.body , resetPasswordschema)
+        const { otp } = req.params;
 
-        const {email, otp, password, confirmPassword } = validated
+        if (!otp) {
+            return res.status(400).json({ message: 'OTP not found' });
+        }
 
+        const validated = await validate(req.body, resetPasswordschema);
 
+        const { password, confirmPassword } = validated
+
+        if (!password || !confirmPassword) {
+            return res.status(400).json({ message: 'Please provide both password and confirmPassword' });
+        }
+
+    
         if (password !== confirmPassword) {
             return res.status(400).json({ message: 'Passwords do not match' });
         }
 
-        const secret = `${process.env.OTP_SECRET}${email.toLowerCase()}`;
-        const isValidOTP = totp.check(otp, secret);
-  
-        if (!isValidOTP) {
-           return res.status(400).json({ message: 'Invalid or expired OTP' });
+
+        const landlords = await landlordModel.findAll()
+        let landlord = null;
+
+        for (const l of landlords) {
+            const secret = `${process.env.OTP_SECRET}${l.email.toLowerCase()}`;
+            if (totp.check(otp, secret)) {
+                landlord = l;
+                break;
+            }
         }
 
-        const landlord = await landlordModel.findOne({ where: { email: email.toLowerCase() } });
-
+       
         if (!landlord) {
             return res.status(404).json({ message: 'landlord not found' });
         }
@@ -287,10 +302,7 @@ exports.landlordResetPassword = async (req, res) => {
         
     } catch (error) {
         console.log(error.message);
-        if (error instanceof jwt.JsonWebTokenError) {
-          return res.status(400).json({message: 'Session expired. Please enter your email to resend link'})
-        }  
-        
+
        res.status(500).json({message: 'Error resetting password', error: error.message});
     }
 }

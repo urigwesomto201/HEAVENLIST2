@@ -198,9 +198,10 @@ exports.adminForgotPassword = async (req, res) => {
         const otp = totp.generate(secret);
 
         
-        const firstName = admin.fullName.split(' ')[0]
+        const resetLink = `${req.protocol}://${req.get('host')}/api/v1/reset-adminpassword/${otp}`;
 
-        const html = forgotTemplate(firstName, otp)
+        const firstName = admin.fullName.split(' ')[0];
+        const html = forgotTemplate(firstName, otp, resetLink);
 
         const mailOptions = {
             subject: 'admin reset password',
@@ -223,25 +224,35 @@ exports.adminForgotPassword = async (req, res) => {
 exports.adminResetPassword = async (req, res) => {
     try {
 
-        const validated = await validate(req.body , resetPasswordschema)
+        const { otp } = req.params;
 
-   
-        const { email,otp, password, confirmPassword } = validated;
+        if (!otp) {
+            return res.status(400).json({ message: 'OTP not found' });
+        }
 
+        const validated = await validate(req.body, resetPasswordschema);
 
+        const { password, confirmPassword } = validated
+
+        if (!password || !confirmPassword) {
+            return res.status(400).json({ message: 'Please provide both password and confirmPassword' });
+        }
+
+    
         if (password !== confirmPassword) {
             return res.status(400).json({ message: 'Passwords do not match' });
         }
 
-        const secret = `${process.env.OTP_SECRET}${email.toLowerCase()}`;
-        const isValidOTP = totp.check(otp, secret);
-  
-        if (!isValidOTP) {
-           return res.status(400).json({ message: 'Invalid or expired OTP' });
-        }
-  
+        const admins = await adminModel.findAll()
+        let admin = null;
 
-        const admin = await adminModel.findOne({ where: { email: email.toLowerCase() } });
+        for (const a of admins) {
+            const secret = `${process.env.OTP_SECRET}${a.email.toLowerCase()}`;
+            if (totp.check(otp, secret)) {
+                admin = a;
+                break;
+            }
+        }
 
         if (!admin) {
             return res.status(404).json({ message: 'admin not found' });
@@ -259,10 +270,6 @@ exports.adminResetPassword = async (req, res) => {
         
     } catch (error) {
         console.log(error.message);
-        if (error instanceof jwt.JsonWebTokenError) {
-          return res.status(400).json({message: 'Session expired. Please enter your email to resend link'})
-        }  
-        
        res.status(500).json({message: 'Error resetting password', error: error.message});
     }
 }
