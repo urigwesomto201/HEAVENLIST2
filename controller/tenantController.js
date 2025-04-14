@@ -47,7 +47,7 @@ exports.registerTenant = async (req, res) => {
 
         const token = await jwt.sign({ tenantId: newTenant.id}, process.env.JWT_SECRET, { expiresIn: '2days'})
 
-        const link = `${req.protocol}://${req.get('host')}/api/v1/tenant-verify/${token}`
+        const link = `https://haven-list.vercel.app/api/v1/tenant-verify/${token}`
 
         const firstName = newTenant.fullName.split(' ')[0]
 
@@ -128,7 +128,7 @@ exports.resendTenantVerificationEmail = async (req, res) => {
 
         const token = await jwt.sign({ tenantId: tenant.id}, process.env.JWT_SECRET, { expiresIn: '2h'})
 
-        const link = `${req.protocol}://${req.get('host')}/api/v1/tenant-verify/${token}`
+        const link = `https://haven-list.vercel.app/api/v1/tenant-verify/${token}`
 
         const firstName = tenant.fullName.split(' ')[0]
 
@@ -218,7 +218,7 @@ exports.TenantForgotPassword = async (req, res) => {
         const secret = `${process.env.OTP_SECRET}${email.toLowerCase()}`;
         const otp = totp.generate(secret);
 
-        const resetLink = `${req.protocol}://${req.get('host')}/api/v1/reset-tenantpassword/${otp}`;
+        const resetLink = `https://haven-list.vercel.app/api/v1/reset-tenantpassword/${otp}`;
 
         const firstName = tenant.fullName.split(' ')[0];
         const html = forgotTemplate(firstName, otp, resetLink);
@@ -257,7 +257,7 @@ exports.TenantResetPassword = async (req, res) => {
             return res.status(400).json({ message: 'Please provide both password and confirmPassword' });
         }
 
-        
+
         if (password !== confirmPassword) {
             return res.status(400).json({ message: 'Passwords do not match' });
         }

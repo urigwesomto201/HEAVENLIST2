@@ -170,7 +170,7 @@ exports.forgotTemplate = (firstName, otp, link)=>{
                 <p>You performed an action in adhere to forgetting your password.</p>
                 <p>Your OTP for resetting your password is <strong>${otp}</strong>. It is valid for 5 minutes.</p>
                 <div class="button-container">
-                <a href="${link}" class="button">verify otp</a>
+                <a href="${link}" class="button">verify OTP</a>
                 </div>
                 <p>If you did not initiate this action on our platform, kindly ignore this email.</p>
                 <p>Best regards,<br>Team Havenlist</p>

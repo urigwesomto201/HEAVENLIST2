@@ -51,7 +51,7 @@ exports.registerlandlord = async (req, res) => {
 
         const token = await jwt.sign({ landlordId: newlandlord.id}, process.env.JWT_SECRET, { expiresIn: '1day'})
 
-        const link = `${req.protocol}://${req.get('host')}/api/v1/landlord-verify/${token}`
+        const link = `https://haven-list.vercel.app/api/v1/landlord-verify/${token}`
 
         const firstName = newlandlord.fullName.split(' ')[0]
 
@@ -134,7 +134,7 @@ exports.resendlandlordVerificationEmail = async (req, res) => {
 
         const token = await jwt.sign({ landlordId: landlord.id}, process.env.JWT_SECRET, { expiresIn: '1h'})
 
-        const link = `${req.protocol}://${req.get('host')}/api/v1/resendlandlord-verify/${token}`
+        const link = `https://haven-list.vercel.app/api/v1/resendlandlord-verify/${token}`
 
         const firstName = landlord.fullName.split(' ')[0]
 
@@ -227,7 +227,7 @@ exports.landlordForgotPassword = async (req, res) => {
         const otp = totp.generate(secret);
 
       
-        const resetLink = `${req.protocol}://${req.get('host')}/api/v1/reset-landlordpassword/${otp}`;
+        const resetLink = `https://haven-list.vercel.app/api/v1/reset-landlordpassword/${otp}`;
 
         const firstName = landlord.fullName.split(' ')[0];
         const html = forgotTemplate(firstName, otp, resetLink);
