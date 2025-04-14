@@ -24,7 +24,7 @@ const upload = require('../utils/multer')
  * /api/v1/createProfile/{landlordId}:
  *   post:
  *     summary: Create a new landlord profile
- *     description: Allows a landlord to create their profile with personal details and a profile image.
+ *     description: Allows a landlord to create their profile with personal details and a profile image. Requires landlord authentication
  *     tags:
  *       - Landlord Profile
  *     security:
@@ -141,7 +141,7 @@ router.post('/createProfile/:landlordId', landlordAuthenticate, upload.single('p
  * /api/v1/getlandlordprofile:
  *   get:
  *     summary: Get a landlord profile
- *     description: Fetch the details of a specific landlord profile by their ID.
+ *     description: Fetch the details of a specific landlord profile by their ID. Requires landlord authentication
  *     tags:
  *       - Landlord Profile
  *     security:
@@ -208,7 +208,7 @@ router.get('/getlandlordprofile', landlordAuthenticate, getOneLandlordProfile);
  * /api/v1/updateLandlordProfile:
  *   put:
  *     summary: Update landlord profile
- *     description: Update the details of a specific landlord profile.
+ *     description: Update the details of a specific landlord profile. Requires landlord authentication
  *     tags:
  *       - Landlord Profile
  *     security:
@@ -256,12 +256,13 @@ router.get('/getlandlordprofile', landlordAuthenticate, getOneLandlordProfile);
  */
 router.put('/updateLandlordProfile', landlordAuthenticate, upload.single('profileImage'), updateLandlordProfile);
 
+
 /**
  * @swagger
  * /api/v1/deleteLandlordProfile:
  *   delete:
  *     summary: Delete a landlord profile
- *     description: Delete a specific landlord profile by their ID.
+ *     description: Delete a specific landlord profile by their ID. Requires landlord authentication
  *     tags:
  *       - Landlord Profile
  *     security:

@@ -126,7 +126,7 @@ router.post('/schedule/:tenantId/:listingId', scheduleInspection);
  *     tags:
  *       - Inspections
  *     summary: Confirm or update the status of an inspection
- *     description: This endpoint allows an admin to confirm or update the status of a scheduled inspection.
+ *     description: This endpoint allows an admin to confirm or update the status of a scheduled inspection.  Requires admin authentication
  *     security:
  *       - AdminBearerAuth: [] # Requires admin token
  *     parameters:
@@ -207,7 +207,7 @@ router.post('/schedule/:tenantId/:listingId', scheduleInspection);
  *                   example: Cannot confirm schedule date.
  */
 
-router.post('/confirmSchedule/:inspectionId', confirmSchedule);
+router.post('/confirmSchedule/:inspectionId',adminAuthenticate, confirmSchedule);
 
 
 

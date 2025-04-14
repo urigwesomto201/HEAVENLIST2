@@ -98,9 +98,7 @@ const passport = require('passport')
  *               properties:
  *                 message: 
  *                   type: string
- *                   example: internal server error
- * 
- * 
+ *                   example: error registering landlord
  * 
  * 
  */
@@ -163,7 +161,7 @@ router.post('/registerlandlord', registerlandlord)
  *               properties:
  *                 message: 
  *                   type: string
- *                   example: internal server error
+ *                   example: error logging in landlord
  */
 
 
@@ -199,7 +197,7 @@ router.post('/loginlandlord', loginlandlord)
  *               properties:
  *                 message: 
  *                   type: string
- *                   example: internal server error
+ *                   example: error verifying landlord
  */
 
 
@@ -242,7 +240,7 @@ router.get('/landlord-verify/:token', verifylandlordEmail)
  *               properties:
  *                 message: 
  *                   type: string
- *                   example: internal server error
+ *                   example: error resending verification mail
  */
 
 
@@ -283,7 +281,7 @@ router.post('/resendlandlord-verify', resendlandlordVerificationEmail)
  *               properties:
  *                 message: 
  *                   type: string
- *                   example: internal server error
+ *                   example: error sending password reset email
  */
 
 router.post('/landlordForgotPassword', landlordForgotPassword)
@@ -342,7 +340,7 @@ router.post('/landlordForgotPassword', landlordForgotPassword)
  *               properties:
  *                 message: 
  *                   type: string
- *                   example: internal server error
+ *                   example: error resetting password
  */
 
 
@@ -387,7 +385,7 @@ router.post('/landlordResetPassword', landlordResetPassword)
  *       404:
  *         description: User not found
  *       500:
- *         description: Internal server error
+ *         description: Error changing password
  */
 router.post('/changelandlordPassword',landlordAuthenticate, changelandlordPassword)
 
@@ -406,7 +404,7 @@ router.post('/changelandlordPassword',landlordAuthenticate, changelandlordPasswo
  *       401:
  *         description: Unauthorized
  *       500:
- *         description: error logging out user
+ *         description: error logging out landlord
  */
 router.post('/logoutlandlord', landlordAuthenticate, logoutlandlord)
 

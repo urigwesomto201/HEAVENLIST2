@@ -385,7 +385,7 @@ router.post('/TenantResetPassword', TenantResetPassword)
  *       404:
  *         description: User not found
  *       500:
- *         description: Internal server error
+ *         description: Error changing password
  */
 router.post('/changeTenantPassword',tenantAuthenticate, changeTenantPassword)
 

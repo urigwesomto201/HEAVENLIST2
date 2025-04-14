@@ -105,9 +105,7 @@ const { adminAuthenticate, eitherAuthenticate } = require('../middlewares/authen
  *               properties:
  *                 message: 
  *                   type: string
- *                   example: internal server error
- * 
- * 
+ *                   example: failed to register admin
  * 
  * 
  */
@@ -139,7 +137,7 @@ router.post('/registeradmin', registerAdmin)
  *       400:
  *         description: Invalid or missing token
  *       500:
- *         description: Internal server error
+ *         description: error verifying admin email
  */
 
 
@@ -242,7 +240,7 @@ router.post('/loginAdmin', loginAdmin)
  *               properties:
  *                 message: 
  *                   type: string
- *                   example: internal server error
+ *                   example: error sending password reset email
  */
 
 router.post('/adminForgotPassword', adminForgotPassword)
@@ -294,7 +292,7 @@ router.post('/adminForgotPassword', adminForgotPassword)
  *               properties:
  *                 message: 
  *                   type: string
- *                   example: internal server error
+ *                   example: error resetting password
  */
 
 
@@ -340,7 +338,7 @@ router.post('/adminResetPassword', adminResetPassword)
  *       404:
  *         description: User not found
  *       500:
- *         description: Internal server error
+ *         description: error changing password
  */
 router.post('/changeAdminPassword',adminAuthenticate, changeAdminPassword)
 
@@ -408,7 +406,7 @@ router.post('/logoutAdmin',adminAuthenticate, logoutAdmin)
  *       200:
  *         description: List of tenants retrieved successfully
  *       500:
- *         description: Internal server error
+ *         description: error retrieving tenants
  */
 
 router.get('/getAllTenants',adminAuthenticate, getAllTenants)
@@ -437,7 +435,7 @@ router.get('/getAllTenants',adminAuthenticate, getAllTenants)
  *       404:
  *         description: Tenant not found
  *       500:
- *         description: Internal server error
+ *         description: error retrieving tenant details
  */
 
 router.get('/getOneTenant/:tenantId',adminAuthenticate, getOneTenant)
@@ -458,7 +456,7 @@ router.get('/getOneTenant/:tenantId',adminAuthenticate, getOneTenant)
  *       200:
  *         description: List of landlords retrieved successfully
  *       500:
- *         description: Internal server error
+ *         description: error retrieving landlords
  */
 
 router.get('/getAllLandlords',adminAuthenticate, getAllLandlords)
@@ -487,7 +485,7 @@ router.get('/getAllLandlords',adminAuthenticate, getAllLandlords)
  *       404:
  *         description: Landlord not found
  *       500:
- *         description: Internal server error
+ *         description: error retrieving landlord details
  */
 
 
@@ -516,7 +514,7 @@ router.get('/getOneLandlord/:landlordId',adminAuthenticate, getOneLandlord)
  *       404:
  *         description: Landlord profile not found
  *       500:
- *         description: Internal server error
+ *         description: error retrieving landlord profile details
  */
 
 
@@ -576,7 +574,7 @@ router.get('/getOneLandlordProfile/:landlordProfileId',adminAuthenticate, getOne
  *                             type: "string"
  *                             example: "public-id-of-the-image"
  *       500:
- *         description: "Internal server error"
+ *         description: "error retrieving landlords profiles"
 */
 router.get('/alllandlordProfiles', adminAuthenticate, alllandlordProfiles);
 
@@ -606,7 +604,7 @@ router.get('/alllandlordProfiles', adminAuthenticate, alllandlordProfiles);
  *       404:
  *         description: Landlord profile not found
  *       500:
- *         description: Internal server error
+ *         description: error deleting landlord profile
  */
 
 router.delete('/deleteLandlordProfile/:landlordProfileId',adminAuthenticate, deleteLandlordProfile)
@@ -640,7 +638,7 @@ router.delete('/deleteLandlordProfile/:landlordProfileId',adminAuthenticate, del
  *       404:
  *         description: Admin not found
  *       500:
- *         description: Internal server error
+ *         description: error retrieving admin details
  */
 
 router.get('/getoneadmin/:id',adminAuthenticate, getAdmin); 
@@ -661,7 +659,7 @@ router.get('/getoneadmin/:id',adminAuthenticate, getAdmin);
  *       200:
  *         description: List of admins retrieved successfully
  *       500:
- *         description: Internal server error
+ *         description: error retrieving admins
  */
 
 router.get('/getAllAdmins',adminAuthenticate, getAllAdmins); 
@@ -710,7 +708,7 @@ router.get('/getAllAdmins',adminAuthenticate, getAllAdmins);
  *               example: Error deleting admin
  *             error:
  *               type: string
- *               example: Detailed error message
+ *               example: error deleting admin
  */
 
 router.delete('/deleteadmin/:id',adminAuthenticate, deleteAdmin); 
