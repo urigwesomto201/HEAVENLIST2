@@ -348,9 +348,9 @@ exports.searchListing = async (req, res) => {
         const { area, type, bedrooms, minrent, maxrent } = req.body;
 
 
-        if (!area && !type && !bedrooms && !minrent && !maxrent) {
-            return res.status(400).json({ message: 'Please provide at least one search criteria' });
-        }
+        // if (!area && !type && !bedrooms && !minrent && !maxrent) {
+        //     return res.status(400).json({ message: 'Please provide at least one search criteria' });
+        // }
 
         const queryCondition = {};
         if (area) queryCondition.area = area.toLowerCase();
