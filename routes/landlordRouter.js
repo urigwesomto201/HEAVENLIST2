@@ -1,6 +1,8 @@
 const router = require('express').Router();
 
-const { registerlandlord, loginlandlord, verifylandlordEmail, landlordForgotPassword, landlordResetPassword, resendlandlordVerificationEmail, changelandlordPassword, logoutlandlord} = require('../controller/landlordController')
+const { registerlandlord, loginlandlord, verifylandlordEmail, landlordForgotPassword, landlordResetPassword, resendlandlordVerificationEmail, changelandlordPassword, logoutlandlord,
+    getLandlordTransactions
+} = require('../controller/landlordController')
 const { landlordAuthenticate } = require('../middlewares/authentication')
 const jwt = require('jsonwebtoken');
 const passport = require('passport')
@@ -407,6 +409,90 @@ router.post('/changelandlordPassword',landlordAuthenticate, changelandlordPasswo
  *         description: error logging out user
  */
 router.post('/logoutlandlord', landlordAuthenticate, logoutlandlord)
+
+
+
+
+/**
+ * @swagger
+ * /api/v1/landlordtransactions/{landlordId}:
+ *   get:
+ *     tags:
+ *       - landlord
+ *     summary: Get landlord transactions
+ *     description: This endpoint retrieves all transactions for a specific landlord.
+ *     security:
+ *       - landlordBearerAuth: [] # landlord token is required for authentication
+ *     parameters:
+ *       - in: path
+ *         name: landlordId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the landlord whose transactions are to be retrieved.
+ *         example: "123e4567-e89b-12d3-a456-426614174000"
+ *     responses:
+ *       200:
+ *         description: Landlord transactions retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Landlord transaction history retrieved successfully
+ *                 totalAmount:
+ *                   type: number
+ *                   description: The total amount of successful transactions.
+ *                   example: 5000.0
+ *                 transactions:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         description: The transaction ID.
+ *                         example: "123e4567-e89b-12d3-a456-426614174000"
+ *                       amount:
+ *                         type: number
+ *                         description: The transaction amount.
+ *                         example: 100.0
+ *                       status:
+ *                         type: string
+ *                         description: The transaction status.
+ *                         example: "success"
+ *       404:
+ *         description: Landlord not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Landlord not found
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Error fetching landlord transactions
+ */
+
+router.get('/landlordtransactions/:landlordId', getLandlordTransactions);
+
+
+
+
+
+
+
 
 
 
