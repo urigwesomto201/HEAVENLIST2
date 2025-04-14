@@ -20,7 +20,7 @@ const { adminAuthenticate } = require('../middlewares/authentication')
 /**
  * @swagger
  * /schedule/{tenantId}/{listingId}:
- *   post:
+ *   get:
  *     tags:
  *       - Inspections
  *     summary: Schedule an inspection
@@ -90,6 +90,10 @@ const { adminAuthenticate } = require('../middlewares/authentication')
  *                       type: string
  *                       description: The time range of the inspection.
  *                       example: "9am-12pm"
+ *                     status:
+ *                       type: string
+ *                       description: The time status of the inspection.
+ *                       example: "scheduled"
  *       400:
  *         description: Bad request. Missing or invalid parameters.
  *         content:
@@ -111,7 +115,7 @@ const { adminAuthenticate } = require('../middlewares/authentication')
  *                   type: string
  *                   example: Error scheduling inspection.
  */
-router.post('/schedule/:tenantId/:listingId', scheduleInspection);
+router.get('/schedule/:tenantId/:listingId', scheduleInspection);
 
 
 
