@@ -287,7 +287,7 @@ exports.landlordResetPassword = async (req, res) => {
 
        
         if (!landlord) {
-            return res.status(404).json({ message: 'landlord not found' });
+            return res.status(404).json({ message: 'Invalid or expired OTP' });
         }
 
         const salt = await bcrypt.genSalt(10);
