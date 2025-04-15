@@ -255,7 +255,7 @@ exports.adminResetPassword = async (req, res) => {
         }
 
         if (!admin) {
-            return res.status(404).json({ message: 'admin not found' });
+            return res.status(404).json({ message: 'Invalid or expired OTP' });
         }
 
         const salt = await bcrypt.genSalt(10);
