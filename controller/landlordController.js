@@ -51,7 +51,7 @@ exports.registerlandlord = async (req, res) => {
 
         const token = await jwt.sign({ landlordId: newlandlord.id}, process.env.JWT_SECRET, { expiresIn: '1day'})
 
-        const link = `https://haven-list.vercel.app/api/v1/landlord-verify/${token}`
+        const link = `https://haven-list.vercel.app/api/v1/emailStatus/${token}`
 
         const firstName = newlandlord.fullName.split(' ')[0]
 
