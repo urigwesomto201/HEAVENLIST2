@@ -248,13 +248,20 @@ router.post('/adminForgotPassword', adminForgotPassword)
 
 /**
  * @swagger
- * /api/v1/adminResetPassword:
+ * /api/v1/reset-adminpassword/{otp}:
  *   post:
  *     tags:
  *       - Admin
   *     security: [] # No authentication required
  *     summary: Reset admin password
  *     description: Reset the admin's password using a valid token.
+ *     parameters:
+ *       - name: otp
+ *         in: path
+ *         required: true
+ *         description: Password reset otp sent to the admins email
+ *         schema:
+ *           type: string
  *     requestBody:
  *       required: true
  *       content:
@@ -262,14 +269,6 @@ router.post('/adminForgotPassword', adminForgotPassword)
  *           schema:
  *             type: object
  *             properties:
- *               email:
- *                 type: string
- *                 description: The email of the user to reset password
- *                 example: alaekekaebuka200@gmail.com
- *               otp:
- *                 type: string
- *                 description: The OTP sent to the user's email
- *                 example: 6759
  *               password:
  *                 type: string
  *                 description: The new password for the user
@@ -297,7 +296,7 @@ router.post('/adminForgotPassword', adminForgotPassword)
 
 
 
-router.post('/adminResetPassword', adminResetPassword)
+router.post('/reset-adminpassword/:otp', adminResetPassword)
 
 /**
  * @swagger

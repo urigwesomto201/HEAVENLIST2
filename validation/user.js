@@ -76,15 +76,15 @@ exports.forgotPasswordSchema = Joi.object().keys({
 
 
 exports.resetPasswordschema = Joi.object().keys({
-    email: Joi.string().trim().email().required().messages({
-        'string.email': 'Invalid email format',
-        'any.required': 'Email is required',
-        'string.empty': 'Email cannot be empty',
-    }),
-    otp: Joi.string().length(4).required().messages({
-        'any.required': 'OTP is required',
-        'string.length': 'OTP must be exactly 4 characters',
-    }),
+    // email: Joi.string().trim().email().required().messages({
+    //     'string.email': 'Invalid email format',
+    //     'any.required': 'Email is required',
+    //     'string.empty': 'Email cannot be empty',
+    // }),
+    // otp: Joi.string().length(4).required().messages({
+    //     'any.required': 'OTP is required',
+    //     'string.length': 'OTP must be exactly 4 characters',
+    // }),
     password: Joi.string().pattern(/^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/).trim().messages({
         "any.required":"password is required",
          "string.empty": "password cannot be Empty",

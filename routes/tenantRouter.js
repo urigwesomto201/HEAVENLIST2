@@ -297,12 +297,19 @@ router.post('/TenantForgotPassword', TenantForgotPassword)
 
 /**
  * @swagger
- * /api/v1/TenantResetPassword:
+ * /api/v1/reset-tenantpassword/{otp}:
  *   post:
  *     tags:
  *       - tenant
  *     security: [] # No authentication required
  *     summary: Reset user password
+ *     parameters:
+ *       - name: otp
+ *         in: path
+ *         required: true
+ *         description: Password reset otp sent to the user's email
+ *         schema:
+ *           type: string
  *     requestBody:
  *       required: true
  *       content:
@@ -310,14 +317,6 @@ router.post('/TenantForgotPassword', TenantForgotPassword)
  *           schema:
  *             type: object
  *             properties:
- *               email:
- *                 type: string
- *                 description: The email of the user to reset password
- *                 example: alaekekaebuka200@gmail.com
- *               otp:
- *                 type: string
- *                 description: The OTP sent to the user's email
- *                 example: 6759
  *               password:
  *                 type: string
  *                 description: The new password for the user
@@ -342,7 +341,7 @@ router.post('/TenantForgotPassword', TenantForgotPassword)
  *                   type: string
  *                   example: Reset password failed
  */
-router.post('/TenantResetPassword', TenantResetPassword)
+router.post('/reset-tenantpassword/:otp', TenantResetPassword)
 
 
 
