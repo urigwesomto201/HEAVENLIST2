@@ -22,7 +22,7 @@ exports.registerlandlord = async (req, res) => {
         try {
             validated = await validate(req.body, registerSchema);
         } catch (validationError) {
-            return res.status(400).json({ message: 'Invalid credentials', error: validationError.message });
+            return res.status(400).json({ error: validationError.message });
         }
         
         const {fullName, email, password, confirmPassword} = validated
