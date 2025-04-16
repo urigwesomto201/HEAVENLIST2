@@ -170,7 +170,7 @@ router.post('/loginlandlord', loginlandlord)
 
 /**
  * @swagger
- * /api/v1/emailStatus/{token}:
+ * /api/v1/landlord/{token}:
  *   get:
  *     tags:
  *       - landlord
@@ -201,7 +201,7 @@ router.post('/loginlandlord', loginlandlord)
  */
 
 
-router.get('/emailStatus/:token', verifylandlordEmail)
+router.get('/landlord/:token', verifylandlordEmail)
 
 
 

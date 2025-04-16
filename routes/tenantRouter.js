@@ -177,7 +177,7 @@ router.post('/loginTenant', loginTenant)
 
 /**
  * @swagger
- * /api/v1/tenant-verify/{token}:
+ * /api/v1/tenant/{token}:
  *   get:
  *     tags:
  *       - tenant
@@ -209,7 +209,7 @@ router.post('/loginTenant', loginTenant)
 
 
 
-router.get('/tenant-verify/:token', verifyTenantEmail)
+router.get('/tenant/:token', verifyTenantEmail)
 
 
 

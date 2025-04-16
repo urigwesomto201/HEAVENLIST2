@@ -47,7 +47,7 @@ exports.registerTenant = async (req, res) => {
 
         const token = await jwt.sign({ tenantId: newTenant.id}, process.env.JWT_SECRET, { expiresIn: '2days'})
 
-        const link = `https://haven-list.vercel.app/api/v1/tenant-verify/${token}`
+        const link = `https://haven-list.vercel.app/api/v1/tenant/${token}`
 
         const firstName = newTenant.fullName.split(' ')[0]
 
