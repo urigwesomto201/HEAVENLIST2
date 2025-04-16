@@ -21,11 +21,11 @@ exports.signUpTemplate = (verifyLink,firstName)=>{
                 padding: 20px;
                 border: 1px solid #ddd;
                 border-radius: 10px;
-                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                box-shadow: 0 0 10px rgb(40, 142, 167);
                 background-color: #f4f4f4; /* Light grey background */
             }
             .header {
-                background: #333333;
+                background:rgb(74, 92, 248);
                 padding: 20px;
                 text-align: center;
                 border-bottom: 1px solid #ddd;
@@ -42,20 +42,20 @@ exports.signUpTemplate = (verifyLink,firstName)=>{
             }
             .button {
                 display: inline-block;
-                background-color: #28a745; /* Green background */
+                background-color:rgb(40, 142, 167); /* Green background */
                 color: #ffffff;
                 padding: 15px 30px;
                 font-size: 18px;
                 text-decoration: none;
                 border-radius: 5px;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 4px 6px rgb(40, 142, 167);
                 transition: background-color 0.3s ease;
             }
             .button:hover {
-                background-color: #218838;
+                background-color:rgb(11, 58, 119);
             }
             .footer {
-                background: #333333;
+                background:rgb(74, 92, 248);
                 padding: 10px;
                 text-align: center;
                 border-top: 1px solid #ddd;
@@ -116,11 +116,11 @@ exports.forgotTemplate = (firstName, otp, link)=>{
                 padding: 20px;
                 border: 1px solid #ddd;
                 border-radius: 10px;
-                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                box-shadow: 0 0 10px rgb(40, 142, 167);
                 background-color: #f4f4f4; /* Light grey background */
             }
             .header {
-                background: #333333;
+                background:rgb(74, 92, 248);
                 padding: 20px;
                 text-align: center;
                 border-bottom: 1px solid #ddd;
@@ -137,20 +137,20 @@ exports.forgotTemplate = (firstName, otp, link)=>{
             }
             .button {
                 display: inline-block;
-                background-color: #28a745; /* Green background */
+                background-color:rgb(40, 142, 167); /* Green background */
                 color: #ffffff;
                 padding: 15px 30px;
                 font-size: 18px;
                 text-decoration: none;
                 border-radius: 5px;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 4px 6px rgb(40, 142, 167);
                 transition: background-color 0.3s ease;
             }
             .button:hover {
-                background-color: #218838;
+                background-color:rgb(11, 58, 119);
             }
             .footer {
-                background: #333333;
+                background:rgb(74, 92, 248);
                 padding: 10px;
                 text-align: center;
                 border-top: 1px solid #ddd;
@@ -211,11 +211,11 @@ exports.adminTemplate = (firstName, verifyLink)=>{
                 padding: 20px;
                 border: 1px solid #ddd;
                 border-radius: 10px;
-                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                box-shadow: 0 0 10px rgb(40, 142, 167);
                 background-color: #f4f4f4; /* Light grey background */
             }
             .header {
-                background: #333333;
+                background:rgb(74, 92, 248);
                 padding: 20px;
                 text-align: center;
                 border-bottom: 1px solid #ddd;
@@ -232,20 +232,20 @@ exports.adminTemplate = (firstName, verifyLink)=>{
             }
             .button {
                 display: inline-block;
-                background-color: #28a745; /* Green background */
+                background-color:rgb(40, 142, 167); /* Green background */
                 color: #ffffff;
                 padding: 15px 30px;
                 font-size: 18px;
                 text-decoration: none;
                 border-radius: 5px;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 4px 6px rgb(40, 142, 167);
                 transition: background-color 0.3s ease;
             }
             .button:hover {
-                background-color: #218838;
+                background-color:rgb(11, 58, 119);
             }
             .footer {
-                background: #333333;
+                background:rgb(74, 92, 248);
                 padding: 10px;
                 text-align: center;
                 border-top: 1px solid #ddd;
@@ -308,11 +308,11 @@ exports.tenentRentMessage = (amount, fullName)=>{
                 padding: 20px;
                 border: 1px solid #ddd;
                 border-radius: 10px;
-                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                box-shadow: 0 0 10px rgb(40, 142, 167);
                 background-color: #f4f4f4; /* Light grey background */
             }
             .header {
-                background: #333333;
+                background:rgb(74, 92, 248);
                 padding: 20px;
                 text-align: center;
                 border-bottom: 1px solid #ddd;
@@ -329,20 +329,20 @@ exports.tenentRentMessage = (amount, fullName)=>{
             }
             .button {
                 display: inline-block;
-                background-color: #28a745; /* Green background */
+                background-color:rgb(40, 142, 167); /* Green background */
                 color: #ffffff;
                 padding: 15px 30px;
                 font-size: 18px;
                 text-decoration: none;
                 border-radius: 5px;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 4px 6px rgb(40, 142, 167);
                 transition: background-color 0.3s ease;
             }
             .button:hover {
-                background-color: #218838;
+                background-color:rgb(11, 58, 119);
             }
             .footer {
-                background: #333333;
+                background:rgb(74, 92, 248);
                 padding: 10px;
                 text-align: center;
                 border-top: 1px solid #ddd;
@@ -399,11 +399,11 @@ exports.landlordRentMessage = (amount, fullName)=>{
                 padding: 20px;
                 border: 1px solid #ddd;
                 border-radius: 10px;
-                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                box-shadow: 0 0 10px rgb(40, 142, 167);
                 background-color: #f4f4f4; /* Light grey background */
             }
             .header {
-                background: #333333;
+                background:rgb(74, 92, 248);
                 padding: 20px;
                 text-align: center;
                 border-bottom: 1px solid #ddd;
@@ -420,20 +420,20 @@ exports.landlordRentMessage = (amount, fullName)=>{
             }
             .button {
                 display: inline-block;
-                background-color: #28a745; /* Green background */
+                background-color:rgb(40, 142, 167); /* Green background */
                 color: #ffffff;
                 padding: 15px 30px;
                 font-size: 18px;
                 text-decoration: none;
                 border-radius: 5px;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 4px 6px rgb(40, 142, 167);
                 transition: background-color 0.3s ease;
             }
             .button:hover {
-                background-color: #218838;
+                background-color:rgb(11, 58, 119);
             }
             .footer {
-                background: #333333;
+                background:rgb(74, 92, 248);
                 padding: 10px;
                 text-align: center;
                 border-top: 1px solid #ddd;
