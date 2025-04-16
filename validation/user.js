@@ -45,6 +45,8 @@ exports.loginSchema = Joi.object().keys({
         'string.empty': 'Email cannot be empty',
     }),
     password: Joi.string().trim().messages({
+        'any.required': 'invalid credentials',
+        'string.empty': 'password cannot be empty',
     }).required(),
     
 })
