@@ -77,74 +77,74 @@ exports.registerlandlord = async (req, res) => {
 
 
 
-exports.verifylandlordEmail = async (req, res) => {
-    try {
-        const { token } = req.params;
-
-        if (!token) {
-            return res.status(400).send('Verification token not found.');
-        }
-
-        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-
-        const landlord = await landlordModel.findOne({ where: { id: decodedToken.landlordId } });
-
-        if (!landlord) {
-            return res.status(404).send('Landlord not found.');
-        }
-
-        if (landlord.isVerified) {
-            return res.redirect('https://haven-list.vercel.app/email-verified?status=already');
-        }
-
-        landlord.isVerified = true;
-        await landlord.save();
-
-        return res.redirect('https://haven-list.vercel.app/email-verified?status=success');
-    } catch (error) {
-        console.error(error.message);
-        return res.redirect('https://haven-list.vercel.app/email-verified?status=failed');
-    }
-};
-
-
-
 // exports.verifylandlordEmail = async (req, res) => {
 //     try {
-        
-//         const {token}  = req.params
+//         const { token } = req.params;
 
-//         if(!token) {
-//             return res.status(400).json({message: 'token not found'})
+//         if (!token) {
+//             return res.status(400).send('Verification token not found.');
 //         }
 
-//         const decodedToken = await jwt.verify(token, process.env.JWT_SECRET)
+//         const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
 
-//         const landlord = await landlordModel.findOne({ where: { id: decodedToken.landlordId }})
+//         const landlord = await landlordModel.findOne({ where: { id: decodedToken.landlordId } });
 
-//         if(!landlord) {
-//             return res.status(404).json({message: 'landlord not found'})
+//         if (!landlord) {
+//             return res.status(404).send('Landlord not found.');
 //         }
 
-//         if(landlord.isVerified === true) {
-//             return res.status(400).json({message: 'landlord has already been verified'})
+//         if (landlord.isVerified) {
+//             return res.redirect('https://haven-list.vercel.app/email-verified?status=already');
 //         }
 
-//         landlord.isVerified = true
+//         landlord.isVerified = true;
+//         await landlord.save();
 
-//         await landlord.save()
-
-//         res.status(200).json({message: 'landlord verified successfully'})
-
-
+//         return res.redirect('https://haven-list.vercel.app/email-verified?status=success');
 //     } catch (error) {
-//         console.log(error.message)
-//         if(error instanceof jwt.JsonWebTokenError) {
-//             return res.status(401).json({message: 'verification link expired'})
-//         }
-//         res.status(500).json({message: 'error verifying landlord:' , error:error.message})
+//         console.error(error.message);
+//         return res.redirect('https://haven-list.vercel.app/email-verified?status=failed');
 //     }
-// }
+// };
+
+
+
+exports.verifylandlordEmail = async (req, res) => {
+    try {
+        
+        const {token}  = req.params
+
+        if(!token) {
+            return res.status(400).json({message: 'token not found'})
+        }
+
+        const decodedToken = await jwt.verify(token, process.env.JWT_SECRET)
+
+        const landlord = await landlordModel.findOne({ where: { id: decodedToken.landlordId }})
+
+        if(!landlord) {
+            return res.status(404).json({message: 'landlord not found'})
+        }
+
+        if(landlord.isVerified === true) {
+            return res.status(400).json({message: 'landlord has already been verified'})
+        }
+
+        landlord.isVerified = true
+
+        await landlord.save()
+
+        res.status(200).json({message: 'landlord verified successfully'})
+
+
+    } catch (error) {
+        console.log(error.message)
+        if(error instanceof jwt.JsonWebTokenError) {
+            return res.status(401).json({message: 'verification link expired'})
+        }
+        res.status(500).json({message: 'error verifying landlord:' , error:error.message})
+    }
+}
 
 
 
