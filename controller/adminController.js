@@ -17,8 +17,14 @@ totp.options = { digits: 4, step: 300}
 
 exports.registerAdmin = async (req, res) => {
     try {
+
+        let validated;
+        try {
+            validated = await validate(req.body, registerSchema);
+        } catch (validationError) {
+            return res.status(400).json({ error: validationError.message });
+        }
         
-        const validated = await validate(req.body, registerSchema);
         const { fullName, email, password, confirmPassword } = validated;
 
         if(!fullName || !email || !password || !confirmPassword) {
@@ -133,8 +139,15 @@ exports.verifyAdminEmail = async (req, res) => {
 
 exports.loginAdmin = async (req, res) => {
     try {
+
         
-        const validated = await validate(req.body, loginSchema);
+        let validated;
+        try {
+            validated = await validate(req.body, loginSchema);
+        } catch (validationError) {
+            return res.status(400).json({ error: validationError.message });
+        }
+        
         const { email, password } = validated;
 
        
@@ -179,8 +192,13 @@ exports.loginAdmin = async (req, res) => {
 
 exports.adminForgotPassword = async (req, res) => {
     try {
+        let validated;
+        try {
+            validated = await validate(req.body, forgotPasswordSchema);
+        } catch (validationError) {
+            return res.status(400).json({ error: validationError.message });
+        }
         
-        const validated = await validate(req.body , forgotPasswordSchema)
 
         const {email} = validated
 
@@ -230,7 +248,13 @@ exports.adminResetPassword = async (req, res) => {
             return res.status(400).json({ message: 'OTP not found' });
         }
 
-        const validated = await validate(req.body, resetPasswordschema);
+        let validated;
+        try {
+            validated = await validate(req.body, resetPasswordschema);
+        } catch (validationError) {
+            return res.status(400).json({ error: validationError.message });
+        }
+
 
         const { password, confirmPassword } = validated
 
@@ -280,7 +304,13 @@ exports.adminResetPassword = async (req, res) => {
 exports.changeAdminPassword = async (req, res) => {
     try {
 
-        const validated = await validate(req.body , changePassword )
+        let validated;
+        try {
+            validated = await validate(req.body, changePassword);
+        } catch (validationError) {
+            return res.status(400).json({ error: validationError.message });
+        }
+
 
         const {oldPassword, newPassword, confirmPassword} = validated
 
