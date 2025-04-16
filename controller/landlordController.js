@@ -17,7 +17,13 @@ totp.options = { digits: 4, step: 300}
 
 exports.registerlandlord = async (req, res) => {
     try {
-        const validated = await validate(req.body , registerSchema)
+
+        let validated;
+        try {
+            validated = await validate(req.body, registerSchema);
+        } catch (validationError) {
+            return res.status(400).json({ message: 'Invalid credentials', error: validationError.message });
+        }
         
         const {fullName, email, password, confirmPassword} = validated
 

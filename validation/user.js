@@ -44,10 +44,7 @@ exports.loginSchema = Joi.object().keys({
         'any.required': 'Email is required',
         'string.empty': 'Email cannot be empty',
     }),
-    password: Joi.string().pattern(/^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/).trim().messages({
-        'string.pattern.base': 'Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character [!@#$%^&*]',
-        'any.required': 'Password is required',
-        'string.empty': 'Password cannot be empty',
+    password: Joi.string().trim().messages({
     }).required(),
     
 })
