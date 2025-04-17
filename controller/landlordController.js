@@ -156,8 +156,14 @@ exports.verifylandlordEmail = async (req, res) => {
 
 exports.resendlandlordVerificationEmail = async (req, res) => {
     try {
+
+        let validated;
+        try {
+            validated = await validate(req.body, verificationEmailSchema);
+        } catch (validationError) {
+            return res.status(400).json({ error: validationError.message });
+        }
         
-        const validated = await validate(req.body , verificationEmailSchema)
 
         const {email} = validated
 
@@ -199,8 +205,14 @@ exports.resendlandlordVerificationEmail = async (req, res) => {
 
 exports.loginlandlord = async (req, res) => {
     try {
-        
-        const validated = await validate(req.body, loginSchema);
+
+        let validated;
+        try {
+            validated = await validate(req.body, loginSchema);
+        } catch (validationError) {
+            return res.status(400).json({ error: validationError.message });
+        }
+
         const { email, password } = validated;
 
         
@@ -247,8 +259,13 @@ exports.loginlandlord = async (req, res) => {
 
 exports.landlordForgotPassword = async (req, res) => {
     try {
+        let validated;
+        try {
+            validated = await validate(req.body, forgotPasswordSchema);
+        } catch (validationError) {
+            return res.status(400).json({ error: validationError.message });
+        }
         
-        const validated = await validate(req.body , forgotPasswordSchema)
 
         const {email} = validated
 
@@ -299,7 +316,12 @@ exports.landlordResetPassword = async (req, res) => {
             return res.status(400).json({ message: 'OTP not found' });
         }
 
-        const validated = await validate(req.body, resetPasswordschema);
+        let validated;
+        try {
+            validated = await validate(req.body, resetPasswordschema);
+        } catch (validationError) {
+            return res.status(400).json({ error: validationError.message });
+        }
 
         const { password, confirmPassword } = validated
 
@@ -352,7 +374,14 @@ exports.landlordResetPassword = async (req, res) => {
 exports.changelandlordPassword = async (req, res) => {
     try {
 
-        const validated = await validate(req.body , changePassword )
+        
+        let validated;
+        try {
+            validated = await validate(req.body, changePassword);
+        } catch (validationError) {
+            return res.status(400).json({ error: validationError.message });
+        }
+
 
         const {oldPassword, newPassword, confirmPassword} = validated
 

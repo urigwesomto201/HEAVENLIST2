@@ -19,14 +19,12 @@ exports.registerTenant = async (req, res) => {
         try {
             validated = await validate(req.body, registerSchema);
         } catch (validationError) {
-            return res.status(404).json({ message: 'Invalid credentials', error: validationError.message });
+            return res.status(400).json({ error: validationError.message });
         }
-
 
         const {fullName, email, password, confirmPassword} = validated
 
         
-
         if(!fullName || !email || !password || !confirmPassword) {
             return res.status(400).json({message:'please input correct fields'})
         }
@@ -121,7 +119,12 @@ exports.verifyTenantEmail = async (req, res) => {
 exports.resendTenantVerificationEmail = async (req, res) => {
     try {
         
-        const validated = await validate(req.body , verificationEmailSchema)
+        let validated;
+        try {
+            validated = await validate(req.body, verificationEmailSchema);
+        } catch (validationError) {
+            return res.status(400).json({ error: validationError.message });
+        }
 
         const {email} = validated
 
@@ -211,7 +214,14 @@ exports.loginTenant = async (req, res) => {
 
 exports.TenantForgotPassword = async (req, res) => {
     try {
-        const validated = await validate(req.body, forgotPasswordSchema);
+
+        let validated;
+        try {
+            validated = await validate(req.body, forgotPasswordSchema);
+        } catch (validationError) {
+            return res.status(400).json({ error: validationError.message });
+        }
+
         const { email } = validated;
 
         if (!email) {
@@ -258,7 +268,13 @@ exports.TenantResetPassword = async (req, res) => {
             return res.status(400).json({ message: 'OTP not found' });
         }
 
-        const validated = await validate(req.body, resetPasswordschema);
+        let validated;
+        try {
+            validated = await validate(req.body, resetPasswordschema);
+        } catch (validationError) {
+            return res.status(400).json({ error: validationError.message });
+        }
+
 
         const { password, confirmPassword } = validated;
     
@@ -309,7 +325,13 @@ exports.TenantResetPassword = async (req, res) => {
 exports.changeTenantPassword = async (req, res) => {
     try {
 
-        const validated = await validate(req.body , changePassword )
+        let validated;
+        try {
+            validated = await validate(req.body, changePassword);
+        } catch (validationError) {
+            return res.status(400).json({ error: validationError.message });
+        }
+
 
         const {oldPassword, newPassword, confirmPassword} = validated
 
