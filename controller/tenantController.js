@@ -14,9 +14,18 @@ totp.options = { digits: 4, step: 300}
 
 exports.registerTenant = async (req, res) => {
     try {
-        const validated = await validate(req.body , registerSchema)
         
+        let validated;
+        try {
+            validated = await validate(req.body, registerSchema);
+        } catch (validationError) {
+            return res.status(404).json({ message: 'Invalid credentials', error: validationError.message });
+        }
+
+
         const {fullName, email, password, confirmPassword} = validated
+
+        
 
         if(!fullName || !email || !password || !confirmPassword) {
             return res.status(400).json({message:'please input correct fields'})
