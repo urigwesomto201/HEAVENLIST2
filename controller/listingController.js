@@ -7,71 +7,90 @@ const { Op } = require('sequelize')
 const fs = require('fs')
 
 
+
 exports.createListing = async (req, res) => {
-    try {
-        const { landlordId } = req.params
-        const { title, type, bedrooms,bathrooms,price,toilets,
-            state,area,description, minrent, maxrent, street, year
-         } = req.body
+  try {
+    const { landlordId } = req.params;
+    const {
+      title, type, bedrooms, bathrooms, price, toilets,
+      state, area, description, minrent, maxrent, street, year
+    } = req.body;
 
-         if(!title || !type || !bedrooms || !bathrooms || !price || !toilets ||
-            !state || !area || !description || !minrent || !maxrent || !street || !year ) {
-                return res.status(400).json({message: 'please input all fields'})
-            }
-
-        if(!landlordId) {
-            return res.status(400).json({message: 'landlordId is required'})
-        }
-
-        const landlord = await landlordModel.findOne({ where: { id : landlordId },
-            attributes: ['id', 'fullName'],
-        })
-
-        if (!landlord) {
-            return res.status(404).json({ message: 'Landlord not found' });
-        }
-
-        if (!req.files || req.files.length === 0) {
-            return res.status(400).json({ message: 'At least one listing image is required.' });
-        }
-
-        const result = await cloudinary.uploader.upload(req.files[0].path)
-
-        const newListing = await listingModel.create({
-            title, 
-            type, 
-            bedrooms,
-            bathrooms,
-            price,
-            toilets,
-            state,
-            area,
-            description, 
-            minrent, 
-            maxrent, 
-            street,
-            year,
-            listingImage: JSON.stringify({
-                imageUrl: result.secure_url,
-                publicId: result.public_id,
-            }),
-            landlordId,
-            isAvailable: false,
-            isClicked: 0,
-            status : 'pending'
-            
-            
-        })
-
-        res.status(201).json({message: 'listing created successfully', data: newListing})
-
-    } catch (error) {
-        console.error(error.message)
-        res.status(500).json({ message: 'Error creating listing',   error:error.message})
-         
+    // Validate required fields
+    const requiredFields = [
+      title, type, bedrooms, bathrooms, price, toilets,
+      state, area, description, minrent, maxrent, street, year
+    ];
+    if (requiredFields.some(field => field === undefined)) {
+      return res.status(400).json({ message: 'Please fill in all fields.' });
     }
-}
+    // if(!title || !type || !bedrooms || !bathrooms || !price || !toilets ||
+    //     !state || !area || !description || !minrent || !maxrent || !street || !year ) {
+    //         return res.status(400).json({message: 'please input all fields'})
+    //     }
 
+
+    if (!landlordId) {
+      return res.status(400).json({ message: 'Landlord ID is required.' });
+    }
+
+    const landlord = await landlordModel.findOne({
+      where: { id: landlordId },
+      attributes: ['id', 'fullName'],
+    });
+
+    if (!landlord) {
+      return res.status(404).json({ message: 'Landlord not found.' });
+    }
+
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: 'At least one listing image is required.' });
+    }
+
+    // Upload each image to Cloudinary
+    const uploadedImages = [];
+    for (const file of req.files) {
+      const result = await cloudinary.uploader.upload(file.path);
+      uploadedImages.push({
+        imageUrl: result.secure_url,
+        publicId: result.public_id,
+      });
+    }
+
+    const newListing = await listingModel.create({
+      title,
+      type,
+      bedrooms,
+      bathrooms,
+      price,
+      toilets,
+      state,
+      area,
+      description,
+      minrent,
+      maxrent,
+      street,
+      year,
+      listingImage: uploadedImages, // Sequelize JSON field
+      landlordId,
+      isAvailable: false,
+      isClicked: 0,
+      status: 'pending',
+    });
+
+    res.status(201).json({
+      message: 'Listing created successfully',
+      data: newListing,
+    });
+
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({
+      message: 'Error creating listing',
+      error: error.message,
+    });
+  }
+};
 
 
 

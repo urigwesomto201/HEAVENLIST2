@@ -1,6 +1,6 @@
 const router = require('express').Router();
 
-const { registerlandlord, loginlandlord, verifylandlordEmail, landlordForgotPassword, landlordResetPassword, resendlandlordVerificationEmail, changelandlordPassword, logoutlandlord,
+const { registerlandlord, loginlandlord,verifyLandlordOtp, verifylandlordEmail, landlordForgotPassword, landlordResetPassword, resendlandlordVerificationEmail, changelandlordPassword, logoutlandlord,
     getLandlordTransactions
 } = require('../controller/landlordController')
 const { landlordAuthenticate } = require('../middlewares/authentication')
@@ -285,57 +285,162 @@ router.post('/resendlandlord-verify', resendlandlordVerificationEmail)
 
 router.post('/landlordForgotPassword', landlordForgotPassword)
 
-
-
 /**
  * @swagger
- * /api/v1/reset-landlordpassword/{otp}:
+ * /api/v1/verify-landlordOtp:
  *   post:
+ *     summary: Verify landlord OTP
+ *     description: Verifies the OTP (One Time Password) sent to a landlord during the authentication or registration process. The system checks the OTP against all landlords to find a match.
  *     tags:
- *       - landlord
-  *     security: [] # No authentication required
- *     summary: Reset user password
- *     parameters:
- *       - name: otp
- *         in: path
- *         required: true
- *         description: Password reset otp sent to the user's email
- *         schema:
- *           type: string
+ *       - landlord 
+ *     security: [] 
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - otp
  *             properties:
- *               password:
+ *               otp:
  *                 type: string
- *                 description: The new password for the user
- *                 example: Successtoall20$
- *               confirmPassword:
- *                  type: string
- *                  description: this is the confirm password of the user
- *                  example: Successtoall20$
+ *                 example: "6543"
  *     responses:
  *       200:
- *         description: Password reset successfully
- *       400:
- *         description: Invalid or expired token
- *       500:
- *         description: reset password failed
+ *         description: OTP verified successfully
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 message: 
+ *                 message:
  *                   type: string
- *                   example: error resetting password
+ *                   example: "OTP verified successfully"
+ *                 landlordId:
+ *                   type: string
+ *                   example: "9f8d12bc-3e8e-4a8e-b1a3-912d5ad12345"
+ *                 landlordEmail:
+ *                   type: string
+ *                   example: "landlord@example.com"
+ *       400:
+ *         description: OTP is required but not provided
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "OTP is required"
+ *       404:
+ *         description: Invalid or expired OTP
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid or expired OTP"
+ *       500:
+ *         description: Server-side error during OTP verification
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "An error occurred while verifying OTP"
+ *                 error:
+ *                   type: string
+ *                   example: "Internal Server Error"
  */
+router.post('/verify-landlordOtp', verifyLandlordOtp);
 
-
-router.post('/reset-landlordpassword/:otp', landlordResetPassword)
+/**
+ * @swagger
+ * /api/v1/reset-landlordpassword/{landlordId}:
+ *   post:
+ *     summary: Reset landlord password
+ *     description: Allows a landlord to reset their password by providing their ID in the URL and a new password in the request body.
+  *     tags:
+ *       - landlord
+  *     security: [] # No authentication required
+ *     parameters:
+ *       - in: path
+ *         name: landlordId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the landlord whose password needs to be reset
+ *         example: "f5e6f1a4-2d4e-4d3f-bfd3-8a1cd6a8f6b2"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - password
+ *               - confirmPassword
+ *             properties:
+ *               password:
+ *                 type: string
+ *                 example: "NewStrongPass!123"
+ *               confirmPassword:
+ *                 type: string
+ *                 example: "NewStrongPass!123"
+ *     responses:
+ *       200:
+ *         description: Password reset successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Password reset successful"
+ *       400:
+ *         description: Missing landlordId or password mismatch/validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Passwords do not match"
+ *                 error:
+ *                   type: string
+ *                   example: "Validation failed"
+ *       404:
+ *         description: Landlord not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Landlord not found"
+ *       500:
+ *         description: Server error while resetting password
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "An error occurred while resetting password"
+ *                 error:
+ *                   type: string
+ *                   example: "Internal Server Error"
+ */
+router.post('/reset-landlordpassword/:landlordId', landlordResetPassword)
 
 
 /**

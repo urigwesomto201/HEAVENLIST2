@@ -257,39 +257,19 @@ exports.TenantForgotPassword = async (req, res) => {
     }
 };
 
-
-
-exports.TenantResetPassword = async (req, res) => {
+exports.VerifyTenantOtp = async (req, res) => {
     try {
-
-        const { otp } = req.params;
+        const { otp } = req.body;
 
         if (!otp) {
-            return res.status(400).json({ message: 'OTP not found' });
+            return res.status(400).json({ message: 'OTP is required' });
         }
 
-        let validated;
-        try {
-            validated = await validate(req.body, resetPasswordschema);
-        } catch (validationError) {
-            return res.status(400).json({ error: validationError.message });
-        }
-
-
-        const { password, confirmPassword } = validated;
-    
-        if (!password || !confirmPassword) {
-            return res.status(400).json({ message: 'Please provide both password and confirmPassword' });
-        }
-
-
-        if (password !== confirmPassword) {
-            return res.status(400).json({ message: 'Passwords do not match' });
-        }
-
-        const tenants = await tenantModel.findAll(); 
+        // Get all tenants (since we don’t know which one owns the OTP)
+        const tenants = await tenantModel.findAll();
         let tenant = null;
 
+        // Loop through each tenant to validate the OTP
         for (const t of tenants) {
             const secret = `${process.env.OTP_SECRET}${t.email.toLowerCase()}`;
             if (totp.check(otp, secret)) {
@@ -298,26 +278,68 @@ exports.TenantResetPassword = async (req, res) => {
             }
         }
 
-
         if (!tenant) {
             return res.status(404).json({ message: 'Invalid or expired OTP' });
         }
 
+        res.status(200).json({
+            message: 'OTP verified successfully',
+            tenantEmail: tenant.email  // Optional: can return this to pre-fill email
+        });
+
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({ message: 'Error verifying OTP', error: error.message });
+    }
+};
+
+exports.TenantResetPassword = async (req, res) => {
+    try {
+        // Step 1: Validate request body
+        let validated;
+        try {
+            validated = await validate(req.body, resetPasswordschema);
+        } catch (validationError) {
+            return res.status(400).json({ 
+                message: 'Validation failed', 
+                error: validationError.message 
+            });
+        }
+
+        const { password, confirmPassword } = validated;
+
+        // Step 2: Password match check
+        if (password !== confirmPassword) {
+            return res.status(400).json({ message: 'Passwords do not match' });
+        }
+
+        // Step 3: Get tenant ID from params and fetch tenant
+        const { tenantId } = req.params;
+        if (!tenantId) {
+            return res.status(400).json({ message: 'Tenant ID is required in params' });
+        }
+
+        const tenant = await tenantModel.findByPk(tenantId);
+        if (!tenant) {
+            return res.status(404).json({ message: 'Tenant not found' });
+        }
+
+        // Step 4: Hash and update password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        tenant.password = hashedPassword;
+        await tenant.update({ password: hashedPassword });
 
-        await tenant.save();
+        return res.status(200).json({ message: 'Password reset successful' });
 
-        res.status(200).json({ message: 'Password reset successful' });
-
-        
     } catch (error) {
-        console.log(error.message);   
-       res.status(500).json({message: 'Error resetting password', error: error.message});
+        console.error('Reset password error:', error);
+        return res.status(500).json({ 
+            message: 'Something went wrong while resetting password', 
+            error: error.message 
+        });
     }
-}
+};
 
 
 
