@@ -82,7 +82,7 @@ exports.createLandlordProfile = async (req, res) => {
 // GET one Landlord Profile
 exports.getOneLandlordProfile = async (req, res) => {
     try {
-        const { landlordId } = req.landlord
+        const { landlordId } = req.params
 
         const landlordProfile = await landlordProfileModel.findOne({ where: { landlordId } });
        console.log(landlordProfile)
@@ -107,7 +107,7 @@ exports.getOneLandlordProfile = async (req, res) => {
 
 exports.updateLandlordProfile = async (req, res) => {
   try {
-      const { landlordId } = req.landlord;
+      const { landlordId } = req.params;
       const { fullName, email, state, street, locality } = req.body;
 
       // Find the existing landlord profile
@@ -173,7 +173,7 @@ exports.updateLandlordProfile = async (req, res) => {
 
 exports.deleteLandlordProfile = async (req, res) => {
     try {
-        const { landlordId } = req.landlord;
+        const { landlordId } = req.params;
 
         const landlordProfile = await landlordProfileModel.findOne({ where: { landlordId } });
 

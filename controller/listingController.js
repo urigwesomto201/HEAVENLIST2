@@ -143,9 +143,9 @@ exports.getAllListings = async (req, res) => {
 
 exports.getOneListingByLandlord= async (req, res) => {
     try {
-        const {landlordId} = req.landlord
+        const {landlordId, listingId} = req.params
 
-        const { listingId } = req.params
+        
 
         if(!listingId) {
             return res.status(400).json({message: 'listingId is required'})
@@ -217,7 +217,7 @@ exports.getOneListing = async (req, res) => {
 
 exports.getAllListingsByLandlord = async (req, res) => {
     try {
-        const {landlordId} = req.landlord
+        const {landlordId} = req.params
 
         const listings = await listingModel.findAll({
             where: {  landlordId},
@@ -247,8 +247,8 @@ exports.getAllListingsByLandlord = async (req, res) => {
 
 exports.updateListing = async (req, res) => {
     try {
-        const { landlordId } = req.landlord;
-        const { listingId } = req.params;
+        const { landlordId, listingId } = req.params;
+        
 
         const {
             title, type, bedrooms, bathrooms, price, toilets,
@@ -348,8 +348,8 @@ exports.updateListing = async (req, res) => {
 
 exports.deleteListing = async (req, res) => {
     try {
-        const { landlordId } = req.landlord;
-        const { listingId } = req.params;
+        const { landlordId, listingId } = req.params;
+        
 
         if (!listingId) {
             return res.status(400).json({ message: 'Listing ID is required' });
@@ -446,8 +446,8 @@ exports.searchListing = async (req, res) => {
 
 exports.getClicksbyListing = async (req, res) => {
     try {
-        const {landlordId} = req.landlord
-        const { listingId } = req.params
+        const {landlordId, listingId } = req.params
+        
 
         if(!listingId) {
             return res.status(400).json({message: 'listingId is required'})
