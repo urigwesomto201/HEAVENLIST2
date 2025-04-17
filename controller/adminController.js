@@ -267,7 +267,7 @@ exports.verifyAdminOtp = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error verifying OTP:', error);
+        console.error(error.message);
         return res.status(500).json({
             message: 'An error occurred while verifying OTP',
             error: error.message
@@ -317,7 +317,7 @@ exports.adminResetPassword = async (req, res) => {
         return res.status(200).json({ message: 'Password reset successful' });
 
     } catch (error) {
-        console.error('Error resetting password:', error);
+        console.error(error.message);
         return res.status(500).json({
             message: 'An error occurred while resetting password',
             error: error.message
