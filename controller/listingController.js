@@ -33,12 +33,10 @@ exports.createListing = async (req, res) => {
             where: { id: landlordId },
             attributes: ['id', 'fullName'],
         });
-    
 
         if (!landlord) {
             return res.status(404).json({ message: 'Landlord not found.' });
         }
-
 
         if (!req.files || req.files.length === 0) {
             return res.status(400).json({ message: 'At least one listing image is required.' });
@@ -53,9 +51,6 @@ exports.createListing = async (req, res) => {
                     imageUrl: result.secure_url,
                     publicId: result.public_id,
                 });
-
-                // Delete the file from the server after upload
-                fs.unlinkSync(file.path);
             }
         } catch (uploadError) {
             console.error('Error uploading images to Cloudinary:', uploadError.message);
@@ -93,21 +88,19 @@ exports.createListing = async (req, res) => {
             status: 'pending',
         });
 
- 
+        res.status(201).json({
+            message: 'Listing created successfully',
+            data: newListing,
+        });
+    } catch (error) {
+        console.error(error.message);
 
-    res.status(201).json({
-      message: 'Listing created successfully',
-      data: newListing,
-    });
-
-  } catch (error) {
-    res.status(500).json({
-      message: 'Error creating listing',
-      error: error.message,
-    });
-  }
-}
-
+        res.status(500).json({
+            message: 'Error creating listing',
+            error: error.message,
+        });
+    }
+};
 
 
 
