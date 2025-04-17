@@ -264,14 +264,14 @@ router.get('/getOneListing/:listingId', getOneListing);
  *         description: The unique ID of the landlord creating the listing
  *         schema:
  *           type: string
- *           example: "64a8e9b7b56c8d001c9a4b2d"tion
+ *           example: "64a8e9b7b56c8d001c9a4b2d"
  *     responses:
  *       200:
- *         description: A list of listings by the landlord
+ *         description: Listing retrieved successfully
  *       404:
- *         description: No listings found for the given landlordId
+ *         description: Listing not found
  *       500:
- *         description: error while fetching all listings by landlord
+ *         description: error while fetching listing by landlord
  */
 router.get('/getAllListingsByLandlord', landlordAuthenticate, getAllListingsByLandlord);
 

@@ -20,12 +20,9 @@ exports.createLandlordProfile = async (req, res) => {
           return res.status(400).json({ message: 'All fields are required: fullName, email, state, street, locality' });
       }
 
-      if (!landlordId) {
-          return res.status(400).json({ message: 'Landlord ID is required' });
-      }
 
       // Check if a profile already exists for the landlord
-      const existingProfile = await landlordProfileModel.findOne({ where: { landlordId } });
+      const existingProfile = await landlordProfileModel.findOne({ where: { } });
       if (existingProfile) {
           return res.status(400).json({ message: 'A profile already exists for this landlord' });
       }
@@ -87,7 +84,7 @@ exports.getOneLandlordProfile = async (req, res) => {
     try {
         const { landlordId } = req.landlord
 
-        const landlordProfile = await landlordProfileModel.findOne({ where: { landlordId } });
+        const landlordProfile = await landlordProfileModel.findOne({ where: {  } });
        console.log(landlordProfile)
        
         if (!landlordProfile) {
@@ -114,7 +111,7 @@ exports.updateLandlordProfile = async (req, res) => {
       const { fullName, email, state, street, locality } = req.body;
 
       // Find the existing landlord profile
-      const existingLandlord = await landlordProfileModel.findOne({ where: { landlordId } });
+      const existingLandlord = await landlordProfileModel.findOne({ where: {  } });
 
       if (!existingLandlord) {
           return res.status(404).json({ message: 'Landlord profile not found' });
@@ -178,7 +175,7 @@ exports.deleteLandlordProfile = async (req, res) => {
     try {
         const { landlordId } = req.landlord;
 
-        const landlordProfile = await landlordProfileModel.findOne({ where: { landlordId } });
+        const landlordProfile = await landlordProfileModel.findOne({ where: {  } });
 
         if (!landlordProfile) {
             return res.status(404).json({ message: 'Landlord profile not found' });
