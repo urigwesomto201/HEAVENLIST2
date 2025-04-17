@@ -155,7 +155,7 @@ exports.updateLandlordProfile = async (req, res) => {
       existingLandlord.isVerified = true;
 
       // Fetch the updated profile
-      const updatedLandlord = await landlordProfileModel.findOne({ where: { landlordId } });
+      const updatedLandlord = await landlordProfileModel.findOne({ where: {  } });
 
       res.status(200).json({ message: 'Landlord profile updated successfully', data: updatedLandlord });
   } catch (error) {
