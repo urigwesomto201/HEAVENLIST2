@@ -245,7 +245,7 @@ exports.TenantForgotPassword = async (req, res) => {
         const mailOptions = {
             subject: 'Tenant Reset Password',
             email: tenant.email,
-            html,
+            html
         };
 
         await sendEmail(mailOptions);
@@ -292,6 +292,7 @@ exports.VerifyTenantOtp = async (req, res) => {
         res.status(500).json({ message: 'Error verifying OTP', error: error.message });
     }
 };
+
 
 exports.TenantResetPassword = async (req, res) => {
     try {

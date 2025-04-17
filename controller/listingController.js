@@ -152,7 +152,7 @@ exports.getOneListingByLandlord= async (req, res) => {
         }
 
         const listing = await listingModel.findOne({
-            where: { id: listingId},
+            where: { id: listingId, id: landlordId},
             include: [
                 {
                     model: landlordModel,
@@ -220,7 +220,7 @@ exports.getAllListingsByLandlord = async (req, res) => {
         const {landlordId} = req.landlord
 
         const listings = await listingModel.findAll({
-            where: { },
+            where: { id: landlordId},
             include: [
                 {
                 model: landlordModel,
@@ -266,7 +266,7 @@ exports.updateListing = async (req, res) => {
         }
 
         // Find the listing
-        const listing = await listingModel.findOne({ where: { id: listingId } });
+        const listing = await listingModel.findOne({ where: { id: listingId ,  landlordId} });
 
         if (!listing) {
             return res.status(404).json({ message: 'Listing not found' });
@@ -357,7 +357,7 @@ exports.deleteListing = async (req, res) => {
 
         // Find the listing
         const listing = await listingModel.findOne({
-            where: { id: listingId},
+            where: { id: listingId,  landlordId},
             include: [
                 {
                     model: landlordModel,
@@ -453,7 +453,7 @@ exports.getClicksbyListing = async (req, res) => {
             return res.status(400).json({message: 'listingId is required'})
         }
 
-        const listing = await listingModel.findOne({ where: { id : listingId, isAvailable:true, status: 'accepted' },
+        const listing = await listingModel.findOne({ where: { id : listingId, landlordId, isAvailable:true, status: 'accepted' },
             attributes: ['id', 'title', 'price', 'description', 'area', 'isClicked']
         });
 
