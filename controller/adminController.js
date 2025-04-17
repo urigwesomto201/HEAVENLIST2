@@ -714,7 +714,7 @@ exports.deleteAdmin = async (req, res) => {
 exports.verifyAlisting = async (req, res) => {
     try {
       const { listingId, landlordId } = req.params;
-      const { status } = req.body;
+      const { status } = req.query;
   
 
       if (!status) {
@@ -777,7 +777,7 @@ exports.verifyAlisting = async (req, res) => {
   exports.unverifyAlisting = async (req, res) => {
     try {
       const { listingId, landlordId } = req.params;
-      const { status } = req.body;
+      const { status } = req.query;
   
       // Validate input fields
       if (!status) {
