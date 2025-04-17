@@ -37,7 +37,7 @@ exports.createListing = async (req, res) => {
     const landlord = await landlordModel.findOne({
       where: { id: landlordId },
       attributes: ['id', 'fullName'],
-    });
+    });      
 
     if (!landlord) {
       return res.status(404).json({ message: 'Landlord not found.' });
@@ -84,7 +84,6 @@ exports.createListing = async (req, res) => {
     });
 
   } catch (error) {
-    console.error(error.message);
     res.status(500).json({
       message: 'Error creating listing',
       error: error.message,
@@ -116,7 +115,7 @@ exports.getAllListings = async (req, res) => {
         res.status(200).json({message: 'find all Listing below', total: listings.length, data: listings})
 
     } catch (error) {
-        console.error(error.message)
+        
         res.status(500).json({ message: 'Error fetching listings',   error:error.message})
     }
 }
