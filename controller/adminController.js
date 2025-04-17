@@ -237,37 +237,15 @@ exports.adminForgotPassword = async (req, res) => {
     }
 }
 
-
-
-exports.adminResetPassword = async (req, res) => {
+exports.verifyAdminOtp = async (req, res) => {
     try {
-
-        const { otp } = req.params;
+        const { otp } = req.body;
 
         if (!otp) {
-            return res.status(400).json({ message: 'OTP not found' });
+            return res.status(400).json({ message: 'OTP is required' });
         }
 
-        let validated;
-        try {
-            validated = await validate(req.body, resetPasswordschema);
-        } catch (validationError) {
-            return res.status(400).json({ error: validationError.message });
-        }
-
-
-        const { password, confirmPassword } = validated
-
-        if (!password || !confirmPassword) {
-            return res.status(400).json({ message: 'Please provide both password and confirmPassword' });
-        }
-
-    
-        if (password !== confirmPassword) {
-            return res.status(400).json({ message: 'Passwords do not match' });
-        }
-
-        const admins = await adminModel.findAll()
+        const admins = await adminModel.findAll();
         let admin = null;
 
         for (const a of admins) {
@@ -282,22 +260,70 @@ exports.adminResetPassword = async (req, res) => {
             return res.status(404).json({ message: 'Invalid or expired OTP' });
         }
 
+        return res.status(200).json({
+            message: 'OTP verified successfully',
+            adminId: admin.id,
+            adminEmail: admin.email
+        });
+
+    } catch (error) {
+        console.error('Error verifying OTP:', error);
+        return res.status(500).json({
+            message: 'An error occurred while verifying OTP',
+            error: error.message
+        });
+    }
+};
+
+exports.adminResetPassword = async (req, res) => {
+    try {
+        const { adminId } = req.params;
+
+        if (!adminId) {
+            return res.status(400).json({ message: 'Admin ID is required in the URL parameters' });
+        }
+
+        const admin = await adminModel.findByPk(adminId);
+
+        if (!admin) {
+            return res.status(404).json({ message: 'Admin not found' });
+        }
+
+        let validated;
+        try {
+            validated = await validate(req.body, resetPasswordschema);
+        } catch (validationError) {
+            return res.status(400).json({
+                message: 'Validation failed',
+                error: validationError.message
+            });
+        }
+
+        const { password, confirmPassword } = validated;
+
+        if (!password || !confirmPassword) {
+            return res.status(400).json({ message: 'Password and Confirm Password are required' });
+        }
+
+        if (password !== confirmPassword) {
+            return res.status(400).json({ message: 'Passwords do not match' });
+        }
+
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        admin.password = hashedPassword;
+        await admin.update({ password: hashedPassword });
 
-        await admin.save();
+        return res.status(200).json({ message: 'Password reset successful' });
 
-        res.status(200).json({ message: 'Password reset successful' });
-
-        
     } catch (error) {
-        console.log(error.message);
-       res.status(500).json({message: 'Error resetting password', error: error.message});
+        console.error('Error resetting password:', error);
+        return res.status(500).json({
+            message: 'An error occurred while resetting password',
+            error: error.message
+        });
     }
-}
-
+};
 
 
 

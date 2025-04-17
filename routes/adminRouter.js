@@ -3,7 +3,7 @@ const router = require('express').Router();
 const {registerAdmin, loginAdmin, adminForgotPassword, adminResetPassword,changeAdminPassword, logoutAdmin,
     getAdmin, getAllAdmins, deleteAdmin, getAllTenants, verifyAdminEmail,
     getAllLandlords, verifyAlisting, unverifyAlisting,
-    getOneTenant, getOneLandlord, getOneLandlordProfile,deleteLandlordProfile, alllandlordProfiles
+    getOneTenant, getOneLandlord, getOneLandlordProfile,deleteLandlordProfile,verifyAdminOtp, alllandlordProfiles
 
 } = require('../controller/adminController')
 const { adminAuthenticate, eitherAuthenticate } = require('../middlewares/authentication')
@@ -248,55 +248,160 @@ router.post('/adminForgotPassword', adminForgotPassword)
 
 /**
  * @swagger
- * /api/v1/reset-adminpassword/{otp}:
+ * /api/v1/verify-adminOtp:
  *   post:
- *     tags:
+ *     summary: Verify admin OTP
+ *     description: Verifies the OTP (One Time Password) sent to an admin by checking it against all registered admins.
+  *     tags:
  *       - Admin
   *     security: [] # No authentication required
- *     summary: Reset admin password
- *     description: Reset the admin's password using a valid token.
- *     parameters:
- *       - name: otp
- *         in: path
- *         required: true
- *         description: Password reset otp sent to the admins email
- *         schema:
- *           type: string
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - otp
  *             properties:
- *               password:
+ *               otp:
  *                 type: string
- *                 description: The new password for the user
- *                 example: Successtoall20$
- *               confirmPassword:
- *                  type: string
- *                  description: this is the confirm password of the user
- *                  example: Successtoall20$
+ *                 example: "456789"
  *     responses:
  *       200:
- *         description: Password reset successfully
- *       400:
- *         description: Invalid or expired token
- *       500:
- *         description: reset password failed
+ *         description: OTP verified successfully
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 message: 
+ *                 message:
  *                   type: string
- *                   example: error resetting password
+ *                   example: "OTP verified successfully"
+ *                 adminId:
+ *                   type: string
+ *                   example: "21e8029c-c493-4e9d-9f64-4b2d8d12fa12"
+ *                 adminEmail:
+ *                   type: string
+ *                   example: "admin@example.com"
+ *       400:
+ *         description: OTP is missing from the request body
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "OTP is required"
+ *       404:
+ *         description: OTP does not match any admin
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid or expired OTP"
+ *       500:
+ *         description: Internal server error during OTP verification
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "An error occurred while verifying OTP"
+ *                 error:
+ *                   type: string
+ *                   example: "Internal Server Error"
  */
+router.post('/verify-adminOtp', verifyAdminOtp)
+/**
+ * @swagger
+ * /api/v1/reset-adminpassword/{adminId}:
+ *   post:
+ *     summary: Reset admin password
+ *     description: Resets the password for an admin given the admin's ID. Requires the admin ID in the URL parameters and the new password details in the request body.
+  *     tags:
+ *       - Admin
+ *     security: [] # No authentication required
+ *     parameters:
+ *       - in: path
+ *         name: adminId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the admin whose password will be reset
+ *         example: "b85a4b8c-67b3-4d7c-ae5f-67e2b8656e1d"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - password
+ *               - confirmPassword
+ *             properties:
+ *               password:
+ *                 type: string
+ *                 description: The new password for the admin
+ *                 example: "newAdminPassword123"
+ *               confirmPassword:
+ *                 type: string
+ *                 description: The password confirmation to ensure the correct password is entered
+ *                 example: "newAdminPassword123"
+ *     responses:
+ *       200:
+ *         description: Password reset successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Password reset successful"
+ *       400:
+ *         description: Invalid input (e.g., missing required fields, passwords don't match)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Passwords do not match"
+ *       404:
+ *         description: Admin not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Admin not found"
+ *       500:
+ *         description: Internal server error during password reset process
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "An error occurred while resetting password"
+ *                 error:
+ *                   type: string
+ *                   example: "Internal Server Error"
+ */
+router.post('/reset-adminpassword/:adminId', adminResetPassword);
 
 
-
-router.post('/reset-adminpassword/:otp', adminResetPassword)
 
 /**
  * @swagger

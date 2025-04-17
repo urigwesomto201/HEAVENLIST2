@@ -1,6 +1,6 @@
 const router = require('express').Router();
 
-const { registerTenant, loginTenant, verifyTenantEmail, TenantForgotPassword, getTenantProfile,
+const { registerTenant, loginTenant, verifyTenantEmail,VerifyTenantOtp, TenantForgotPassword, getTenantProfile,
     TenantResetPassword, resendTenantVerificationEmail, changeTenantPassword, logoutTenant} = require('../controller/tenantController')
 const { tenantAuthenticate } = require('../middlewares/authentication')
 
@@ -109,9 +109,8 @@ const { tenantAuthenticate } = require('../middlewares/authentication')
  * 
  * 
  */
-
-
 router.post('/registerTenant', registerTenant)
+
 
 
 /**
@@ -293,55 +292,163 @@ router.post('/tenant-verify', resendTenantVerificationEmail)
 
 router.post('/TenantForgotPassword', TenantForgotPassword)
 
-
-
 /**
  * @swagger
- * /api/v1/reset-tenantpassword/{otp}:
+ * /api/v1/verifyTenantOtp:
  *   post:
- *     tags:
+ *     summary: Verify tenant OTP
+ *     description: This endpoint allows you to verify the OTP (One Time Password) sent to the tenant. The OTP should be passed in the request body.
+*     tags:
  *       - tenant
- *     security: [] # No authentication required
- *     summary: Reset user password
- *     parameters:
- *       - name: otp
- *         in: path
- *         required: true
- *         description: Password reset otp sent to the user's email
- *         schema:
- *           type: string
+  *     security: [] # No authentication required
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - otp
  *             properties:
- *               password:
+ *               otp:
  *                 type: string
- *                 description: The new password for the user
- *                 example: Successtoall20$
- *               confirmPassword:
- *                 type: string
- *                 description: The confirmation of the new password
- *                 example: Successtoall20$
+ *                 example: "1274"  # Example OTP sent to tenant
  *     responses:
  *       200:
- *         description: Password reset successfully
- *       400:
- *         description: Invalid or expired OTP
- *       500:
- *         description: Reset password failed
+ *         description: OTP verified successfully
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 message: 
+ *                 message:
  *                   type: string
- *                   example: Reset password failed
+ *                   example: "OTP verified successfully"
+ *                 tenantEmail:
+ *                   type: string
+ *                   example: "johndoe@example.com"
+ *       400:
+ *         description: OTP is missing or invalid
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "OTP is required"
+ *       404:
+ *         description: Invalid or expired OTP
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid or expired OTP"
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Error verifying OTP"
+ *                 error:
+ *                   type: string
+ *                   example: "Internal Server Error"
  */
-router.post('/reset-tenantpassword/:otp', TenantResetPassword)
+router.post('/verify-tenantOtp', VerifyTenantOtp)
+
+/**
+ * @swagger
+ * /api/v1/reset-tenantpassword/{tenantId}:
+ *   post:
+ *     summary: Reset a tenant's password
+ *     description: Resets the password for a tenant based on their ID. The request body must contain a valid password and confirmPassword that match.
+ *     tags:
+ *       - tenant
+   *     security: [] # No authentication required
+ *     parameters:
+ *       - in: path
+ *         name: tenantId
+ *         required: true
+ *         description: ID of the tenant to reset the password for
+ *         schema:
+ *           type: string
+ *           example: "12345"  # Example tenant ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - password
+ *               - confirmPassword
+ *             properties:
+ *               password:
+ *                 type: string
+ *                 example: "NewPassword123!"  # Example password
+ *               confirmPassword:
+ *                 type: string
+ *                 example: "NewPassword123!"  # Example confirmPassword
+ *     responses:
+ *       200:
+ *         description: Password reset successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Password reset successful"
+ *       400:
+ *         description: Validation failed or password mismatch
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Validation failed"
+ *                 error:
+ *                   type: string
+ *                   example: "Password is required"
+ *       404:
+ *         description: Tenant not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Tenant not found"
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Something went wrong while resetting password"
+ *                 error:
+ *                   type: string
+ *                   example: "Internal Server Error"
+ */
+
+router.post('/reset-tenantpassword/:tenantId', TenantResetPassword);
+
+
+
 
 
 
