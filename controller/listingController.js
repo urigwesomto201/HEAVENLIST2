@@ -157,7 +157,7 @@ exports.getOneListingByLandlord= async (req, res) => {
         }
 
         const listing = await listingModel.findOne({
-            where: { id: listingId}, 
+            where: { id: listingId}, landlordId,
             include: [
                 {
                     model: landlordModel,
@@ -447,13 +447,14 @@ exports.searchListing = async (req, res) => {
 
 exports.getClicksbyListing = async (req, res) => {
     try {
+        const {landlordId} = req.landlord
         const { listingId } = req.params
 
         if(!listingId) {
             return res.status(400).json({message: 'listingId is required'})
         }
 
-        const listing = await listingModel.findOne({ where: { id : listingId, isAvailable:true, status: 'accepted' },
+        const listing = await listingModel.findOne({ where: { id : listingId, landlordId, isAvailable:true, status: 'accepted' },
             attributes: ['id', 'title', 'price', 'description', 'area', 'isClicked']
         });
 
