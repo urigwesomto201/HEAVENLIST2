@@ -267,7 +267,7 @@ exports.verifyAdminOtp = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error verifying OTP:', error);
+        console.error(error.message);
         return res.status(500).json({
             message: 'An error occurred while verifying OTP',
             error: error.message
@@ -317,7 +317,7 @@ exports.adminResetPassword = async (req, res) => {
         return res.status(200).json({ message: 'Password reset successful' });
 
     } catch (error) {
-        console.error('Error resetting password:', error);
+        console.error(error.message);
         return res.status(500).json({
             message: 'An error occurred while resetting password',
             error: error.message
@@ -714,7 +714,7 @@ exports.deleteAdmin = async (req, res) => {
 exports.verifyAlisting = async (req, res) => {
     try {
       const { listingId, landlordId } = req.params;
-      const { status } = req.body;
+      const { status } = req.query;
   
 
       if (!status) {
@@ -777,7 +777,7 @@ exports.verifyAlisting = async (req, res) => {
   exports.unverifyAlisting = async (req, res) => {
     try {
       const { listingId, landlordId } = req.params;
-      const { status } = req.body;
+      const { status } = req.query;
   
       // Validate input fields
       if (!status) {

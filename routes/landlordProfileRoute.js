@@ -147,12 +147,13 @@ router.post('/createProfile/:landlordId', landlordAuthenticate, upload.single('p
  *     security:
  *       - landlordBearerAuth: [] # Requires landlord authentication
  *     parameters:
- *       - name: landlordId
- *         in: query
- *         description: ID of the landlord to fetch the profile
+ *       - in: path
+ *         name: landlordId
  *         required: true
  *         schema:
  *           type: string
+ *         description: The ID of the landlord creating the profile.
+ *         example: "123e4567-e89b-12d3-a456-426614174000"
  *     responses:
  *       200:
  *         description: Successfully fetched the landlord profile
@@ -213,6 +214,14 @@ router.get('/getlandlordprofile', landlordAuthenticate, getOneLandlordProfile);
  *       - Landlord Profile
  *     security:
  *       - landlordBearerAuth: [] # Requires landlord authentication
+ *     parameters:
+ *       - in: path
+ *         name: landlordId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the landlord creating the profile.
+ *         example: "123e4567-e89b-12d3-a456-426614174000"
  *     requestBody:
  *       required: true
  *       content:
@@ -268,12 +277,13 @@ router.put('/updateLandlordProfile', landlordAuthenticate, upload.single('profil
  *     security:
  *       - landlordBearerAuth: [] # Requires landlord authentication
  *     parameters:
- *       - name: landlordId
- *         in: query
- *         description: ID of the landlord to delete the profile
+ *       - in: path
+ *         name: landlordId
  *         required: true
  *         schema:
  *           type: string
+ *         description: The ID of the landlord creating the profile.
+ *         example: "123e4567-e89b-12d3-a456-426614174000"
  *     responses:
  *       200:
  *         description: Successfully deleted the landlord profile

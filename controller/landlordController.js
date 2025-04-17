@@ -334,7 +334,7 @@ exports.verifyLandlordOtp = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error verifying OTP:', error);
+        console.error(error.message);
         return res.status(500).json({
             message: 'An error occurred while verifying OTP',
             error: error.message
@@ -362,7 +362,6 @@ exports.landlordResetPassword = async (req, res) => {
             validated = await validate(req.body, resetPasswordschema);
         } catch (validationError) {
             return res.status(400).json({
-                message: 'Validation failed',
                 error: validationError.message
             });
         }
@@ -385,7 +384,7 @@ exports.landlordResetPassword = async (req, res) => {
         return res.status(200).json({ message: 'Password reset successful' });
 
     } catch (error) {
-        console.error('Error resetting password:', error);
+        console.error(error.message);
         return res.status(500).json({
             message: 'An error occurred while resetting password',
             error: error.message

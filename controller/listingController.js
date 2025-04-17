@@ -8,54 +8,96 @@ const fs = require('fs')
 
 
 
+
+
 exports.createListing = async (req, res) => {
-  try {
-    const { landlordId } = req.params;
-    const {
-      title, type, bedrooms, bathrooms, price, toilets,
-      state, area, description, minrent, maxrent, street, year
-    } = req.body;
+    try {
+        const { landlordId } = req.params;
+        const {
+            title, type, bedrooms, bathrooms, price, toilets,
+            state, area, description, minrent, maxrent, street, year
+        } = req.body;
 
-    // Validate required fields
-    const requiredFields = [
-      title, type, bedrooms, bathrooms, price, toilets,
-      state, area, description, minrent, maxrent, street, year
-    ];
-    if (requiredFields.some(field => field === undefined)) {
-      return res.status(400).json({ message: 'Please fill in all fields.' });
-    }
-    // if(!title || !type || !bedrooms || !bathrooms || !price || !toilets ||
-    //     !state || !area || !description || !minrent || !maxrent || !street || !year ) {
-    //         return res.status(400).json({message: 'please input all fields'})
-    //     }
+        // Validate required fields
+        if (!title || !type || !bedrooms || !bathrooms || !price || !toilets ||
+            !state || !area || !description || !minrent || !maxrent || !street || !year) {
+            return res.status(400).json({ message: 'Please provide all required fields' });
+        }
 
+        if (!landlordId) {
+            return res.status(400).json({ message: 'Landlord ID is required.' });
+        }
 
-    if (!landlordId) {
-      return res.status(400).json({ message: 'Landlord ID is required.' });
-    }
+        // Check if landlord exists
+        const landlord = await landlordModel.findOne({
+            where: { id: landlordId },
+            attributes: ['id', 'fullName'],
+        });
+
 
     const landlord = await landlordModel.findOne({
       where: { id: landlordId },
       attributes: ['id', 'fullName'],
     });      
 
-    if (!landlord) {
-      return res.status(404).json({ message: 'Landlord not found.' });
-    }
+        if (!landlord) {
+            return res.status(404).json({ message: 'Landlord not found.' });
+        }
 
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ message: 'At least one listing image is required.' });
-    }
 
-    // Upload each image to Cloudinary
-    const uploadedImages = [];
-    for (const file of req.files) {
-      const result = await cloudinary.uploader.upload(file.path);
-      uploadedImages.push({
-        imageUrl: result.secure_url,
-        publicId: result.public_id,
-      });
-    }
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ message: 'At least one listing image is required.' });
+        }
+
+        // Upload each image to Cloudinary
+        const uploadedImages = [];
+        try {
+            for (const file of req.files) {
+                const result = await cloudinary.uploader.upload(file.path);
+                uploadedImages.push({
+                    imageUrl: result.secure_url,
+                    publicId: result.public_id,
+                });
+
+                // Delete the file from the server after upload
+                fs.unlinkSync(file.path);
+            }
+        } catch (uploadError) {
+            console.error('Error uploading images to Cloudinary:', uploadError.message);
+
+            // Clean up already uploaded images in case of an error
+            for (const image of uploadedImages) {
+                await cloudinary.uploader.destroy(image.publicId);
+            }
+
+            return res.status(500).json({
+                message: 'Error uploading images to Cloudinary',
+                error: uploadError.message,
+            });
+        }
+
+        // Save the listing
+        const newListing = await listingModel.create({
+            title,
+            type,
+            bedrooms,
+            bathrooms,
+            price,
+            toilets,
+            state,
+            area,
+            description,
+            minrent,
+            maxrent,
+            street,
+            year,
+            listingImage: JSON.stringify(uploadedImages), // Save as JSON string
+            landlordId,
+            isAvailable: false,
+            isClicked: 0,
+            status: 'pending',
+        });
+
 
     const newListing = await listingModel.create({
       title,
@@ -89,6 +131,29 @@ exports.createListing = async (req, res) => {
       error: error.message,
     });
   }
+
+        res.status(201).json({
+            message: 'Listing created successfully',
+            data: newListing,
+        });
+    } catch (error) {
+        console.error('Error creating listing:', error.message);
+
+        // Delete uploaded files from the server in case of an error
+        if (req.files) {
+            for (const file of req.files) {
+                if (fs.existsSync(file.path)) {
+                    fs.unlinkSync(file.path);
+                }
+            }
+        }
+
+        res.status(500).json({
+            message: 'Error creating listing',
+            error: error.message,
+        });
+    }
+
 };
 
 
@@ -134,7 +199,7 @@ exports.getOneListingByLandlord= async (req, res) => {
         }
 
         const listing = await listingModel.findOne({
-            where: { id: listingId}, 
+            where: { id: listingId}, landlordId,
             include: [
                 {
                     model: landlordModel,
@@ -201,8 +266,12 @@ exports.getAllListingsByLandlord = async (req, res) => {
     try {
         const {landlordId} = req.landlord
 
+        if (!landlordId) {
+            return res.status(400).json({ message: 'Landlord ID is required' });
+        }
+
         const listings = await listingModel.findAll({
-            where: { },
+            where: {landlordId },
             include: [
                 {
                 model: landlordModel,
@@ -227,91 +296,130 @@ exports.getAllListingsByLandlord = async (req, res) => {
 
 
 
-
-
 exports.updateListing = async (req, res) => {
     try {
-        const {landlordId} = req.landlord
+        const { landlordId } = req.landlord;
+        const { listingId } = req.params;
 
-        const { listingId } = req.params
+        const {
+            title, type, bedrooms, bathrooms, price, toilets,
+            state, area, description, minrent, maxrent, street, year,
+        } = req.body;
 
-
-        const { title, type, bedrooms,bathrooms,price,toilets,
-            state,area,description, minrent, maxrent, street, year,
-        } = req.body
-
-        if(!title || !type || !bedrooms || !bathrooms || !price || !toilets ||
-            !state || !area || !description || !minrent || !maxrent || !street || !year ) {
-            return res.status(400).json({message: 'please input all fields'})
+        // Validate required fields
+        if (!title || !type || !bedrooms || !bathrooms || !price || !toilets ||
+            !state || !area || !description || !minrent || !maxrent || !street || !year) {
+            return res.status(400).json({ message: 'Please input all fields' });
         }
 
-        if(!listingId) {
-            return res.status(400).json({message: 'listingId is required'})
+        if (!listingId) {
+            return res.status(400).json({ message: 'Listing ID is required' });
         }
 
-        const listing = await listingModel.findOne({ where: { id : listingId} })
+        // Find the listing
+        const listing = await listingModel.findOne({ where: { id: listingId } });
 
         if (!listing) {
             return res.status(404).json({ message: 'Listing not found' });
-        } 
-
-        let updatedImage = listing.listingImage
-
-       
-        if (req.files) {
-            if (listing.listingImage && listing.listingImage.publicId) {
-                await cloudinary.uploader.destroy(listing.listingImage.publicId);
-            }
-
-            const result = await cloudinary.uploader.upload(req.files[0].path);
-            updatedImage = JSON.stringify({
-                imageUrl: result.secure_url,
-                publicId: result.public_id,
-            })
         }
 
-        await listingModel.update(
-            {
-            title, 
-            type, 
+        // Parse existing images
+        let updatedImages = [];
+        if (listing.listingImage) {
+            try {
+                updatedImages = JSON.parse(listing.listingImage);
+                if (!Array.isArray(updatedImages)) {
+                    updatedImages = [];
+                }
+            } catch (parseError) {
+                console.error('Error parsing listingImage:', parseError.message);
+                updatedImages = []; // Fallback to an empty array
+            }
+        }
+
+        // Handle new images
+        if (req.files && req.files.length > 0) {
+            try {
+                // Delete old images from Cloudinary
+                for (const image of updatedImages) {
+                    if (image.publicId) {
+                        await cloudinary.uploader.destroy(image.publicId);
+                    }
+                }
+
+                // Upload new images to Cloudinary
+                updatedImages = [];
+                for (const file of req.files) {
+                    const result = await cloudinary.uploader.upload(file.path);
+                    updatedImages.push({
+                        imageUrl: result.secure_url,
+                        publicId: result.public_id,
+                    });
+
+                    // Delete the file from the server after upload
+                    safelyDeleteFile(file.path);
+                }
+            } catch (uploadError) {
+                console.error('Error uploading images to Cloudinary:', uploadError.message);
+                return res.status(500).json({ message: 'Error uploading images to Cloudinary', error: uploadError.message });
+            }
+        }
+
+        // Update the listing
+        await listing.update({
+            title,
+            type,
             bedrooms,
             bathrooms,
             price,
             toilets,
             state,
             area,
-            description, 
-            minrent, 
-            maxrent, 
+            description,
+            minrent,
+            maxrent,
             street,
             year,
-            listingImage: updatedImage,
-            },
-            { where: { id: listingId } } 
-        );
+            listingImage: JSON.stringify(updatedImages),
+        });
 
-       
-        const updatedListing = await listingModel.findOne({ where: { id: listingId },
-        include: [
-            {
-            model: landlordModel,
-            attributes: ['id', 'fullName'], 
-             as: 'landlord', 
-            },
-        ],
-    });
-
+        // Fetch the updated listing
+        const updatedListing = await listingModel.findOne({
+            where: { id: listingId },
+            include: [
+                {
+                    model: landlordModel,
+                    attributes: ['id', 'fullName'],
+                    as: 'landlord',
+                },
+            ],
+        });
 
         res.status(200).json({ message: 'Listing updated successfully', data: updatedListing });
-
-
     } catch (error) {
-        console.error(error.message);
-        res.status(500).json({ message: 'Error updating listings', error: error.message });
+        console.error('Error updating listing:', error.message);
+
+        // Delete uploaded files from the server in case of an error
+        if (req.files) {
+            for (const file of req.files) {
+                safelyDeleteFile(file.path);
+            }
+        }
+
+        res.status(500).json({ message: 'Error updating listing', error: error.message });
     }
-}
+};
 
-
+// Helper function to safely delete a file
+const safelyDeleteFile = (filePath) => {
+    if (fs.existsSync(filePath)) {
+        try {
+            fs.unlinkSync(filePath);
+        } catch (err) {
+            console.error('Error deleting file:', err.message);
+        }
+    }
+};
 
 
 exports.deleteListing = async (req, res) => {
@@ -324,7 +432,7 @@ exports.deleteListing = async (req, res) => {
         }
 
 
-        const listing = await listingModel.findOne({ where: { id : listingId },
+        const listing = await listingModel.findOne({ where: { id : listingId, landlordId },
             include: [
                 {
                 model: landlordModel,
@@ -410,13 +518,14 @@ exports.searchListing = async (req, res) => {
 
 exports.getClicksbyListing = async (req, res) => {
     try {
+        const {landlordId} = req.landlord
         const { listingId } = req.params
 
         if(!listingId) {
             return res.status(400).json({message: 'listingId is required'})
         }
 
-        const listing = await listingModel.findOne({ where: { id : listingId, isAvailable:true, status: 'accepted' },
+        const listing = await listingModel.findOne({ where: { id : listingId, landlordId, isAvailable:true, status: 'accepted' },
             attributes: ['id', 'title', 'price', 'description', 'area', 'isClicked']
         });
 

@@ -301,7 +301,6 @@ exports.TenantResetPassword = async (req, res) => {
             validated = await validate(req.body, resetPasswordschema);
         } catch (validationError) {
             return res.status(400).json({ 
-                message: 'Validation failed', 
                 error: validationError.message 
             });
         }
@@ -333,7 +332,7 @@ exports.TenantResetPassword = async (req, res) => {
         return res.status(200).json({ message: 'Password reset successful' });
 
     } catch (error) {
-        console.error('Reset password error:', error);
+        console.error(error.message);
         return res.status(500).json({ 
             message: 'Something went wrong while resetting password', 
             error: error.message 

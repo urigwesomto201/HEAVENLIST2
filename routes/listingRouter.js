@@ -194,6 +194,13 @@ router.get('/getAllListings', getAllListings);
  *     security:
  *       - landlordBearerAuth: [] # Requires landlord authentication
  *     parameters:
+ *       - name: landlordId
+ *         in: path
+ *         required: true
+ *         description: The unique ID of the landlord creating the listing
+ *         schema:
+ *           type: string
+ *           example: "64a8e9b7b56c8d001c9a4b2d"
  *       - name: listingId
  *         in: path
  *         required: true
@@ -250,6 +257,14 @@ router.get('/getOneListing/:listingId', getOneListing);
  *       - Listings
  *     security:
  *       - landlordBearerAuth: [] # Requires landlord authentication
+ *     parameters:
+ *       - name: landlordId
+ *         in: path
+ *         required: true
+ *         description: The unique ID of the landlord creating the listing
+ *         schema:
+ *           type: string
+ *           example: "64a8e9b7b56c8d001c9a4b2d"tion
  *     responses:
  *       200:
  *         description: A list of listings by the landlord
@@ -273,6 +288,13 @@ router.get('/getAllListingsByLandlord', landlordAuthenticate, getAllListingsByLa
  *     security:
  *       - landlordBearerAuth: [] # Requires landlord authentication
  *     parameters:
+ *       - in: path
+ *         name: landlordId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the landlord creating the profile.
+ *         example: "123e4567-e89b-12d3-a456-426614174000"
  *       - name: listingId
  *         in: path
  *         required: true
@@ -375,6 +397,13 @@ router.put('/updateListing/:listingId', landlordAuthenticate, upload.array('list
  *     security:
  *       - landlordBearerAuth: [] # Requires landlord authentication
  *     parameters:
+ *       - in: path
+ *         name: landlordId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the landlord creating the profile.
+ *         example: "123e4567-e89b-12d3-a456-426614174000"
  *       - name: listingId
  *         in: path
  *         required: true
@@ -530,6 +559,13 @@ router.get('/searchListing', searchListing);
  *     security:
  *       - landlordBearerAuth: [] # Requires landlord authentication
  *     parameters:
+ *       - in: path
+ *         name: landlordId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the landlord creating the profile.
+ *         example: "123e4567-e89b-12d3-a456-426614174000"
  *       - name: listingId
  *         in: path
  *         required: true

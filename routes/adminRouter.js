@@ -844,6 +844,14 @@ router.delete('/deleteadmin/:id',adminAuthenticate, deleteAdmin);
  *         schema:
  *           type: string
  *           example: "12345"
+ *       - in: query
+ *         name: status
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: ["accepted", "rejected"]
+ *         description: The status of the listing to be updated as verified.
+ *         example: "accepted"
  *     responses:
  *       200:
  *         description: Listing has been successfully verified and updated.
@@ -918,6 +926,14 @@ router.put('/verifyAlisting/:listingId/:landlordId', adminAuthenticate, verifyAl
  *         schema:
  *           type: string
  *           example: "12345"
+ *       - in: query
+ *         name: status
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: ["rejected"]
+ *         description: to unverify a listing
+ *         example: "rejected"
  *     responses:
  *       200:
  *         description: Listing has been successfully unverified and updated.
