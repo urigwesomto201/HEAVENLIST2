@@ -688,18 +688,18 @@ router.get('/alllandlordProfiles', adminAuthenticate, alllandlordProfiles);
 /**
  * @swagger
  * /api/v1/deleteLandlordProfile/{landlordProfileId}:
- *   delete:
+ *   get:
  *     tags:
  *       - Admin
  *     security:
  *       - AdminBearerAuth: [] # Requires admin authentication
- *     summary: Delete a landlord profile
- *     description: Delete a specific landlord profile by ID
+ *     summary: Get one landlord profile
+ *     description: Retrieve details of a specific landlord profile by ID
  *     parameters:
  *       - in: path
  *         name: landlordProfileId
  *         required: true
- *         description: ID of the landlord profile to delete
+ *         description: ID of the landlord profile to retrieve
  *         schema:
  *           type: string
  *     responses:
