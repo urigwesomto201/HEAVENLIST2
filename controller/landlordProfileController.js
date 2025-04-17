@@ -9,77 +9,66 @@ const cloudinary = require('../database/cloudinary')
 
 
 
-
 exports.createLandlordProfile = async (req, res) => {
-  try {
-      const { landlordId } = req.params;
-      const { fullName, email, state, street, locality } = req.body;
-
-      // Validate required fields
-      if (!fullName || !email || !state || !street || !locality) {
-          return res.status(400).json({ message: 'All fields are required: fullName, email, state, street, locality' });
-      }
-
-
-      // Check if a profile already exists for the landlord
-      const existingProfile = await landlordProfileModel.findOne({ where: { id: landlordId  } });
-      if (existingProfile) {
-          return res.status(400).json({ message: 'A profile already exists for this landlord' });
-      }
-
-      if (!req.file) {
-          return res.status(400).json({ message: 'Landlord profile image is required' });
-      }
-
-      // Upload the profile image to Cloudinary
-      let uploadedImage;
-      try {
-          uploadedImage = await cloudinary.uploader.upload(req.file.path, { resource_type: 'auto' });
-      } catch (uploadError) {
-          console.error('Error uploading image to Cloudinary:', uploadError.message);
-          return res.status(500).json({ message: 'Error uploading image to Cloudinary', error: uploadError.message });
-      }
-
-      // Ensure the uploaded image has a secure URL
-      if (!uploadedImage.secure_url) {
-          return res.status(500).json({ message: 'Failed to retrieve secure URL from Cloudinary' });
-      }
-
-      // Delete the file from the server after successful upload
-      safelyDeleteFile(req.file.path);
-
-      // Create the landlord profile
-      const newProfile = await landlordProfileModel.create({
-          landlordId,
-          fullName,
-          email,
-          state,
-          street,
-          locality,
-          profileImage: uploadedImage.secure_url,
-      });
-
-      newProfile.isVerified = true;
-      await newProfile.save();
-
-      res.status(201).json({ message: 'Landlord profile created successfully', data: newProfile });
-  } catch (error) {
-      console.error('Error creating landlord profile:', error.message);
-
-      // Delete the file from the server in case of an error
-      if (req.file) {
-          safelyDeleteFile(req.file.path);
-      }
-
-      res.status(500).json({ message: 'Error creating landlord profile', error: error.message });
-  }
+    try {
+        const { landlordId } = req.params;
+        const { fullName, email, state, street, locality } = req.body;
+  
+        // Validate required fields
+        if (!fullName || !email || !state || !street || !locality) {
+            return res.status(400).json({ message: 'All fields are required: fullName, email, state, street, locality' });
+        }
+  
+        // Check if a profile already exists for the landlord
+        const existingProfile = await landlordProfileModel.findOne({ where: { id: landlordId } });
+        if (existingProfile) {
+            return res.status(400).json({ message: 'A profile already exists for this landlord' });
+        }
+  
+        if (!req.file) {
+            return res.status(400).json({ message: 'Landlord profile image is required' });
+        }
+  
+        // Upload the profile image to Cloudinary
+        let uploadedImage;
+        try {
+            uploadedImage = await cloudinary.uploader.upload(req.file.path, { resource_type: 'auto' });
+        } catch (uploadError) {
+            console.error('Error uploading image to Cloudinary:', uploadError.message);
+            return res.status(500).json({ message: 'Error uploading image to Cloudinary', error: uploadError.message });
+        }
+  
+        // Ensure the uploaded image has a secure URL
+        if (!uploadedImage.secure_url) {
+            return res.status(500).json({ message: 'Failed to retrieve secure URL from Cloudinary' });
+        }
+  
+        // Create the landlord profile
+        const newProfile = await landlordProfileModel.create({
+            landlordId,
+            fullName,
+            email,
+            state,
+            street,
+            locality,
+            profileImage: uploadedImage.secure_url,
+        });
+  
+        newProfile.isVerified = true;
+        await newProfile.save();
+  
+        res.status(201).json({ message: 'Landlord profile created successfully', data: newProfile });
+    } catch (error) {
+        console.error('Error creating landlord profile:', error.message);
+  
+        res.status(500).json({ message: 'Error creating landlord profile', error: error.message });
+    }
 };
 
 
 
 
 
-// GET one Landlord Profile
 exports.getOneLandlordProfile = async (req, res) => {
     try {
         const { landlordId } = req.params

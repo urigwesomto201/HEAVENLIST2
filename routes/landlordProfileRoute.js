@@ -138,7 +138,7 @@ router.post('/createProfile/:landlordId', landlordAuthenticate, upload.single('p
 
 /**
  * @swagger
- * /api/v1/getlandlordprofile{landlordId}:
+ * /api/v1/getlandlordprofile/{landlordId}:
  *   get:
  *     summary: Get a landlord profile
  *     description: Fetch the details of a specific landlord profile by their ID. Requires landlord authentication
@@ -206,7 +206,7 @@ router.get('/getlandlordprofile/:landlordId', landlordAuthenticate, getOneLandlo
 
 /**
  * @swagger
- * /api/v1/updateLandlordProfile{landlordId}:
+ * /api/v1/updateLandlordProfile/{landlordId}:
  *   put:
  *     summary: Update landlord profile
  *     description: Update the details of a specific landlord profile. Requires landlord authentication
@@ -268,7 +268,7 @@ router.put('/updateLandlordProfile/:landlordId', landlordAuthenticate, upload.si
 
 /**
  * @swagger
- * /api/v1/deleteLandlordProfile{landlordId}:
+ * /api/v1/deleteLandlordProfile/{landlordId}:
  *   delete:
  *     summary: Delete a landlord profile
  *     description: Delete a specific landlord profile by their ID. Requires landlord authentication
