@@ -30,7 +30,7 @@ exports.createListing = async (req, res) => {
 
         // Check if landlord exists
         const landlord = await landlordModel.findOne({
-            where: { landlordId },
+            where: { id: landlordId },
             attributes: ['id', 'fullName'],
         });
     
@@ -220,7 +220,7 @@ exports.getAllListingsByLandlord = async (req, res) => {
         const {landlordId} = req.params
 
         const listings = await listingModel.findAll({
-            where: {  landlordId},
+            where: {  id: landlordId},
             include: [
                 {
                 model: landlordModel,
