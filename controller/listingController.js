@@ -34,9 +34,16 @@ exports.createListing = async (req, res) => {
             attributes: ['id', 'fullName'],
         });
 
+
+    const landlord = await landlordModel.findOne({
+      where: { id: landlordId },
+      attributes: ['id', 'fullName'],
+    });      
+
         if (!landlord) {
             return res.status(404).json({ message: 'Landlord not found.' });
         }
+
 
         if (!req.files || req.files.length === 0) {
             return res.status(400).json({ message: 'At least one listing image is required.' });
@@ -91,6 +98,40 @@ exports.createListing = async (req, res) => {
             status: 'pending',
         });
 
+
+    const newListing = await listingModel.create({
+      title,
+      type,
+      bedrooms,
+      bathrooms,
+      price,
+      toilets,
+      state,
+      area,
+      description,
+      minrent,
+      maxrent,
+      street,
+      year,
+      listingImage: uploadedImages, // Sequelize JSON field
+      landlordId,
+      isAvailable: false,
+      isClicked: 0,
+      status: 'pending',
+    });
+
+    res.status(201).json({
+      message: 'Listing created successfully',
+      data: newListing,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: 'Error creating listing',
+      error: error.message,
+    });
+  }
+
         res.status(201).json({
             message: 'Listing created successfully',
             data: newListing,
@@ -112,6 +153,7 @@ exports.createListing = async (req, res) => {
             error: error.message,
         });
     }
+
 };
 
 
@@ -138,7 +180,7 @@ exports.getAllListings = async (req, res) => {
         res.status(200).json({message: 'find all Listing below', total: listings.length, data: listings})
 
     } catch (error) {
-        console.error(error.message)
+        
         res.status(500).json({ message: 'Error fetching listings',   error:error.message})
     }
 }
