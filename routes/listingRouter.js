@@ -185,7 +185,7 @@ router.get('/getAllListings', getAllListings);
 
 /**
  * @swagger
- * /api/v1/getOneListingByLandlord/{listingId}:
+ * /api/v1/getOneListingByLandlord/{landlordId}/{listingId}:
  *   get:
  *     summary: Get a specific listing owned by a landlord
  *     description: Retrieves a single listing based on the landlord's ID and the listing's ID. Requires landlord authentication.
@@ -216,7 +216,7 @@ router.get('/getAllListings', getAllListings);
  *       500:
  *         description: error while fetching listing by landlord
  */
-router.get('/getOneListingByLandlord/:listingId', landlordAuthenticate, getOneListingByLandlord);
+router.get('/getOneListingByLandlord/:landlordId/:listingId', landlordAuthenticate, getOneListingByLandlord);
 
 /**
  * @swagger
@@ -249,7 +249,7 @@ router.get('/getOneListing/:listingId', getOneListing);
 
 /**
  * @swagger
- * /api/v1/getAllListingsByLandlord:
+ * /api/v1/getAllListingsByLandlord/{landlordId}:
  *   get:
  *     summary: Get all listings by a specific landlord
  *     description: Fetch all available and verified listings created by the landlord specified by `landlordId`. Requires authentication.
@@ -273,13 +273,13 @@ router.get('/getOneListing/:listingId', getOneListing);
  *       500:
  *         description: error while fetching listing by landlord
  */
-router.get('/getAllListingsByLandlord', landlordAuthenticate, getAllListingsByLandlord);
+router.get('/getAllListingsByLandlord/:landlordId', landlordAuthenticate, getAllListingsByLandlord);
 
 
 
 /**
  * @swagger
- * /api/v1/updateListing/{listingId}:
+ * /api/v1/updateListing/{landlordId}/{listingId}:
  *   put:
  *     summary: Update a listing by landlord
  *     description: Allows a landlord to update the details of a specific listing. Requires landlord authentication.
@@ -382,13 +382,13 @@ router.get('/getAllListingsByLandlord', landlordAuthenticate, getAllListingsByLa
  *       500:
  *         description: error while updating listing
  */
-router.put('/updateListing/:listingId', landlordAuthenticate, upload.array('listingImage', 8), updateListing);
+router.put('/updateListing/:landlordId/:listingId', landlordAuthenticate, upload.array('listingImage', 8), updateListing);
 
 
 
 /**
  * @swagger
- * /api/v1/deleteListing/{listingId}:
+ * /api/v1/deleteListing/{landlordId}/{listingId}:
  *   delete:
  *     summary: Delete a listing by listing ID
  *     description: Allows a landlord to delete the details of a specific listing. Requires landlord authentication.
@@ -419,7 +419,7 @@ router.put('/updateListing/:listingId', landlordAuthenticate, upload.array('list
  *       500:
  *         description: error while deleting listing
  */
-router.delete('/deleteListing/:listingId', landlordAuthenticate, deleteListing);
+router.delete('/deleteListing/:landlordId/:listingId', landlordAuthenticate, deleteListing);
 
 
 
@@ -550,7 +550,7 @@ router.get('/searchListing', searchListing);
 
 /**
  * @swagger
- * /api/v1/getClicksbyListing/{listingId}:
+ * /api/v1/getClicksbyListing/{landlordId}/{listingId}:
  *   get:
  *     summary: Get the number of clicks/views for a specific listing
  *     description: Retrieve the number of times a specific listing has been viewed (clicked). Requires landlord authentication.
@@ -581,6 +581,6 @@ router.get('/searchListing', searchListing);
  *       500:
  *         description: error while fetching clicks for the listing.
  */
-router.get('/getClicksbyListing/:listingId', landlordAuthenticate, getClicksbyListing);
+router.get('/getClicksbyListing/:landlordId/:listingId', landlordAuthenticate, getClicksbyListing);
 
 module.exports = router;
