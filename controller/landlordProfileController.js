@@ -22,7 +22,7 @@ exports.createLandlordProfile = async (req, res) => {
 
 
       // Check if a profile already exists for the landlord
-      const existingProfile = await landlordProfileModel.findOne({ where: { landlordId } });
+      const existingProfile = await landlordProfileModel.findOne({ where: { id: landlordId  } });
       if (existingProfile) {
           return res.status(400).json({ message: 'A profile already exists for this landlord' });
       }
@@ -84,7 +84,7 @@ exports.getOneLandlordProfile = async (req, res) => {
     try {
         const { landlordId } = req.params
 
-        const landlordProfile = await landlordProfileModel.findOne({ where: { landlordId } });
+        const landlordProfile = await landlordProfileModel.findOne({ where: { id: landlordId  } });
        console.log(landlordProfile)
        
         if (!landlordProfile) {
@@ -111,7 +111,7 @@ exports.updateLandlordProfile = async (req, res) => {
       const { fullName, email, state, street, locality } = req.body;
 
       // Find the existing landlord profile
-      const existingLandlord = await landlordProfileModel.findOne({ where: { landlordId } });
+      const existingLandlord = await landlordProfileModel.findOne({ where: { id: landlordId  } });
 
       if (!existingLandlord) {
           return res.status(404).json({ message: 'Landlord profile not found' });
@@ -155,7 +155,7 @@ exports.updateLandlordProfile = async (req, res) => {
       existingLandlord.isVerified = true;
 
       // Fetch the updated profile
-      const updatedLandlord = await landlordProfileModel.findOne({ where: { landlordId } });
+      const updatedLandlord = await landlordProfileModel.findOne({ where: { id: landlordId  } });
 
       res.status(200).json({ message: 'Landlord profile updated successfully', data: updatedLandlord });
   } catch (error) {
@@ -175,7 +175,7 @@ exports.deleteLandlordProfile = async (req, res) => {
     try {
         const { landlordId } = req.params;
 
-        const landlordProfile = await landlordProfileModel.findOne({ where: { landlordId } });
+        const landlordProfile = await landlordProfileModel.findOne({ where: { id: landlordId  } });
 
         if (!landlordProfile) {
             return res.status(404).json({ message: 'Landlord profile not found' });
