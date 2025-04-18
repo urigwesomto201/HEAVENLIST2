@@ -237,7 +237,7 @@ exports.TenantForgotPassword = async (req, res) => {
         const secret = `${process.env.OTP_SECRET}${email.toLowerCase()}`;
         const otp = totp.generate(secret);
 
-        const resetLink = `https://haven-list.vercel.app/api/v1/verify/tenant/${otp}`;
+        const resetLink = `https://haven-list.vercel.app/api/v1/verify/tenant`;
 
         const firstName = tenant.fullName.split(' ')[0];
         const html = forgotTemplate(firstName, otp, resetLink);

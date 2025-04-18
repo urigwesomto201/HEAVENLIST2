@@ -283,7 +283,7 @@ exports.landlordForgotPassword = async (req, res) => {
         const otp = totp.generate(secret);
 
       
-        const resetLink = `https://haven-list.vercel.app/api/v1/verify/landlord/${otp}`;
+        const resetLink = `https://haven-list.vercel.app/api/v1/verify/landlord`;
 
         const firstName = landlord.fullName.split(' ')[0];
         const html = forgotTemplate(firstName, otp, resetLink);
