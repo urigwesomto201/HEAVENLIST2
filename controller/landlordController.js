@@ -304,6 +304,8 @@ exports.landlordForgotPassword = async (req, res) => {
     }
 }
 
+
+
 exports.verifyLandlordOtp = async (req, res) => {
     try {
         const { otp } = req.body;
@@ -316,8 +318,8 @@ exports.verifyLandlordOtp = async (req, res) => {
         let landlord = null;
 
         for (const l of landlords) {
-            const secret =` ${process.env.OTP_SECRET}${l.email.toLowerCase()}`;
-            if (totp.check(otp, secret)) {
+            const secret = `${process.env.OTP_SECRET}${l.email.toLowerCase()}`;
+            if (totp.check(otp, secret, { window: 10 })) { // Allow 5-minute window
                 landlord = l;
                 break;
             }
@@ -329,14 +331,13 @@ exports.verifyLandlordOtp = async (req, res) => {
 
         return res.status(200).json({
             message: 'OTP verified successfully',
-            landlordId: landlord.id,
             landlordEmail: landlord.email
         });
 
     } catch (error) {
-        console.error(error.message);
+        console.error('Error verifying OTP:', error);
         return res.status(500).json({
-            message: 'An error occurred while verifying OTP',
+            message: 'Error verifying OTP',
             error: error.message
         });
     }
