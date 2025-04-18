@@ -83,10 +83,25 @@ Listing.init(
       type: DataTypes.ENUM('pending', 'accepted', 'rejected'),
       defaultValue: 'pending',
     },
+    // listingImage: {
+    //   // type: DataTypes.JSON, // JSON can store arrays of objects
+    //   type: DataTypes.TEXT('long'), // JSON can store arrays of objects
+    //   allowNull: false
+    // },
     listingImage: {
-      // type: DataTypes.JSON, // JSON can store arrays of objects
-      type: DataTypes.TEXT('long'), // JSON can store arrays of objects
-      allowNull: false
+      type: DataTypes.TEXT,
+      allowNull: false, // No default value, can be null
+      get() {
+        const raw = this.getDataValue('listingImage');
+        try {
+          return raw ? JSON.parse(raw) : [];
+        } catch (e) {
+          return []; // fallback if somehow stored invalid JSON
+        }
+      },
+      set(value) {
+        this.setDataValue('listingImage', JSON.stringify(value));
+    },
     },
     landlordId: {
       type: DataTypes.UUID,
