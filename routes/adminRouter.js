@@ -680,7 +680,7 @@ router.get('/getOneLandlordProfile/:landlordProfileId',adminAuthenticate, getOne
  *       500:
  *         description: "error retrieving landlords profiles"
 */
-router.get('/alllandlordProfiles', adminAuthenticate, alllandlordProfiles);
+router.get('/getAllLandlordProfiles', adminAuthenticate, alllandlordProfiles);
 
 
 
