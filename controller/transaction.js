@@ -34,7 +34,7 @@ exports.initialPayment = async (req, res) => {
       customer: { name, email },
       currency: 'NGN',
       reference: ref,
-      redirect_url:"https://haven-list.vercel.app"
+      redirect_url:"https://haven-list.vercel.app/api/v1/payment/status"
     };
 
 
