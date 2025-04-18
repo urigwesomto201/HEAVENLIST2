@@ -254,8 +254,6 @@ exports.getAllListingsByLandlord = async (req, res) => {
 
 
 
-
-
 exports.updateListing = async (req, res) => {
     try {
         const { landlordId } = req.landlord;
@@ -277,58 +275,71 @@ exports.updateListing = async (req, res) => {
         }
 
         // Find the listing
-        const listing = await listingModel.findOne({ where: { id: listingId, landlordId } });
+        const listing = await listingModel.findOne({ where: { id: listingId } });
 
         if (!listing) {
             return res.status(404).json({ message: 'Listing not found' });
         }
 
         // Parse existing images
-        let updatedImages = listing.listingImage ? JSON.parse(listing.listingImage) : [];
+        let updatedImages = [];
+        if (listing.listingImage) {
+            try {
+                updatedImages = JSON.parse(listing.listingImage);
+                if (!Array.isArray(updatedImages)) {
+                    updatedImages = [];
+                }
+            } catch (parseError) {
+                console.error('Error parsing listingImage:', parseError.message);
+                updatedImages = []; // Fallback to an empty array
+            }
+        }
 
         // Handle new images
         if (req.files && req.files.length > 0) {
-            // Delete old images from Cloudinary
-            for (const image of updatedImages) {
-                if (image.publicId) {
-                    await cloudinary.uploader.destroy(image.publicId);
+            try {
+                // Delete old images from Cloudinary
+                for (const image of updatedImages) {
+                    if (image.publicId) {
+                        await cloudinary.uploader.destroy(image.publicId);
+                    }
                 }
-            }
 
-            // Upload new images to Cloudinary
-            updatedImages = [];
-            for (const file of req.files) {
-                const result = await cloudinary.uploader.upload(file.path);
-                updatedImages.push({
-                    imageUrl: result.secure_url,
-                    publicId: result.public_id,
-                });
+                // Upload new images to Cloudinary
+                updatedImages = [];
+                for (const file of req.files) {
+                    const result = await cloudinary.uploader.upload(file.path);
+                    updatedImages.push({
+                        imageUrl: result.secure_url,
+                        publicId: result.public_id,
+                    });
 
-                // Delete the file from the server after upload
-                fs.unlinkSync(file.path);
+                    // Delete the file from the server after upload
+                    safelyDeleteFile(file.path);
+                }
+            } catch (uploadError) {
+                console.error('Error uploading images to Cloudinary:', uploadError.message);
+                return res.status(500).json({ message: 'Error uploading images to Cloudinary', error: uploadError.message });
             }
         }
 
         // Update the listing
-        await listingModel.update(
-            {
-                title,
-                type,
-                bedrooms,
-                bathrooms,
-                price,
-                toilets,
-                state,
-                area,
-                description,
-                minrent,
-                maxrent,
-                street,
-                year,
-                listingImage: JSON.stringify(updatedImages),
-            },
-            { where: { id: listingId } }
-        );
+        await listing.update({
+            title,
+            type,
+            bedrooms,
+            bathrooms,
+            price,
+            toilets,
+            state,
+            area,
+            description,
+            minrent,
+            maxrent,
+            street,
+            year,
+            listingImage: JSON.stringify(updatedImages),
+        });
 
         // Fetch the updated listing
         const updatedListing = await listingModel.findOne({
@@ -344,11 +355,29 @@ exports.updateListing = async (req, res) => {
 
         res.status(200).json({ message: 'Listing updated successfully', data: updatedListing });
     } catch (error) {
-        console.error(error.message);
+        console.error('Error updating listing:', error.message);
+
+        // Delete uploaded files from the server in case of an error
+        if (req.files) {
+            for (const file of req.files) {
+                safelyDeleteFile(file.path);
+            }
+        }
+
         res.status(500).json({ message: 'Error updating listing', error: error.message });
     }
 };
 
+// Helper function to safely delete a file
+const safelyDeleteFile = (filePath) => {
+    if (fs.existsSync(filePath)) {
+        try {
+            fs.unlinkSync(filePath);
+        } catch (err) {
+            console.error('Error deleting file:', err.message);
+        }
+    }
+};
 
 
 exports.deleteListing = async (req, res) => {
