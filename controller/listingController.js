@@ -213,7 +213,7 @@ exports.getAllListingsByLandlord = async (req, res) => {
         const {landlordId} = req.params
 
         const listings = await listingModel.findAll({
-            where: {  id: landlordId},
+            where: { landlordId},
             include: [
                 {
                 model: landlordModel,
