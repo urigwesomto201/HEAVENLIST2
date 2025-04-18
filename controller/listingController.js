@@ -81,7 +81,7 @@ exports.createListing = async (req, res) => {
             maxrent,
             street,
             year,
-            listingImage: JSON.stringify(uploadedImages), // Save as JSON string
+            listingImage: uploadedImages, // Save as JSON string
             landlordId,
             isAvailable: false,
             isClicked: 0,

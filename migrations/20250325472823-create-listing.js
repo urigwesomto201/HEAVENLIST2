@@ -70,7 +70,7 @@ module.exports = {
         defaultValue: 'pending',
       },
       listingImage: {
-        type: Sequelize.TEXT('long'), // JSON to store an array of objects
+        type: Sequelize.TEXT, // JSON to store an array of objects
         allowNull: false,
       },
       landlordId: {
