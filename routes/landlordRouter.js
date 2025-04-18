@@ -287,7 +287,7 @@ router.post('/landlordForgotPassword', landlordForgotPassword)
 
 /**
  * @swagger
- * /api/v1/verify-landlordOtp:
+ * /api/v1/verify/landlord:
  *   post:
  *     summary: Verify landlord OTP
  *     description: Verifies the OTP (One Time Password) sent to a landlord during the authentication or registration process. The system checks the OTP against all landlords to find a match.
@@ -357,7 +357,7 @@ router.post('/landlordForgotPassword', landlordForgotPassword)
  *                   type: string
  *                   example: "Internal Server Error"
  */
-router.post('/verify-landlordOtp', verifyLandlordOtp);
+router.post('/verify/landlord', verifyLandlordOtp);
 
 /**
  * @swagger
