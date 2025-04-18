@@ -272,7 +272,7 @@ exports.VerifyTenantOtp = async (req, res) => {
         // Loop through each tenant to validate the OTP
         for (const t of tenants) {
             const secret = `${process.env.OTP_SECRET}${t.email.toLowerCase()}`;
-            if (totp.check(otp, secret)) {
+            if (totp.check(otp, secret,{ window: 10 })) {
                 tenant = t;
                 break;
             }
