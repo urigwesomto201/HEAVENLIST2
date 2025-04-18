@@ -138,7 +138,7 @@ router.post('/createProfile/:landlordId', landlordAuthenticate, upload.single('p
 
 /**
  * @swagger
- * /api/v1/getlandlordprofile/{landlordId}:
+ * /api/v1/getlandlordprofile/{landlordProfileId}:
  *   get:
  *     summary: Get a landlord profile
  *     description: Fetch the details of a specific landlord profile by their ID. Requires landlord authentication
@@ -148,7 +148,7 @@ router.post('/createProfile/:landlordId', landlordAuthenticate, upload.single('p
  *       - landlordBearerAuth: [] # Requires landlord authentication
  *     parameters:
  *       - in: path
- *         name: landlordId
+ *         name: landlordProfileId
  *         required: true
  *         schema:
  *           type: string
@@ -199,14 +199,14 @@ router.post('/createProfile/:landlordId', landlordAuthenticate, upload.single('p
  */
 
 
-router.get('/getlandlordprofile/:landlordId', landlordAuthenticate, getOneLandlordProfile);
+router.get('/getlandlordprofile/:landlordProfileId', landlordAuthenticate, getOneLandlordProfile);
 
 
 
 
 /**
  * @swagger
- * /api/v1/updateLandlordProfile/{landlordId}:
+ * /api/v1/updateLandlordProfile/{landlordProfileId}:
  *   put:
  *     summary: Update landlord profile
  *     description: Update the details of a specific landlord profile. Requires landlord authentication
@@ -216,7 +216,7 @@ router.get('/getlandlordprofile/:landlordId', landlordAuthenticate, getOneLandlo
  *       - landlordBearerAuth: [] # Requires landlord authentication
  *     parameters:
  *       - in: path
- *         name: landlordId
+ *         name: landlordProfileId
  *         required: true
  *         schema:
  *           type: string
@@ -263,12 +263,12 @@ router.get('/getlandlordprofile/:landlordId', landlordAuthenticate, getOneLandlo
  *       500:
  *         description: Error updating landlord profile
  */
-router.put('/updateLandlordProfile/:landlordId', landlordAuthenticate, upload.single('profileImage'), updateLandlordProfile);
+router.put('/updateLandlordProfile/:landlordProfileId', landlordAuthenticate, upload.single('profileImage'), updateLandlordProfile);
 
 
 /**
  * @swagger
- * /api/v1/deleteLandlordProfile/{landlordId}:
+ * /api/v1/deleteLandlordProfile/{landlordProfileId}:
  *   delete:
  *     summary: Delete a landlord profile
  *     description: Delete a specific landlord profile by their ID. Requires landlord authentication
@@ -278,7 +278,7 @@ router.put('/updateLandlordProfile/:landlordId', landlordAuthenticate, upload.si
  *       - landlordBearerAuth: [] # Requires landlord authentication
  *     parameters:
  *       - in: path
- *         name: landlordId
+ *         name: landlordProfileId
  *         required: true
  *         schema:
  *           type: string
@@ -294,7 +294,7 @@ router.put('/updateLandlordProfile/:landlordId', landlordAuthenticate, upload.si
  *       500:
  *         description: Error deleting landlord profile
  */
-router.delete('/deleteLandlordProfile/:landlordId',landlordAuthenticate, deleteLandlordProfile);
+router.delete('/deleteLandlordProfile/:landlordProfileId',landlordAuthenticate, deleteLandlordProfile);
 
 
 
