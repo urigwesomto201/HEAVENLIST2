@@ -33,12 +33,7 @@ exports.createListing = async (req, res) => {
             where: { id: landlordId },
             attributes: ['id', 'fullName'],
         });
-
-
-    const landlord = await landlordModel.findOne({
-      where: { id: landlordId },
-      attributes: ['id', 'fullName'],
-    });      
+    
 
         if (!landlord) {
             return res.status(404).json({ message: 'Landlord not found.' });
@@ -98,27 +93,7 @@ exports.createListing = async (req, res) => {
             status: 'pending',
         });
 
-
-    const newListing = await listingModel.create({
-      title,
-      type,
-      bedrooms,
-      bathrooms,
-      price,
-      toilets,
-      state,
-      area,
-      description,
-      minrent,
-      maxrent,
-      street,
-      year,
-      listingImage: uploadedImages, // Sequelize JSON field
-      landlordId,
-      isAvailable: false,
-      isClicked: 0,
-      status: 'pending',
-    });
+ 
 
     res.status(201).json({
       message: 'Listing created successfully',
@@ -131,30 +106,8 @@ exports.createListing = async (req, res) => {
       error: error.message,
     });
   }
+}
 
-        res.status(201).json({
-            message: 'Listing created successfully',
-            data: newListing,
-        });
-    } catch (error) {
-        console.error('Error creating listing:', error.message);
-
-        // Delete uploaded files from the server in case of an error
-        if (req.files) {
-            for (const file of req.files) {
-                if (fs.existsSync(file.path)) {
-                    fs.unlinkSync(file.path);
-                }
-            }
-        }
-
-        res.status(500).json({
-            message: 'Error creating listing',
-            error: error.message,
-        });
-    }
-
-};
 
 
 
@@ -199,7 +152,7 @@ exports.getOneListingByLandlord= async (req, res) => {
         }
 
         const listing = await listingModel.findOne({
-            where: { id: listingId}, landlordId,
+            where: { id: listingId},
             include: [
                 {
                     model: landlordModel,
@@ -266,12 +219,8 @@ exports.getAllListingsByLandlord = async (req, res) => {
     try {
         const {landlordId} = req.landlord
 
-        if (!landlordId) {
-            return res.status(400).json({ message: 'Landlord ID is required' });
-        }
-
         const listings = await listingModel.findAll({
-            where: {landlordId },
+            where: { },
             include: [
                 {
                 model: landlordModel,
@@ -340,13 +289,6 @@ exports.updateListing = async (req, res) => {
         // Handle new images
         if (req.files && req.files.length > 0) {
             try {
-                // Delete old images from Cloudinary
-                for (const image of updatedImages) {
-                    if (image.publicId) {
-                        await cloudinary.uploader.destroy(image.publicId);
-                    }
-                }
-
                 // Upload new images to Cloudinary
                 updatedImages = [];
                 for (const file of req.files) {
@@ -355,9 +297,6 @@ exports.updateListing = async (req, res) => {
                         imageUrl: result.secure_url,
                         publicId: result.public_id,
                     });
-
-                    // Delete the file from the server after upload
-                    safelyDeleteFile(file.path);
                 }
             } catch (uploadError) {
                 console.error('Error uploading images to Cloudinary:', uploadError.message);
@@ -399,74 +338,63 @@ exports.updateListing = async (req, res) => {
     } catch (error) {
         console.error('Error updating listing:', error.message);
 
-        // Delete uploaded files from the server in case of an error
-        if (req.files) {
-            for (const file of req.files) {
-                safelyDeleteFile(file.path);
-            }
-        }
-
         res.status(500).json({ message: 'Error updating listing', error: error.message });
     }
 };
 
-// Helper function to safely delete a file
-const safelyDeleteFile = (filePath) => {
-    if (fs.existsSync(filePath)) {
-        try {
-            fs.unlinkSync(filePath);
-        } catch (err) {
-            console.error('Error deleting file:', err.message);
-        }
-    }
-};
+
+
 
 
 exports.deleteListing = async (req, res) => {
     try {
-        const {landlordId} = req.landlord
-        const { listingId } = req.params
+        const { landlordId } = req.landlord;
+        const { listingId } = req.params;
 
-        if(!listingId) {
-            return res.status(400).json({message: 'listingId is required'})
+        if (!listingId) {
+            return res.status(400).json({ message: 'Listing ID is required' });
         }
 
-
-        const listing = await listingModel.findOne({ where: { id : listingId, landlordId },
+        // Find the listing
+        const listing = await listingModel.findOne({
+            where: { id: listingId},
             include: [
                 {
-                model: landlordModel,
-                attributes: ['id', 'fullName'], 
-                 as: 'landlord', 
+                    model: landlordModel,
+                    attributes: ['id', 'fullName'],
+                    as: 'landlord',
                 },
             ],
         });
-    
-         
-    
+
         if (!listing) {
             return res.status(404).json({ message: 'Listing not found or does not belong to the specified landlord' });
         }
-        
 
-        if (listing.listingImage && listing.listingImage.publicId) {
-            await cloudinary.uploader.destroy(listing.listingImage.publicId);
+        // Parse and delete images from Cloudinary
+        if (listing.listingImage) {
+            try {
+                const images = JSON.parse(listing.listingImage);
+                for (const image of images) {
+                    if (image.publicId) {
+                        await cloudinary.uploader.destroy(image.publicId);
+                    }
+                }
+            } catch (parseError) {
+                console.error('Error parsing listingImage:', parseError.message);
+                return res.status(500).json({ message: 'Error parsing listing images', error: parseError.message });
+            }
         }
 
-        
+        // Delete the listing
         await listingModel.destroy({ where: { id: listingId } });
 
         res.status(200).json({ message: 'Listing deleted successfully', data: listing });
-
-
     } catch (error) {
-        console.error(error.message);
-        res.status(500).json({ message: 'Error deleting listings',   error:error.message});
+        console.error('Error deleting listing:', error.message);
+        res.status(500).json({ message: 'Error deleting listing', error: error.message });
     }
-}
-
-
-
+};
 
 
 exports.searchListing = async (req, res) => {
@@ -525,7 +453,7 @@ exports.getClicksbyListing = async (req, res) => {
             return res.status(400).json({message: 'listingId is required'})
         }
 
-        const listing = await listingModel.findOne({ where: { id : listingId, landlordId, isAvailable:true, status: 'accepted' },
+        const listing = await listingModel.findOne({ where: { id : listingId, isAvailable:true, status: 'accepted' },
             attributes: ['id', 'title', 'price', 'description', 'area', 'isClicked']
         });
 
