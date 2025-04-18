@@ -571,7 +571,7 @@ exports.deleteLandlordProfile = async (req, res) => {
             return res.status(404).json({ message: 'Landlord profile not found' });
         }
 
-        await LandlordProfile.destroy({ where: { id: landlordProfileId, id: listingId } });
+        await landlordProfileModel.destroy({ where: { id: landlordProfileId, id: listingId } });
 
         res.status(200).json({ message: 'Landlord profile deleted successfully' });
     } catch (error) {
