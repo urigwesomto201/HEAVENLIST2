@@ -294,7 +294,7 @@ router.post('/TenantForgotPassword', TenantForgotPassword)
 
 /**
  * @swagger
- * /api/v1/verify-tenantOtp:
+ * /api/v1/verify/tenant:
  *   post:
  *     summary: Verify tenant OTP
  *     description: This endpoint allows you to verify the OTP (One Time Password) sent to the tenant. The OTP should be passed in the request body.
@@ -361,7 +361,7 @@ router.post('/TenantForgotPassword', TenantForgotPassword)
  *                   type: string
  *                   example: "Internal Server Error"
  */
-router.post('/verify-tenantOtp', VerifyTenantOtp)
+router.post('/verify/tenant', VerifyTenantOtp)
 
 /**
  * @swagger
