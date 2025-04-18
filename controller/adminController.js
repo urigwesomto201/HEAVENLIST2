@@ -11,8 +11,9 @@ const { Op } = require('sequelize')
 const { totp } = require('otplib');
 const { signUpTemplate ,forgotTemplate, adminTemplate } = require('../utils/mailTemplates')
 const {validate} = require('../helper/utilities')
-const {registerSchema, loginSchema, verificationEmailSchema, forgotPasswordSchema, resetPasswordschema, changePassword} = require('../validation/user')
-totp.options = { digits: 4, step: 300}
+const {registerSchema, loginSchema, verificationEmailSchema, forgotPasswordSchema, resetPasswordschema,
+    verifyPasswordSchema, changePassword} = require('../validation/user')
+totp.options = { digits: 4, step: 900}
 
 
 exports.registerAdmin = async (req, res) => {
@@ -237,9 +238,18 @@ exports.adminForgotPassword = async (req, res) => {
     }
 }
 
+
 exports.verifyAdminOtp = async (req, res) => {
     try {
-        const { otp } = req.body;
+        let validated;
+        try {
+            validated = await validate(req.body, verifyPasswordSchema);
+        } catch (validationError) {
+            return res.status(400).json({ error: validationError.message });
+        }
+
+
+        const { otp } = validated
 
         if (!otp) {
             return res.status(400).json({ message: 'OTP is required' });

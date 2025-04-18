@@ -168,7 +168,7 @@ exports.forgotTemplate = (firstName, otp, link)=>{
             <div class="content">
                 <p>Hello ${firstName},</p>
                 <p>You performed an action in adhere to forgetting your password.</p>
-                <p>Your OTP for resetting your password is <strong>${otp}</strong>. It is valid for 5 minutes.</p>
+                <p>Your OTP for resetting your password is <strong>${otp}</strong>. It is valid for 15 minutes.</p>
                 <div class="button-container">
                 <a href="${link}" class="button">verify OTP</a>
                 </div>

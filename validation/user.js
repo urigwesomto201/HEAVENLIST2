@@ -73,6 +73,17 @@ exports.forgotPasswordSchema = Joi.object().keys({
 })
 
 
+exports.verifyPasswordSchema = Joi.object().keys({
+    otp: Joi.string().length(4).required().messages({
+        'any.required': 'OTP is required',
+        'string.length': 'OTP must be exactly 4 characters',
+    }),
+
+})
+
+
+
+
 
 exports.resetPasswordschema = Joi.object().keys({
     // email: Joi.string().trim().email().required().messages({
