@@ -5,7 +5,7 @@ const {initialPayment,verifyPayment}= require('../controller/transaction')
 
 /**
  * @swagger
- * /api/v1/initialize/{tenantid}/{landlordid}/{listingId}:
+ * /api/v1/initialize/{tenantId}/{landlordId}/{listingId}:
  *   post:
  *     tags:
  *       - Transactions
@@ -13,14 +13,14 @@ const {initialPayment,verifyPayment}= require('../controller/transaction')
  *     description: This endpoint initializes a payment process by generating a transaction reference and saving the transaction details.
  *     parameters:
  *       - in: path
- *         name: tenantid
+ *         name: tenantId
  *         required: true
  *         schema:
  *           type: string
  *         description: The ID of the tenant initiating the payment.
  *         example: "123e4567-e89b-12d3-a456-426614174000"
  *       - in: path
- *         name: landlordid
+ *         name: landlordId
  *         required: true
  *         schema:
  *           type: string
@@ -96,6 +96,7 @@ const {initialPayment,verifyPayment}= require('../controller/transaction')
  *                   example: Error initializing payment
  */
 transactionrouter.post("/initialize/:tenantId/:landlordId/:listingId", initialPayment)
+
 
 /**
  * @swagger
