@@ -28,6 +28,10 @@ exports.initialPayment = async (req, res) => {
       return res.status(400).json({ message: 'PLEASE INPUT ALL FIELDS' });
     }
 
+    if (isNaN(amount) || parseFloat(amount) <= 0) {
+      return res.status(400).json({ message: 'Invalid payment amount. Amount must be greater than zero.' });
+    }
+
     // Fetch the listing details
     const listing = await listingModel.findOne({
       where: { id: listingId },
@@ -47,7 +51,15 @@ exports.initialPayment = async (req, res) => {
       return res.status(400).json({ message: 'This property is no longer available for payment.' });
     }
 
-    
+    const existingTransaction = await transactionModel.findOne({ where: { reference: ref } });
+    if (existingTransaction) {
+      return res.status(409).json({ message: 'Duplicate reference detected' });
+    }
+
+    if (!listing.partPayment || !listing.partPayment.endsWith('%')) {
+      return res.status(400).json({ message: 'Invalid part-payment configuration for this listing.' });
+    }
+
 
     // Calculate the expected part-payment amount
     const partPaymentPercentage = parseFloat(listing.partPayment.replace('%', '')) / 100; // Remove '%' and convert to decimal
@@ -83,6 +95,8 @@ exports.initialPayment = async (req, res) => {
       reference: ref,
       redirect_url: "https://haven-list.vercel.app/api/v1/payment/status",
     };
+
+    console.log('Payment Data:', paymentData);
 
     const response = await axios.post(
       'https://api.korapay.com/merchant/api/v1/charges/initialize',
@@ -122,14 +136,13 @@ exports.initialPayment = async (req, res) => {
       },
     });
   } catch (error) {
-    if (error.response?.status === 409) {
-      return res.status(409).json({ message: 'Transaction already exists or duplicate reference' });
-    }
-
-    res.status(500).json({ message: 'Error initializing payment', error: error.message });
+    console.error('Korapay API Error:', error.response?.data || error.message);
+    return res.status(500).json({
+      message: 'Error initializing payment',
+      error: error.response?.data?.message || error.message,
+    });
   }
-};
-
+}
 
 exports.verifyPayment = async (req, res) => {
   try {
