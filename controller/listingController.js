@@ -15,18 +15,28 @@ exports.createListing = async (req, res) => {
         const { landlordId } = req.params;
         const {
             title, type, bedrooms, bathrooms, price, toilets,
-            state, area, description, minrent, maxrent, street, year
+            state, area, description, minrent, maxrent, street, year, partPayment
         } = req.body;
 
         // Validate required fields
         if (!title || !type || !bedrooms || !bathrooms || !price || !toilets ||
-            !state || !area || !description || !minrent || !maxrent || !street || !year) {
-            return res.status(400).json({ message: 'Please provide all required fields' });
+            !state || !area || !description || !street || !year || !partPayment) {
+            return res.status(400).json({ message: 'Please provide all required fields'});
         }
 
         if (!landlordId) {
             return res.status(400).json({ message: 'Landlord ID is required.' });
         }
+
+        // Validate partPayment
+        const allowedPartPayments = ['10%', '20%', '30%'];
+        if (!allowedPartPayments.includes(partPayment)) {
+            return res.status(400).json({ message: `Invalid partPayment value. Allowed values are: ${allowedPartPayments.join(', ')}` });
+        }
+
+        // Calculate part-payment amount
+        const partPaymentPercentage = parseFloat(partPayment) / 100; // Convert '10%' to 0.1
+        const partPaymentAmount = price * partPaymentPercentage;
 
         // Check if landlord exists
         const landlord = await landlordModel.findOne({
@@ -81,7 +91,9 @@ exports.createListing = async (req, res) => {
             maxrent,
             street,
             year,
-            listingImage: uploadedImages, // Save as JSON string
+            partPayment,
+            partPaymentAmount, // Save the calculated part-payment amount
+            listingImage: JSON.stringify(uploadedImages), // Save as JSON string
             landlordId,
             isAvailable: false,
             isClicked: 0,
@@ -241,25 +253,34 @@ exports.getAllListingsByLandlord = async (req, res) => {
 exports.updateListing = async (req, res) => {
     try {
         const { landlordId, listingId } = req.params;
-        
 
         const {
             title, type, bedrooms, bathrooms, price, toilets,
-            state, area, description, minrent, maxrent, street, year,
+            state, area, description, minrent, maxrent, street, year, partPayment
         } = req.body;
 
         // Validate required fields
         if (!title || !type || !bedrooms || !bathrooms || !price || !toilets ||
-            !state || !area || !description || !minrent || !maxrent || !street || !year) {
-            return res.status(400).json({ message: 'Please input all fields' });
+            !state || !area || !description || !minrent || !maxrent || !street || !year || !partPayment) {
+            return res.status(400).json({ message: 'Please provide all required fields, including partPayment' });
         }
 
         if (!listingId) {
             return res.status(400).json({ message: 'Listing ID is required' });
         }
 
+        // Validate partPayment
+        const allowedPartPayments = ['10%', '20%', '30%'];
+        if (!allowedPartPayments.includes(partPayment)) {
+            return res.status(400).json({ message: `Invalid partPayment value. Allowed values are: ${allowedPartPayments.join(', ')}` });
+        }
+
+        // Calculate part-payment amount
+        const partPaymentPercentage = parseFloat(partPayment) / 100; // Convert '10%' to 0.1
+        const partPaymentAmount = price * partPaymentPercentage;
+
         // Find the listing
-        const listing = await listingModel.findOne({ where: { id: listingId ,  landlordId} });
+        const listing = await listingModel.findOne({ where: { id: listingId, landlordId } });
 
         if (!listing) {
             return res.status(404).json({ message: 'Listing not found' });
@@ -312,6 +333,8 @@ exports.updateListing = async (req, res) => {
             maxrent,
             street,
             year,
+            partPayment,
+            partPaymentAmount, // Save the calculated part-payment amount
             listingImage: JSON.stringify(updatedImages),
         });
 
@@ -334,7 +357,6 @@ exports.updateListing = async (req, res) => {
         res.status(500).json({ message: 'Error updating listing', error: error.message });
     }
 };
-
 
 
 

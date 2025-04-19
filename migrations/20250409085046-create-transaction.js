@@ -10,20 +10,28 @@ module.exports = {
       },
       email: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       name: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       amount: {
         type: Sequelize.FLOAT,
-        allowNull: false,
+        allowNull: true,
       },
       reference: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
         unique: true,
+      },
+      partPaymentAmount: {
+        type: Sequelize.FLOAT,
+        allowNull: true,
+      },
+      balance: {
+        type: Sequelize.FLOAT,
+        allowNull: true,
       },
       status: {
         type: Sequelize.ENUM('pending', 'success', 'failed'),

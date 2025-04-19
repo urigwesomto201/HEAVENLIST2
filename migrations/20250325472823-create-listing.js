@@ -13,7 +13,7 @@ module.exports = {
         allowNull: false,
       },
       type: {
-        type: Sequelize.ENUM('Bungalow','Flat','Duplex'),
+        type: Sequelize.ENUM('Bungalow','Flat','Duplex','Mini-flat'),
       },
       bedrooms: {
         type: Sequelize.ENUM('1', '2', '3', '4', '5+'),
@@ -23,12 +23,6 @@ module.exports = {
       },
       toilets: {
         type: Sequelize.ENUM('1', '2', '3', '4', '5+'),
-      },
-      minrent: {
-        type: Sequelize.ENUM('500000', '600000', '700000', '800000', '900000', '1000000'),
-      },
-      maxrent: {
-        type: Sequelize.ENUM('1000000', '2000000', '3000000', '4000000', '5000000'),
       },
       state: {
         type: Sequelize.ENUM('Lagos'),
@@ -69,6 +63,15 @@ module.exports = {
         type: Sequelize.ENUM('pending', 'accepted', 'rejected'),
         defaultValue: 'pending',
       },
+      partPayment: {
+        type: Sequelize.ENUM('10%', '20%', '30%'),
+        allowNull: false 
+      },
+      partPaymentAmount: {
+        type: Sequelize.FLOAT,
+        allowNull: false,
+        defaultValue: 0.0,
+     },
       listingImage: {
         type: Sequelize.TEXT, // JSON to store an array of objects
         allowNull: false,

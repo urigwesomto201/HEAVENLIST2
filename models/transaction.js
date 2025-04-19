@@ -35,6 +35,14 @@ Transaction.init(
       allowNull: false,
       unique: true,
     },
+    partPaymentAmount: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+    },
+    balance: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+    },
     status: {
       type: DataTypes.ENUM('pending', 'success', 'failed'),
       defaultValue: 'pending',

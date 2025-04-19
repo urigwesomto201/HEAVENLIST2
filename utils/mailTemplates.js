@@ -285,7 +285,7 @@ exports.adminTemplate = (firstName, verifyLink)=>{
 
 
 
-exports.tenentRentMessage = (amount, fullName)=>{
+exports.tenentRentMessage = (amountPaid, remainingBalance, tenantName)=>{
     return `
     <!DOCTYPE html>
     <html lang="en">
@@ -358,10 +358,10 @@ exports.tenentRentMessage = (amount, fullName)=>{
                 <h1>Havenlist</h1>
             </div>
             <div class="content">
-                <p>Dear ${fullName},</p>
-                <p>Your payment of NGN ${amount} was successful. You have successfully rented the property.</p>
-                <p>Thank you for using our service!</p>
-                <p>Best regards,<br>Havenlist</p>
+              <p>Thank you for your payment of <strong>₦${amountPaid}</strong> for the property you rented.</p>
+              <p>Your remaining balance to be paid is <strong>₦${remainingBalance}</strong>.</p>
+              <p>We appreciate your prompt payment.</p>
+              <p>Best regards,<br>HavenList Team</p>
             </div>
             <div class="footer">
                 <p>&copy; ${new Date().getFullYear()} . All rights reserved.</p>
@@ -376,7 +376,7 @@ exports.tenentRentMessage = (amount, fullName)=>{
 
 
 
-exports.landlordRentMessage = (amount, fullName)=>{
+exports.landlordRentMessage = (amountPaid, remainingBalance, landlordName)=>{
     return `
     <!DOCTYPE html>
     <html lang="en">
@@ -449,11 +449,11 @@ exports.landlordRentMessage = (amount, fullName)=>{
                 <h1>Havenlist</h1>
             </div>
             <div class="content">
-                
-                <p>Dear ${fullName},</p>
-                <p>Your property has been successfully rented. A payment of NGN ${amount} has been made by the tenant.</p>
-                <p>Thank you for your service .</p>
-                <p>Best regards,<br>Havenlist</p>
+              <p>Dear ${landlordName},</p>
+              <p>We are pleased to inform you that a tenant has made a payment of <strong>₦${amountPaid}</strong> for your property.</p>
+              <p>The remaining balance to be paid by the tenant is <strong>₦${remainingBalance}</strong>.</p>
+              <p>Thank you for using HavenList.</p>
+              <p>Best regards,<br>HavenList Team</p>
             </div>
             <div class="footer">
                 <p>&copy; ${new Date().getFullYear()} . All rights reserved.</p>
