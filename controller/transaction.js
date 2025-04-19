@@ -237,108 +237,108 @@ exports.verifyPayment = async (req, res) => {
 }
 
 
-exports.payBalance = async (req, res) => {
-  try {
-    const { amount, email, name } = req.body;
-    const { tenantId, landlordId, listingId } = req.params;
+// exports.payBalance = async (req, res) => {
+//   try {
+//     const { amount, email, name } = req.body;
+//     const { tenantId, landlordId, listingId } = req.params;
 
-    if (!tenantId || !landlordId || !listingId) {
-      return res.status(400).json({ message: 'All fields are required' });
-    }
+//     if (!tenantId || !landlordId || !listingId) {
+//       return res.status(400).json({ message: 'All fields are required' });
+//     }
 
-    if (!amount || !email || !name) {
-      return res.status(400).json({ message: 'PLEASE INPUT ALL FIELDS' });
-    }
+//     if (!amount || !email || !name) {
+//       return res.status(400).json({ message: 'PLEASE INPUT ALL FIELDS' });
+//     }
 
-    // Fetch the listing details
-    const listing = await listingModel.findOne({
-      where: { id: listingId },
-      attributes: ['id', 'price', 'balance', 'landlordId', 'tenantId', 'status', 'isAvailable'],
-    });
+//     // Fetch the listing details
+//     const listing = await listingModel.findOne({
+//       where: { id: listingId },
+//       attributes: ['id', 'price', 'balance', 'landlordId', 'tenantId', 'status', 'isAvailable'],
+//     });
 
-    if (!listing) {
-      return res.status(404).json({ message: 'Listing not found.' });
-    }
+//     if (!listing) {
+//       return res.status(404).json({ message: 'Listing not found.' });
+//     }
 
-    // Validate that the listing is accepted and available
-    if (listing.status !== 'accepted') {
-      return res.status(400).json({ message: 'This property is not accepted for payment.' });
-    }
+//     // Validate that the listing is accepted and available
+//     if (listing.status !== 'accepted') {
+//       return res.status(400).json({ message: 'This property is not accepted for payment.' });
+//     }
 
-    if (!listing.isAvailable) {
-      return res.status(400).json({ message: 'This property is no longer available for payment.' });
-    }
+//     if (!listing.isAvailable) {
+//       return res.status(400).json({ message: 'This property is no longer available for payment.' });
+//     }
 
-    // Ensure the tenant making the payment is the same tenant associated with the listing
-    if (listing.tenantId !== tenantId) {
-      return res.status(403).json({ message: 'You are not authorized to pay the balance for this listing.' });
-    }
+//     // Ensure the tenant making the payment is the same tenant associated with the listing
+//     if (listing.tenantId !== tenantId) {
+//       return res.status(403).json({ message: 'You are not authorized to pay the balance for this listing.' });
+//     }
 
-    // Ensure balance is a valid number
-    const currentBalance = listing.balance || listing.price; // Use price if balance is null
+//     // Ensure balance is a valid number
+//     const currentBalance = listing.balance || listing.price; // Use price if balance is null
 
-    // Validate the payment amount
-    if (parseFloat(amount) > currentBalance) {
-      return res.status(400).json({
-        message: `Invalid payment amount. You cannot pay more than the remaining balance of ₦${currentBalance}.`,
-      });
-    }
+//     // Validate the payment amount
+//     if (parseFloat(amount) > currentBalance) {
+//       return res.status(400).json({
+//         message: `Invalid payment amount. You cannot pay more than the remaining balance of ₦${currentBalance}.`,
+//       });
+//     }
 
-    // Process the payment
-    const paymentData = {
-      amount,
-      customer: { name, email },
-      currency: 'NGN',
-      reference: ref,
-      redirect_url: "https://haven-list.vercel.app/api/v1/payment/status",
-    };
+//     // Process the payment
+//     const paymentData = {
+//       amount,
+//       customer: { name, email },
+//       currency: 'NGN',
+//       reference: ref,
+//       redirect_url: "https://haven-list.vercel.app/api/v1/payment/status",
+//     };
 
-    const response = await axios.post(
-      'https://api.korapay.com/merchant/api/v1/charges/initialize',
-      paymentData,
-      {
-        headers: {
-          Authorization: `Bearer ${secret_key}`,
-        },
-      }
-    );
+//     const response = await axios.post(
+//       'https://api.korapay.com/merchant/api/v1/charges/initialize',
+//       paymentData,
+//       {
+//         headers: {
+//           Authorization: `Bearer ${secret_key}`,
+//         },
+//       }
+//     );
 
-    const { data } = response?.data;
+//     const { data } = response?.data;
 
-    // Create a new transaction for the balance payment
-    await transactionModel.create({
-      email,
-      amount,
-      name,
-      balance: currentBalance - amount, // Update balance after the payment
-      reference: data?.reference,
-      paymentDate: formatDate,
-      status: 'pending',
-      landlordId,
-      tenantId,
-      listingId,
-    });
+//     // Create a new transaction for the balance payment
+//     await transactionModel.create({
+//       email,
+//       amount,
+//       name,
+//       balance: currentBalance - amount, // Update balance after the payment
+//       reference: data?.reference,
+//       paymentDate: formatDate,
+//       status: 'pending',
+//       landlordId,
+//       tenantId,
+//       listingId,
+//     });
 
-    // Update the listing's balance
-    const newBalance = currentBalance - amount;
-    const isFullyPaid = newBalance <= 0;
-    await listing.update({
-      balance: newBalance,
-      isAvailable: !isFullyPaid, // Mark the property as unavailable if fully paid
-    });
+//     // Update the listing's balance
+//     const newBalance = currentBalance - amount;
+//     const isFullyPaid = newBalance <= 0;
+//     await listing.update({
+//       balance: newBalance,
+//       isAvailable: !isFullyPaid, // Mark the property as unavailable if fully paid
+//     });
 
-    res.status(201).json({
-      message: 'Balance payment initialized successfully',
-      data: {
-        reference: data?.reference,
-        checkout_url: data?.checkout_url,
-      },
-    });
-  } catch (error) {
-    if (error.response?.status === 409) {
-      return res.status(409).json({ message: 'Transaction already exists or duplicate reference' });
-    }
+//     res.status(201).json({
+//       message: 'Balance payment initialized successfully',
+//       data: {
+//         reference: data?.reference,
+//         checkout_url: data?.checkout_url,
+//       },
+//     });
+//   } catch (error) {
+//     if (error.response?.status === 409) {
+//       return res.status(409).json({ message: 'Transaction already exists or duplicate reference' });
+//     }
 
-    res.status(500).json({ message: 'Error initializing balance payment', error: error.message });
-  }
-};
+//     res.status(500).json({ message: 'Error initializing balance payment', error: error.message });
+//   }
+// };
