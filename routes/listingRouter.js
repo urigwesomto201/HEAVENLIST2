@@ -422,7 +422,7 @@ router.delete('/deleteListing/:landlordId/:listingId', landlordAuthenticate, del
  * /api/v1/searchListing:
  *   get:
  *     summary: Search for listings based on specific criteria
- *     description: Allows the user to search for property listings based on various filters such as locality, type, number of bedrooms, bathrooms, price range, and availability. At least one search criterion must be provided.
+ *     description: Allows users to search for property listings based on various filters such as locality, type, number of bedrooms, bathrooms, price range, and availability. At least one search criterion must be provided.
  *     tags:
  *       - Listings
  *     security: [] # No authentication required
@@ -433,7 +433,7 @@ router.delete('/deleteListing/:landlordId/:listingId', landlordAuthenticate, del
  *         required: false
  *         schema:
  *           type: string
- *           enum: ["Agege", "Ajeromi-Ifelodun", "Alimosho", "Amuwo Odofin", "Apapa", "Badagry", "Epe", "Eti-Osa", "Ibeju Lekki", "Ikeja", "Ikorodu", "Lagos Island", "Mushin", "Ojo", "Shomolu", "Surulere"]: 
+ *           enum: ["Agege", "Ajeromi-Ifelodun", "Alimosho", "Amuwo Odofin", "Apapa", "Badagry", "Epe", "Eti-Osa", "Ibeju Lekki", "Ikeja", "Ikorodu", "Lagos Island", "Mushin", "Ojo", "Shomolu", "Surulere"]
  *           example: "Ikeja"
  *       - name: type
  *         in: query
@@ -441,7 +441,7 @@ router.delete('/deleteListing/:landlordId/:listingId', landlordAuthenticate, del
  *         required: false
  *         schema:
  *           type: string
- *           enum: ["Bungalow", "Flat", "Duplex"]
+ *           enum: ["Bungalow", "Flat", "Duplex", "Mini-flat"]
  *           example: "Flat"
  *       - name: bedrooms
  *         in: query
@@ -465,34 +465,43 @@ router.delete('/deleteListing/:landlordId/:listingId', landlordAuthenticate, del
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: string
- *                     example: "64a8e9b7b56c8d001c9a4b2d"
- *                   title:
- *                     type: string
- *                     example: "Luxury 3-Bedroom Apartment in Lekki"
- *                   type:
- *                     type: string
- *                     example: "Flat"
- *                   bedrooms:
- *                     type: string
- *                     example: "3"
- *                   bathrooms:
- *                     type: string
- *                     example: "2"
- *                   price:
- *                     type: number
- *                     example: 1500000
- *                   area:
- *                     type: string
- *                     example: "Ikeja"
- *                   isAvailable:
- *                     type: boolean
- *                     example: true
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Listings for the specified criteria"
+ *                 total:
+ *                   type: number
+ *                   example: 2
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         example: "64a8e9b7b56c8d001c9a4b2d"
+ *                       title:
+ *                         type: string
+ *                         example: "Luxury 3-Bedroom Apartment in Lekki"
+ *                       type:
+ *                         type: string
+ *                         example: "Flat"
+ *                       bedrooms:
+ *                         type: string
+ *                         example: "3"
+ *                       bathrooms:
+ *                         type: string
+ *                         example: "2"
+ *                       price:
+ *                         type: number
+ *                         example: 150000
+ *                       area:
+ *                         type: string
+ *                         example: "Ikeja"
+ *                       isAvailable:
+ *                         type: boolean
+ *                         example: true
  *       400:
  *         description: No search criteria provided.
  *         content:
@@ -514,7 +523,7 @@ router.delete('/deleteListing/:landlordId/:listingId', landlordAuthenticate, del
  *                   type: string
  *                   example: "No listings found for the specified criteria"
  *       500:
- *         description: error while searching for listings.
+ *         description: Error while searching for listings.
  *         content:
  *           application/json:
  *             schema:
