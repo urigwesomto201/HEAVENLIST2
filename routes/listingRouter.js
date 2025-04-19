@@ -433,6 +433,7 @@ router.delete('/deleteListing/:landlordId/:listingId', landlordAuthenticate, del
  *         required: false
  *         schema:
  *           type: string
+ *           enum: ["Agege", "Ajeromi-Ifelodun", "Alimosho", "Amuwo Odofin", "Apapa", "Badagry", "Epe", "Eti-Osa", "Ibeju Lekki", "Ikeja", "Ikorodu", "Lagos Island", "Mushin", "Ojo", "Shomolu", "Surulere"]: 
  *           example: "Ikeja"
  *       - name: type
  *         in: query
