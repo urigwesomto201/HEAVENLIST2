@@ -58,7 +58,7 @@ const upload = require('../utils/multer');
  *                 example: "Luxury 3-Bedroom Apartment in Lekki"
  *               type:
  *                 type: string
- *                 enum: ["Bungalow", "Flat", "Duplex"]
+ *                 enum: ["Bungalow", "Flat", "Duplex", "Mini-flat"]
  *                 description: The type of the property
  *                 example: "Bungalow"
  *               bedrooms:
