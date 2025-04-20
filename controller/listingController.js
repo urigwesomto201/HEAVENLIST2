@@ -93,7 +93,7 @@ exports.createListing = async (req, res) => {
             year,
             partPayment,
             partPaymentAmount, // Save the calculated part-payment amount
-            listingImage: JSON.stringify(uploadedImages), // Save as JSON string
+            listingImage: uploadedImages, // Save as JSON string
             landlordId,
             isAvailable: false,
             isClicked: 0,
@@ -335,7 +335,7 @@ exports.updateListing = async (req, res) => {
             year,
             partPayment,
             partPaymentAmount, // Save the calculated part-payment amount
-            listingImage: JSON.stringify(updatedImages),
+            listingImage: updatedImages,
         });
 
         // Fetch the updated listing
