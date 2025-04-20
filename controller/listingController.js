@@ -357,57 +357,42 @@ exports.updateListing = async (req, res) => {
 
 
 
-
 exports.deleteListing = async (req, res) => {
     try {
-        const { landlordId, listingId } = req.params;
-        
-
-        if (!listingId) {
-            return res.status(400).json({ message: 'Listing ID is required' });
-        }
-
-        // Find the listing
-        const listing = await listingModel.findOne({
-            where: { id: listingId,  landlordId},
-            include: [
-                {
-                    model: landlordModel,
-                    attributes: ['id', 'fullName'],
-                    as: 'landlord',
-                },
-            ],
-        });
-
-        if (!listing) {
-            return res.status(404).json({ message: 'Listing not found or does not belong to the specified landlord' });
-        }
-
-        // Parse and delete images from Cloudinary
-        if (listing.listingImage) {
-            try {
-                const images = JSON.parse(listing.listingImage);
-                for (const image of images) {
-                    if (image.publicId) {
-                        await cloudinary.uploader.destroy(image.publicId);
-                    }
-                }
-            } catch (parseError) {
-                console.error('Error parsing listingImage:', parseError.message);
-                return res.status(500).json({ message: 'Error parsing listing images', error: parseError.message });
-            }
-        }
-
-        // Delete the listing
-        await listingModel.destroy({ where: { id: listingId } });
-
-        res.status(200).json({ message: 'Listing deleted successfully', data: listing });
+      const { landlordId, listingId } = req.params;
+  
+      if (!listingId) {
+        return res.status(400).json({ message: 'Listing ID is required' });
+      }
+  
+      // Find the listing
+      const listing = await listingModel.findOne({
+        where: { id: listingId, landlordId },
+        include: [
+          {
+            model: landlordModel,
+            attributes: ['id', 'fullName'],
+            as: 'landlord',
+          },
+        ],
+      });
+  
+      if (!listing) {
+        return res.status(404).json({ message: 'Listing not found or does not belong to the specified landlord' });
+      }
+  
+      // Mark the listing as unavailable and update its status
+      await listing.update({
+        isAvailable: false,
+        status: 'rejected', // Optional: Update the status to indicate deletion
+      });
+  
+      res.status(200).json({ message: 'Listing marked as unavailable successfully', data: listing });
     } catch (error) {
-        console.error('Error deleting listing:', error.message);
-        res.status(500).json({ message: 'Error deleting listing', error: error.message });
+      console.error('Error marking listing as unavailable:', error.message);
+      res.status(500).json({ message: 'Error marking listing as unavailable', error: error.message });
     }
-};
-
+  };
 
 
 exports.searchListing = async (req, res) => {
