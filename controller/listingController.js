@@ -2,7 +2,8 @@ const { Sequelize, DataTypes, Model } = require('sequelize');
 const listingModel = require('../models/listing')
 const cloudinary = require('../database/cloudinary')
 const landlordModel = require('../models/landlord')
-const { Op } = require('sequelize')
+// const { Op } = require('sequelize')
+const { Op } = require('sequelize');
 
 const fs = require('fs')
 
@@ -15,7 +16,7 @@ exports.createListing = async (req, res) => {
         const { landlordId } = req.params;
         const {
             title, type, bedrooms, bathrooms, price, toilets,
-            state, area, description, minrent, maxrent, street, year, partPayment
+            state, area, description, street, year, partPayment
         } = req.body;
 
         // Validate required fields
@@ -87,8 +88,6 @@ exports.createListing = async (req, res) => {
             state,
             area,
             description,
-            minrent,
-            maxrent,
             street,
             year,
             partPayment,
@@ -256,12 +255,12 @@ exports.updateListing = async (req, res) => {
 
         const {
             title, type, bedrooms, bathrooms, price, toilets,
-            state, area, description, minrent, maxrent, street, year, partPayment
+            state, area, description,street, year, partPayment
         } = req.body;
 
         // Validate required fields
         if (!title || !type || !bedrooms || !bathrooms || !price || !toilets ||
-            !state || !area || !description || !minrent || !maxrent || !street || !year || !partPayment) {
+            !state || !area || !description || !street || !year || !partPayment) {
             return res.status(400).json({ message: 'Please provide all required fields, including partPayment' });
         }
 
@@ -329,8 +328,6 @@ exports.updateListing = async (req, res) => {
             state,
             area,
             description,
-            minrent,
-            maxrent,
             street,
             year,
             partPayment,
@@ -412,50 +409,49 @@ exports.deleteListing = async (req, res) => {
 };
 
 
+
 exports.searchListing = async (req, res) => {
     try {
-        const { area, type, bedrooms, minrent, maxrent } = req.query;
-
-
-        if (!area && !type && !bedrooms && !minrent && !maxrent) {
-            return res.status(400).json({ message: 'Please provide at least one search criteria' });
-        }
-
-        const queryCondition = {};
-        if (area) queryCondition.area = area.toLowerCase();
-        if (type) queryCondition.type = type;
-        if (bedrooms) queryCondition.bedrooms = bedrooms;
-        if (minrent) queryCondition.minrent = minrent
-        if (maxrent) queryCondition.maxrent = maxrent
-
-        const listings = await listingModel.findAll({
-            where: {
-                ...queryCondition,
-                isAvailable: true,
-                status: 'accepted'
-            },
-            include: [
-                {
-                    model: landlordModel, 
-                    attributes: ['id', 'fullName'], 
-                    as: 'landlord', 
-                },
-            ],
-        });
-
-        if (listings.length === 0) {
-            return res.status(404).json({ message: 'No listings found for the specified criteria' });
-        }
-
-        res.status(200).json({ message: 'Listings for the specified criteria', total: listings.length, data: listings });
+      const { area, type, bedrooms, bathrooms} = req.query;
+  
+      if (!area && !type && !bedrooms && !bathrooms) {
+        return res.status(400).json({ message: 'Please provide at least one search criteria' });
+      }
+  
+      // Build the query condition using Sequelize's Op.or
+      const queryConditions = [];
+      if (area) queryConditions.push({ area: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('area')), 'LIKE', `%${area.toLowerCase()}%`) });
+      if (type) queryConditions.push({ type });
+      if (bedrooms) queryConditions.push({ bedrooms });
+      if (bathrooms) queryConditions.push({ bathrooms });
+  
+      const listings = await listingModel.findAll({
+        where: {
+          [Op.and]: [
+            { isAvailable: true },
+            { status: 'accepted' },
+            { [Op.or]: queryConditions }, // At least one condition must match
+          ],
+        },
+        include: [
+          {
+            model: landlordModel,
+            attributes: ['id', 'fullName'],
+            as: 'landlord',
+          },
+        ],
+      });
+  
+      if (listings.length === 0) {
+        return res.status(404).json({ message: 'No listings found for the specified criteria' });
+      }
+  
+      res.status(200).json({ message: 'Listings for the specified criteria', total: listings.length, data: listings });
     } catch (error) {
-        console.error(error.message);
-        res.status(500).json({ message: 'Error getting listings by criteria', error: error.message });
+      console.error(error.message);
+      res.status(500).json({ message: 'Error getting listings by criteria', error: error.message });
     }
 };
-
-
-
 
 
 
