@@ -72,10 +72,20 @@ module.exports = {
         allowNull: false,
         defaultValue: 0.0,
      },
-      listingImage: {
-        type: Sequelize.TEXT, // JSON to store an array of objects
-        allowNull: false,
+    listingImage: {
+      type: Sequelize.TEXT,
+      allowNull: false, // No default value, can be null
+      get() {
+        const raw = this.getDataValue('listingImage');
+        try {
+          return raw ? JSON.parse(raw) : [];
+        } catch (e) {
+          return []; // fallback if somehow stored invalid JSON
+        }
       },
+      set(value) {
+        this.setDataValue('listingImage', JSON.stringify(value));
+    },
       landlordId: {
         type: Sequelize.UUID,
         references: {
