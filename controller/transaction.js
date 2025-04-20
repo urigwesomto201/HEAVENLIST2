@@ -188,11 +188,10 @@ exports.verifyPayment = async (req, res) => {
       const currentBalance = listing.balance || listing.price; // Use price if balance is null
       const newBalance = currentBalance - existingTransaction.amount;
 
-      // Update the listing's balance and mark it as unavailable if fully paid
-      const isFullyPaid = newBalance <= 0;
+      // Update the listing's balance and mark it as unavailable
       await listing.update({
         balance: newBalance,
-        isAvailable: false, // Mark the property as unavailable after payment verification
+        isAvailable: false, // Mark the property as unavailable after successful payment
       });
 
       // Send email to the tenant
@@ -236,6 +235,7 @@ exports.verifyPayment = async (req, res) => {
     res.status(500).json({ message: 'Error verifying payment', error: error.message });
   }
 };
+
 
 
 // exports.payBalance = async (req, res) => {
