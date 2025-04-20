@@ -14,12 +14,12 @@ exports.createLandlordProfile = async (req, res) => {
         const { landlordId } = req.params;
         const { fullName, email, state, street, locality } = req.body;
   
-        // Validate required fields
+        
         if (!fullName || !email || !state || !street || !locality) {
             return res.status(400).json({ message: 'All fields are required: fullName, email, state, street, locality' });
         }
   
-        // Check if a profile already exists for the landlord
+       
         const existingProfile = await landlordProfileModel.findOne({ where: {  landlordId } });
         if (existingProfile) {
             return res.status(400).json({ message: 'A profile already exists for this landlord' });
@@ -29,7 +29,7 @@ exports.createLandlordProfile = async (req, res) => {
             return res.status(400).json({ message: 'Landlord profile image is required' });
         }
   
-        // Upload the profile image to Cloudinary
+      
         let uploadedImage;
         try {
             uploadedImage = await cloudinary.uploader.upload(req.file.path, { resource_type: 'auto' });
@@ -38,12 +38,12 @@ exports.createLandlordProfile = async (req, res) => {
             return res.status(500).json({ message: 'Error uploading image to Cloudinary', error: uploadError.message });
         }
   
-        // Ensure the uploaded image has a secure URL
+        
         if (!uploadedImage.secure_url) {
             return res.status(500).json({ message: 'Failed to retrieve secure URL from Cloudinary' });
         }
   
-        // Create the landlord profile
+        
         const newProfile = await landlordProfileModel.create({
             landlordId,
             fullName,

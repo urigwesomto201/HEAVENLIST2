@@ -21,7 +21,7 @@ Listing.init(
       allowNull: false
     },
     type: {
-      type: DataTypes.ENUM('Bungalow','Flat','Duplex')
+      type: DataTypes.ENUM('Bungalow','Flat','Duplex','Mini-flat')
   
     },
     bedrooms: {
@@ -34,14 +34,6 @@ Listing.init(
     },
     toilets: {
       type: DataTypes.ENUM('1', '2', '3', '4', '5+')
-      
-    },
-    minrent: {
-      type: DataTypes.ENUM('500000','600000','700000','800000','900000','1000000')
-    
-    },
-    maxrent: {
-      type: DataTypes.ENUM('1000000','2000000','3000000','4000000','5000000')
       
     },
     state: {
@@ -83,6 +75,16 @@ Listing.init(
       type: DataTypes.ENUM('pending', 'accepted', 'rejected'),
       defaultValue: 'pending',
     },
+    partPayment: {
+      type: DataTypes.ENUM('10%', '20%', '30%'),
+      allowNull: false 
+    },
+    partPaymentAmount: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+      defaultValue: 0.0
+    },
+
     // listingImage: {
     //   // type: DataTypes.JSON, // JSON can store arrays of objects
     //   type: DataTypes.TEXT('long'), // JSON can store arrays of objects

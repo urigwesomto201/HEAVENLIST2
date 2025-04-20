@@ -76,14 +76,6 @@ const upload = require('../utils/multer');
  *                 enum: ["1", "2", "3", "4", "5+"]
  *                 description: Number of toilets
  *                 example: "2"
- *               minrent:
- *                 type: string
- *                 description: Minimum rent price
- *                 example: "500000"
- *               maxrent:
- *                 type: string
- *                 description: Maximum rent price
- *                 example: "2000000"
  *               state:
  *                 type: string
  *                 enum: ["Lagos"]
@@ -111,6 +103,11 @@ const upload = require('../utils/multer');
  *                 type: string
  *                 description: A description of the property
  *                 example: "A beautiful 3-bedroom apartment in the heart of Lagos."
+ *               partPayment:
+ *                 type: string
+ *                 enum: ["10%", "20%", "30%"]
+ *                 description: The part-payment percentage for the property
+ *                 example: "20%"
  *               listingImage:
  *                 type: array
  *                 items:
@@ -315,9 +312,9 @@ router.get('/getAllListingsByLandlord/:landlordId', landlordAuthenticate, getAll
  *                 example: "Luxury 3-Bedroom Apartment in Lekki"
  *               type:
  *                 type: string
- *                 enum: ["Bungalow", "Flat", "Duplex"]
+ *                 enum: ["Bungalow", "Flat", "Duplex", "Mini-flat"]
  *                 description: The type of the property
- *                 example: "Bungalow"
+ *                 example: "Flat"
  *               bedrooms:
  *                 type: string
  *                 enum: ["1", "2", "3", "4", "5+"]
@@ -333,14 +330,6 @@ router.get('/getAllListingsByLandlord/:landlordId', landlordAuthenticate, getAll
  *                 enum: ["1", "2", "3", "4", "5+"]
  *                 description: Number of toilets
  *                 example: "2"
- *               minrent:
- *                 type: string
- *                 description: Minimum rent price
- *                 example: "500000"
- *               maxrent:
- *                 type: string
- *                 description: Maximum rent price
- *                 example: "2000000"
  *               state:
  *                 type: string
  *                 enum: ["Lagos"]
@@ -368,6 +357,11 @@ router.get('/getAllListingsByLandlord/:landlordId', landlordAuthenticate, getAll
  *                 type: string
  *                 description: A description of the property
  *                 example: "A beautiful 3-bedroom apartment in the heart of Lagos."
+ *               partPayment:
+ *                 type: string
+ *                 enum: ["10%", "20%", "30%"]
+ *                 description: The part-payment percentage for the property
+ *                 example: "20%"
  *               listingImage:
  *                 type: array
  *                 items:
@@ -464,22 +458,6 @@ router.delete('/deleteListing/:landlordId/:listingId', landlordAuthenticate, del
  *           type: string
  *           enum: ["1", "2", "3", "4", "5+"]
  *           example: "2"
- *       - name: minrent
- *         in: query
- *         description: The minimum price of the property.
- *         required: false
- *         schema:
- *           type: string
- *           enum: ["500000", "600000", "700000", "800000", "900000", "1000000"]
- *           example: "500000"
- *       - name: maxrent
- *         in: query
- *         description: The maximum price of the property.
- *         required: false
- *         schema:
- *           type: string
- *           enum: ["1000000", "2000000", "3000000", "4000000", "5000000"]
- *           example: "2000000"
  *     responses:
  *       200:
  *         description: A list of listings that match the search criteria.

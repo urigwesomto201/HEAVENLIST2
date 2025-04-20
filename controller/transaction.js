@@ -2,6 +2,7 @@ const { Op, fn, col } = require('sequelize');
 const transactionModel = require('../models/transaction');
 const tenantModel = require('../models/tenant');
 const landlordModel = require('../models/landlord');
+const listingModel = require('../models/listing'); //
 const axios = require('axios');
 const otpGenerator = require('otp-generator');
 const nodemailer = require('nodemailer');
@@ -13,7 +14,6 @@ const otp = otpGenerator.generate(12, { specialChars: false });
 const ref = `TCA-AF${otp}`;
 const secret_key = process.env.koraPay_SECRET_KEY;
 const formatDate = new Date().toLocaleString();
-
 
 exports.initialPayment = async (req, res) => {
   try {
@@ -28,15 +28,59 @@ exports.initialPayment = async (req, res) => {
       return res.status(400).json({ message: 'PLEASE INPUT ALL FIELDS' });
     }
 
+    // Fetch the listing details
+    const listing = await listingModel.findOne({
+      where: { id: listingId },
+      attributes: ['id', 'price', 'partPayment', 'partPaymentAmount', 'landlordId', 'status', 'isAvailable'],
+    });
+
+    if (!listing) {
+      return res.status(404).json({ message: 'Listing not found.' });
+    }
+
+    // Validate that the listing is accepted and available
+    if (listing.status !== 'accepted') {
+      return res.status(400).json({ message: 'This property is not accepted for payment.' });
+    }
+
+    if (!listing.isAvailable) {
+      return res.status(400).json({ message: 'This property is no longer available for payment.' });
+    }
+
+    // Calculate the expected part-payment amount
+    const partPaymentPercentage = parseFloat(listing.partPayment.replace('%', '')) / 100; // Remove '%' and convert to decimal
+    const expectedPartPaymentAmount = listing.price * partPaymentPercentage;
+
+    // Validate the payment amount (must be above or equal to the part-payment amount and not exceed the listing price)
+    if (parseFloat(amount) < expectedPartPaymentAmount) {
+      return res.status(400).json({
+        message: `Invalid payment amount. You must pay at least the part-payment amount of ₦${expectedPartPaymentAmount}.`,
+      });
+    }
+
+    if (parseFloat(amount) > listing.price) {
+      return res.status(400).json({
+        message: `Invalid payment amount. You cannot pay more than the listing price of ₦${listing.price}.`,
+      });
+    }
+
+    // Check if tenant exists
+    const tenant = await tenantModel.findOne({
+      where: { id: tenantId },
+      attributes: ['id', 'fullName'],
+    });
+
+    if (!tenant) {
+      return res.status(404).json({ message: 'Tenant not found.' });
+    }
 
     const paymentData = {
       amount,
       customer: { name, email },
       currency: 'NGN',
       reference: ref,
-      redirect_url:"https://haven-list.vercel.app/api/v1/payment/status"
+      redirect_url: "https://haven-list.vercel.app/api/v1/payment/status",
     };
-
 
     const response = await axios.post(
       'https://api.korapay.com/merchant/api/v1/charges/initialize',
@@ -50,22 +94,24 @@ exports.initialPayment = async (req, res) => {
 
     const { data } = response?.data;
 
-  
     await transactionModel.create({
       email,
-      amount,
+      amount, // Save the actual amount paid by the tenant
       name,
+      partPaymentAmount: expectedPartPaymentAmount, // Save the calculated part-payment amount
+      balance: listing.price - amount, // Update balance after the payment
       reference: data?.reference,
       paymentDate: formatDate,
       status: 'pending',
       landlordId,
       tenantId,
-      listingId
-      
-
+      listingId,
     });
 
-  
+    await listing.update({
+      balance: listing.price - amount, // Update the listing's balance
+    });
+
     res.status(201).json({
       message: 'Payment initialized successfully',
       data: {
@@ -82,26 +128,20 @@ exports.initialPayment = async (req, res) => {
   }
 };
 
-
-
-
-
 exports.verifyPayment = async (req, res) => {
   try {
     const { reference } = req.query;
-
 
     if (!reference) {
       return res.status(400).json({ message: 'Reference is required' });
     }
 
-
+    // Fetch the transaction using the reference
     const existingTransaction = await transactionModel.findOne({ where: { reference } });
 
     if (!existingTransaction) {
       return res.status(404).json({ message: 'Transaction not found' });
     }
-
 
     if (existingTransaction.status === 'success') {
       return res.status(400).json({ message: 'Payment has already been verified successfully' });
@@ -111,7 +151,7 @@ exports.verifyPayment = async (req, res) => {
       return res.status(400).json({ message: 'Payment verification already failed' });
     }
 
-
+    // Verify the payment status from the payment gateway
     const response = await axios.get(
       `https://api.korapay.com/merchant/api/v1/charges/${reference}`,
       {
@@ -123,58 +163,52 @@ exports.verifyPayment = async (req, res) => {
 
     const data = response?.data;
 
- 
     if (data?.data?.status === 'success') {
       console.log('Payment successful');
 
-  
+      // Update the transaction status to 'success'
       await transactionModel.update(
         { status: 'success' },
         { where: { reference } }
       );
 
-      // Fetch tenant and landlord details
+      // Fetch tenant, landlord, and listing details
       const tenant = await tenantModel.findOne({ where: { id: existingTransaction.tenantId } });
       const landlord = await landlordModel.findOne({ where: { id: existingTransaction.landlordId } });
+      const listing = await listingModel.findOne({ where: { id: existingTransaction.listingId } });
 
-      const tenantname = tenant.fullName
-      const tenentamount = existingTransaction.amount
-      
-      const tenanthtml = tenentRentMessage(tenentamount, tenantname)
+      if (!listing) {
+        return res.status(404).json({ message: 'Listing not found.' });
+      }
 
-     
+      // Ensure balance is a valid number
+      const currentBalance = listing.balance || listing.price; // Use price if balance is null
+      const newBalance = currentBalance - existingTransaction.amount;
+
+      // Update the listing's balance and mark it as unavailable if fully paid
+      const isFullyPaid = newBalance <= 0;
+      await listing.update({
+        balance: newBalance,
+        isAvailable: !isFullyPaid, // Mark the property as unavailable if fully paid
+      });
+
+      // Send email to the tenant
       if (tenant?.email) {
         const tenantMailDetails = {
           subject: 'Payment Successful - Property Rented!',
           email: tenant.email,
-          html: tenanthtml
-          // `
-          //   <p>Dear ${tenant.fullName || 'Tenant'},</p>
-          //   <p>Your payment of NGN ${existingTransaction.amount} was successful. You have successfully rented the property.</p>
-          //   <p>Thank you for using our service!</p>
-          // `,
+          html: tenentRentMessage(existingTransaction.amount, newBalance, tenant.fullName),
         };
         await sendEmail(tenantMailDetails);
       }
-
-      const firstName = landlord.fullName
-      const landlordamount = existingTransaction.amount
-      
-      const landlordhtml = landlordRentMessage(landlordamount, firstName)
 
       // Send email to the landlord
       if (landlord?.email) {
         const landlordMailDetails = {
           subject: 'Your Property Has Been Rented!',
           email: landlord.email,
-          html: landlordhtml
-
-          // `
-          //   <p>Dear ${landlord.fullName || 'Landlord'},</p>
-          //   <p>Your property has been successfully rented. A payment of NGN ${existingTransaction.amount} has been made by the tenant.</p>
-          //   <p>Thank you for using our service!</p>
-          // `,
-        }
+          html: landlordRentMessage(existingTransaction.amount, newBalance, landlord.fullName),
+        };
         await sendEmail(landlordMailDetails);
       }
 
@@ -199,9 +233,6 @@ exports.verifyPayment = async (req, res) => {
     res.status(500).json({ message: 'Error verifying payment', error: error.message });
   }
 };
-
-
-
 
 
 
