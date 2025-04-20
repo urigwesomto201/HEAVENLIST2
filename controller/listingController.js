@@ -392,7 +392,7 @@ exports.deleteListing = async (req, res) => {
       console.error('Error marking listing as unavailable:', error.message);
       res.status(500).json({ message: 'Error marking listing as unavailable', error: error.message });
     }
-  };
+};
 
 
 exports.searchListing = async (req, res) => {
