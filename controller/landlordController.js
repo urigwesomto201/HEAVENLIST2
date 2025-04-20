@@ -313,11 +313,10 @@ exports.verifyLandlordOtp = async (req, res) => {
         try {
             validated = await validate(req.body, verifyPasswordSchema);
         } catch (validationError) {
-            return res.status(400).json({ error: validationError.message });
+            return res.status(400).json({ message: validationError.message });
         }
 
-
-        const { otp } = validated
+        const { otp } = validated;
 
         if (!otp) {
             return res.status(400).json({ message: 'OTP is required' });
@@ -328,7 +327,7 @@ exports.verifyLandlordOtp = async (req, res) => {
 
         for (const l of landlords) {
             const secret = `${process.env.OTP_SECRET}${l.email.toLowerCase()}`;
-            if (totp.check(otp, secret, { window: 10 })) { // Allow 5-minute window
+            if (totp.check(otp, secret, { window: 10 })) {
                 landlord = l;
                 break;
             }
@@ -338,9 +337,16 @@ exports.verifyLandlordOtp = async (req, res) => {
             return res.status(404).json({ message: 'Invalid or expired OTP' });
         }
 
+        // Generate JWT token valid for 10 minutes
+        const token = jwt.sign(
+            { id: landlord.id, email: landlord.email },
+            process.env.JWT_SECRET,
+            { expiresIn: '10m' }
+        );
+
         return res.status(200).json({
             message: 'OTP verified successfully',
-            landlordEmail: landlord.email
+            token
         });
 
     } catch (error) {
@@ -352,16 +358,22 @@ exports.verifyLandlordOtp = async (req, res) => {
     }
 };
 
-
 exports.landlordResetPassword = async (req, res) => {
     try {
-        const { landlordId } = req.params;
+        const { token } = req.params;
 
-        if (!landlordId) {
-            return res.status(400).json({ message: 'Landlord ID is required in the URL parameters' });
+        if (!token) {
+            return res.status(400).json({ message: 'Token is required in the URL parameters' });
         }
 
-        const landlord = await landlordModel.findByPk(landlordId);
+        let decoded;
+        try {
+            decoded = jwt.verify(token, process.env.JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ message: 'Invalid or expired token' });
+        }
+
+        const landlord = await landlordModel.findByPk(decoded.id);
 
         if (!landlord) {
             return res.status(404).json({ message: 'Landlord not found' });
@@ -371,9 +383,7 @@ exports.landlordResetPassword = async (req, res) => {
         try {
             validated = await validate(req.body, resetPasswordschema);
         } catch (validationError) {
-            return res.status(400).json({
-                error: validationError.message
-            });
+            return res.status(400).json({ message: validationError.message });
         }
 
         const { password, confirmPassword } = validated;
@@ -394,7 +404,7 @@ exports.landlordResetPassword = async (req, res) => {
         return res.status(200).json({ message: 'Password reset successful' });
 
     } catch (error) {
-        console.error(error.message);
+        console.error('Reset Password Error:', error);
         return res.status(500).json({
             message: 'An error occurred while resetting password',
             error: error.message

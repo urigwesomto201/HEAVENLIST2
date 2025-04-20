@@ -260,29 +260,25 @@ exports.TenantForgotPassword = async (req, res) => {
 
 exports.VerifyTenantOtp = async (req, res) => {
     try {
-        
         let validated;
         try {
             validated = await validate(req.body, verifyPasswordSchema);
         } catch (validationError) {
-            return res.status(400).json({ error: validationError.message });
+            return res.status(400).json({ message: validationError.message });
         }
 
-
-        const { otp } = validated
+        const { otp } = validated;
 
         if (!otp) {
             return res.status(400).json({ message: 'OTP is required' });
         }
 
-        // Get all tenants (since we don’t know which one owns the OTP)
         const tenants = await tenantModel.findAll();
         let tenant = null;
 
-        // Loop through each tenant to validate the OTP
         for (const t of tenants) {
             const secret = `${process.env.OTP_SECRET}${t.email.toLowerCase()}`;
-            if (totp.check(otp, secret,{ window: 10 })) {
+            if (totp.check(otp, secret, { window: 10 })) {
                 tenant = t;
                 break;
             }
@@ -292,49 +288,61 @@ exports.VerifyTenantOtp = async (req, res) => {
             return res.status(404).json({ message: 'Invalid or expired OTP' });
         }
 
-        res.status(200).json({
+        const token = jwt.sign(
+            { id: tenant.id, email: tenant.email },
+            process.env.JWT_SECRET,
+            { expiresIn: '10m' } // Token valid for 10 minutes
+        );
+
+        return res.status(200).json({
             message: 'OTP verified successfully',
-            tenantEmail: tenant.email  // Optional: can return this to pre-fill email
+            token,
         });
 
     } catch (error) {
-        console.log(error.message);
-        res.status(500).json({ message: 'Error verifying OTP', error: error.message });
+        console.error('Verify OTP Error:', error);
+        return res.status(500).json({ message: 'Error verifying OTP', error: error.message });
     }
 };
 
 
 exports.TenantResetPassword = async (req, res) => {
     try {
-        // Step 1: Validate request body
-        let validated;
+        const { token } = req.params;
+
+        if (!token) {
+            return res.status(400).json({ message: 'Token is required in URL params' });
+        }
+
+        let decoded;
         try {
-            validated = await validate(req.body, resetPasswordschema);
-        } catch (validationError) {
-            return res.status(400).json({ 
-                error: validationError.message 
-            });
+            decoded = jwt.verify(token, process.env.JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ message: 'Invalid or expired token' });
         }
 
-        const { password, confirmPassword } = validated;
-
-        // Step 2: Password match check
-        if (password !== confirmPassword) {
-            return res.status(400).json({ message: 'Passwords do not match' });
-        }
-
-        // Step 3: Get tenant ID from params and fetch tenant
-        const { tenantId } = req.params;
-        if (!tenantId) {
-            return res.status(400).json({ message: 'Tenant ID is required in params' });
-        }
-
-        const tenant = await tenantModel.findByPk(tenantId);
+        const tenant = await tenantModel.findByPk(decoded.id);
         if (!tenant) {
             return res.status(404).json({ message: 'Tenant not found' });
         }
 
-        // Step 4: Hash and update password
+        let validated;
+        try {
+            validated = await validate(req.body, resetPasswordschema);
+        } catch (validationError) {
+            return res.status(400).json({ message: validationError.message });
+        }
+
+        const { password, confirmPassword } = validated;
+
+        if (!password || !confirmPassword) {
+            return res.status(400).json({ message: 'Password and Confirm Password are required' });
+        }
+
+        if (password !== confirmPassword) {
+            return res.status(400).json({ message: 'Passwords do not match' });
+        }
+
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -343,10 +351,10 @@ exports.TenantResetPassword = async (req, res) => {
         return res.status(200).json({ message: 'Password reset successful' });
 
     } catch (error) {
-        console.error(error.message);
-        return res.status(500).json({ 
-            message: 'Something went wrong while resetting password', 
-            error: error.message 
+        console.error('Reset Password Error:', error);
+        return res.status(500).json({
+            message: 'Something went wrong while resetting password',
+            error: error.message
         });
     }
 };

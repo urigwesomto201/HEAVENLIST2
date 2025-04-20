@@ -296,11 +296,11 @@ router.post('/TenantForgotPassword', TenantForgotPassword)
  * @swagger
  * /api/v1/verify/tenant:
  *   post:
- *     summary: Verify tenant OTP
- *     description: This endpoint allows you to verify the OTP (One Time Password) sent to the tenant. The OTP should be passed in the request body.
-*     tags:
+ *     summary: Verify OTP for tenant password reset
+  *     tags:
  *       - tenant
   *     security: [] # No authentication required
+ *     description: Validates the OTP sent to the tenant's email and returns a JWT token if valid. The token is used to securely reset the tenant's password.
  *     requestBody:
  *       required: true
  *       content:
@@ -312,10 +312,11 @@ router.post('/TenantForgotPassword', TenantForgotPassword)
  *             properties:
  *               otp:
  *                 type: string
- *                 example: "1274"  # Example OTP sent to tenant
+ *                 example: "123456"
+ *                 description: One-time password sent to tenant's email
  *     responses:
  *       200:
- *         description: OTP verified successfully
+ *         description: OTP verified successfully and JWT token returned
  *         content:
  *           application/json:
  *             schema:
@@ -323,12 +324,12 @@ router.post('/TenantForgotPassword', TenantForgotPassword)
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "OTP verified successfully"
- *                 tenantEmail:
+ *                   example: OTP verified successfully
+ *                 token:
  *                   type: string
- *                   example: "johndoe@example.com"
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
  *       400:
- *         description: OTP is missing or invalid
+ *         description: Validation error or OTP missing
  *         content:
  *           application/json:
  *             schema:
@@ -336,7 +337,7 @@ router.post('/TenantForgotPassword', TenantForgotPassword)
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "OTP is required"
+ *                   example: OTP is required
  *       404:
  *         description: Invalid or expired OTP
  *         content:
@@ -346,9 +347,9 @@ router.post('/TenantForgotPassword', TenantForgotPassword)
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Invalid or expired OTP"
+ *                   example: Invalid or expired OTP
  *       500:
- *         description: Server error
+ *         description: Internal server error
  *         content:
  *           application/json:
  *             schema:
@@ -356,30 +357,30 @@ router.post('/TenantForgotPassword', TenantForgotPassword)
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Error verifying OTP"
+ *                   example: Error verifying OTP
  *                 error:
  *                   type: string
- *                   example: "Internal Server Error"
+ *                   example: Some internal error message
  */
 router.post('/verify/tenant', VerifyTenantOtp)
 
 /**
  * @swagger
- * /api/v1/reset-tenantpassword/{tenantId}:
+ * /api/v1/tenant/reset-password/{token}:
  *   post:
- *     summary: Reset a tenant's password
- *     description: Resets the password for a tenant based on their ID. The request body must contain a valid password and confirmPassword that match.
+ *     summary: Reset tenant password using JWT token
  *     tags:
  *       - tenant
-   *     security: [] # No authentication required
+ *     security: [] # No authentication required
+ *     description: Resets a tenant's password using a valid JWT token provided after OTP verification.
  *     parameters:
  *       - in: path
- *         name: tenantId
+ *         name: token
  *         required: true
- *         description: ID of the tenant to reset the password for
  *         schema:
  *           type: string
- *           example: "12345"  # Example tenant ID
+ *         description: JWT token returned from OTP verification
+ *         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
  *     requestBody:
  *       required: true
  *       content:
@@ -392,10 +393,12 @@ router.post('/verify/tenant', VerifyTenantOtp)
  *             properties:
  *               password:
  *                 type: string
- *                 example: "NewPassword123!"  # Example password
+ *                 format: password
+ *                 example: NewSecurePassword@123
  *               confirmPassword:
  *                 type: string
- *                 example: "NewPassword123!"  # Example confirmPassword
+ *                 format: password
+ *                 example: NewSecurePassword@123
  *     responses:
  *       200:
  *         description: Password reset successful
@@ -406,9 +409,9 @@ router.post('/verify/tenant', VerifyTenantOtp)
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Password reset successful"
+ *                   example: Password reset successful
  *       400:
- *         description: Validation failed or password mismatch
+ *         description: Validation error or missing fields
  *         content:
  *           application/json:
  *             schema:
@@ -416,10 +419,17 @@ router.post('/verify/tenant', VerifyTenantOtp)
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Validation failed"
- *                 error:
+ *                   example: Password and Confirm Password are required
+ *       401:
+ *         description: Invalid or expired JWT token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
  *                   type: string
- *                   example: "Password is required"
+ *                   example: Invalid or expired token
  *       404:
  *         description: Tenant not found
  *         content:
@@ -429,9 +439,9 @@ router.post('/verify/tenant', VerifyTenantOtp)
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Tenant not found"
+ *                   example: Tenant not found
  *       500:
- *         description: Server error
+ *         description: Internal server error
  *         content:
  *           application/json:
  *             schema:
@@ -439,15 +449,12 @@ router.post('/verify/tenant', VerifyTenantOtp)
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Something went wrong while resetting password"
+ *                   example: Something went wrong while resetting password
  *                 error:
  *                   type: string
- *                   example: "Internal Server Error"
+ *                   example: Detailed error message
  */
-
-router.post('/reset-tenantpassword/:tenantId', TenantResetPassword);
-
-
+router.post('/tenant/reset-password/:token', TenantResetPassword);
 
 
 
