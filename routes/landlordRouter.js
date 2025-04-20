@@ -289,11 +289,10 @@ router.post('/landlordForgotPassword', landlordForgotPassword)
  * @swagger
  * /api/v1/verify/landlord:
  *   post:
- *     summary: Verify landlord OTP
- *     description: Verifies the OTP (One Time Password) sent to a landlord during the authentication or registration process. The system checks the OTP against all landlords to find a match.
+ *     summary: Verify landlord OTP and return a reset token
  *     tags:
- *       - landlord 
- *     security: [] 
+ *       - landlord
+  *     security: [] # No authentication required
  *     requestBody:
  *       required: true
  *       content:
@@ -305,10 +304,10 @@ router.post('/landlordForgotPassword', landlordForgotPassword)
  *             properties:
  *               otp:
  *                 type: string
- *                 example: "6543"
+ *                 example: "123456"
  *     responses:
  *       200:
- *         description: OTP verified successfully
+ *         description: OTP verified successfully and token issued
  *         content:
  *           application/json:
  *             schema:
@@ -316,15 +315,12 @@ router.post('/landlordForgotPassword', landlordForgotPassword)
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "OTP verified successfully"
- *                 landlordId:
+ *                   example: OTP verified successfully
+ *                 token:
  *                   type: string
- *                   example: "9f8d12bc-3e8e-4a8e-b1a3-912d5ad12345"
- *                 landlordEmail:
- *                   type: string
- *                   example: "landlord@example.com"
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
  *       400:
- *         description: OTP is required but not provided
+ *         description: Validation error or missing fields
  *         content:
  *           application/json:
  *             schema:
@@ -332,7 +328,7 @@ router.post('/landlordForgotPassword', landlordForgotPassword)
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "OTP is required"
+ *                   example: OTP is required
  *       404:
  *         description: Invalid or expired OTP
  *         content:
@@ -342,9 +338,9 @@ router.post('/landlordForgotPassword', landlordForgotPassword)
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Invalid or expired OTP"
+ *                   example: Invalid or expired OTP
  *       500:
- *         description: Server-side error during OTP verification
+ *         description: Server error during verification
  *         content:
  *           application/json:
  *             schema:
@@ -352,30 +348,29 @@ router.post('/landlordForgotPassword', landlordForgotPassword)
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "An error occurred while verifying OTP"
+ *                   example: Error verifying OTP
  *                 error:
  *                   type: string
- *                   example: "Internal Server Error"
+ *                   example: Internal server error
  */
 router.post('/verify/landlord', verifyLandlordOtp);
 
 /**
  * @swagger
- * /api/v1/reset-landlordpassword/{landlordId}:
+ * /api/v1/landlord/reset-password/{token}:
  *   post:
- *     summary: Reset landlord password
- *     description: Allows a landlord to reset their password by providing their ID in the URL and a new password in the request body.
-  *     tags:
+ *     summary: Reset landlord password using a JWT token
+ *     tags:
  *       - landlord
   *     security: [] # No authentication required
  *     parameters:
  *       - in: path
- *         name: landlordId
+ *         name: token
  *         required: true
+ *         description: JWT token obtained from OTP verification
  *         schema:
  *           type: string
- *         description: The ID of the landlord whose password needs to be reset
- *         example: "f5e6f1a4-2d4e-4d3f-bfd3-8a1cd6a8f6b2"
+ *           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
  *     requestBody:
  *       required: true
  *       content:
@@ -388,10 +383,10 @@ router.post('/verify/landlord', verifyLandlordOtp);
  *             properties:
  *               password:
  *                 type: string
- *                 example: "NewStrongPass!123"
+ *                 example: NewStrongPassword123!
  *               confirmPassword:
  *                 type: string
- *                 example: "NewStrongPass!123"
+ *                 example: NewStrongPassword123!
  *     responses:
  *       200:
  *         description: Password reset successful
@@ -402,9 +397,9 @@ router.post('/verify/landlord', verifyLandlordOtp);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Password reset successful"
+ *                   example: Password reset successful
  *       400:
- *         description: Missing landlordId or password mismatch/validation error
+ *         description: Validation error or missing/invalid fields
  *         content:
  *           application/json:
  *             schema:
@@ -412,10 +407,17 @@ router.post('/verify/landlord', verifyLandlordOtp);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Passwords do not match"
- *                 error:
+ *                   example: Passwords do not match
+ *       401:
+ *         description: Invalid or expired token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
  *                   type: string
- *                   example: "Validation failed"
+ *                   example: Invalid or expired token
  *       404:
  *         description: Landlord not found
  *         content:
@@ -425,9 +427,9 @@ router.post('/verify/landlord', verifyLandlordOtp);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Landlord not found"
+ *                   example: Landlord not found
  *       500:
- *         description: Server error while resetting password
+ *         description: Server error
  *         content:
  *           application/json:
  *             schema:
@@ -435,12 +437,12 @@ router.post('/verify/landlord', verifyLandlordOtp);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "An error occurred while resetting password"
+ *                   example: An error occurred while resetting password
  *                 error:
  *                   type: string
- *                   example: "Internal Server Error"
+ *                   example: Internal server error
  */
-router.post('/reset-landlordpassword/:landlordId', landlordResetPassword)
+router.post('/landlord/reset-password/:token', landlordResetPassword);
 
 
 /**
