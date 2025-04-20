@@ -73,7 +73,7 @@ exports.getOneLandlordProfile = async (req, res) => {
     try {
         const { landlordProfileId } = req.params
 
-        const landlordProfile = await landlordProfileModel.findOne({ where: {  landlordProfileId  } });
+        const landlordProfile = await landlordProfileModel.findOne({ where: {  id: landlordProfileId  } });
 
        console.log(landlordProfile)
        
@@ -91,103 +91,102 @@ exports.getOneLandlordProfile = async (req, res) => {
 
 
 
-
-
 // UPDATE
 
 exports.updateLandlordProfile = async (req, res) => {
     try {
-        const { landlordProfileId } = req.params;
-        const { fullName, email, state, street, locality } = req.body;
+      const { landlordProfileId } = req.params;
+      const { fullName, email, state, street, locality } = req.body;
   
-        // Find the existing landlord profile
-        const existingLandlord = await landlordProfileModel.findOne({ where: {  landlordProfileId } });
+      // Find the existing landlord profile
+      const existingLandlord = await landlordProfileModel.findOne({ where: { id: landlordProfileId } });
   
-        if (!existingLandlord) {
-            return res.status(404).json({ message: 'Landlord profile not found' });
+      if (!existingLandlord) {
+        return res.status(404).json({ message: 'Landlord profile not found' });
+      }
+  
+      let updatedImage = existingLandlord.profileImage;
+  
+      // Handle profile image update
+      if (req.file) {
+        try {
+          // Upload the new image to Cloudinary
+          const result = await cloudinary.uploader.upload(req.file.path, { resource_type: 'auto' });
+          updatedImage = result.secure_url; // Save only the secure URL to the database
+  
+          // Optionally, delete the file from the server after upload
+          // fs.unlinkSync(req.file.path);
+        } catch (uploadError) {
+          console.error("Error uploading image to Cloudinary:", uploadError.message);
+          return res.status(500).json({ message: 'Error uploading image to Cloudinary', error: uploadError.message });
         }
+      }
   
-        let updatedImage = existingLandlord.profileImage;
+      // Update the landlord profile
+      await existingLandlord.update({
+        fullName,
+        email,
+        state,
+        street,
+        locality,
+        profileImage: updatedImage, // Save the updated image URL
+      });
   
-        // Handle profile image update
-        if (req.file) {
-            try {
-                // Upload the new image to Cloudinary
-                const result = await cloudinary.uploader.upload(req.file.path, { resource_type: 'auto' });
-                updatedImage = {
-                    imageUrl: result.secure_url,
-                    publicId: result.public_id,
-                };
+      existingLandlord.isVerified = true;
+      await existingLandlord.save();
   
-                // Optionally, you can delete the file from the server after upload
-                // safelyDeleteFile(req.file.path);
-            } catch (uploadError) {
-                console.error("Error uploading image to Cloudinary:", uploadError.message);
-                return res.status(500).json({ message: 'Error uploading image to Cloudinary', error: uploadError.message });
-            }
-        }
+      // Fetch the updated profile
+      const updatedLandlord = await landlordProfileModel.findOne({ where: { id: landlordProfileId } });
   
-        // Update the landlord profile
-        await existingLandlord.update({
-            fullName,
-            email,
-            state,
-            street,
-            locality,
-            profileImage: updatedImage,
-        });
-  
-        existingLandlord.isVerified = true;
-  
-        // Fetch the updated profile
-        const updatedLandlord = await landlordProfileModel.findOne({ where: {  landlordProfileId } });
-  
-        res.status(200).json({ message: 'Landlord profile updated successfully', data: updatedLandlord });
+      res.status(200).json({ message: 'Landlord profile updated successfully', data: updatedLandlord });
     } catch (error) {
-        console.error("Error updating landlord profile:", error.message);
-  
-        res.status(500).json({ message: 'Error updating landlord profile', error: error.message });
-    }
-  };
-
-
-
-
-  exports.deleteLandlordProfile = async (req, res) => {
-    try {
-        const { landlordProfileId } = req.params;
-
-      
-        const landlordProfile = await landlordProfileModel.findOne({ where: {  landlordProfileId } });
-
-        if (!landlordProfile) {
-            return res.status(404).json({ message: 'Landlord profile not found' });
-        }
-
-   
-        if (landlordProfile.profileImage) {
-            try {
-                const profileImage = JSON.parse(landlordProfile.profileImage);
-                if (profileImage.publicId) {
-                    await cloudinary.uploader.destroy(profileImage.publicId);
-                }
-            } catch (parseError) {
-                console.error('Error parsing profileImage:', parseError.message);
-                return res.status(500).json({ message: 'Error parsing profile image', error: parseError.message });
-            }
-        }
-
-
-        await landlordProfile.destroy();
-
-        res.status(200).json({ message: 'Landlord profile deleted successfully' });
-    } catch (error) {
-        console.error('Error deleting landlord profile:', error.message);
-        res.status(500).json({ message: 'Error deleting landlord profile', error: error.message });
+      console.error("Error updating landlord profile:", error.message);
+      res.status(500).json({ message: 'Error updating landlord profile', error: error.message });
     }
 };
 
 
+
+
+exports.deleteLandlordProfile = async (req, res) => {
+    try {
+      const { landlordProfileId } = req.params;
+  
+      // Find the landlord profile
+      const landlordProfile = await landlordProfileModel.findOne({ where: { id: landlordProfileId } });
+  
+      if (!landlordProfile) {
+        return res.status(404).json({ message: 'Landlord profile not found' });
+      }
+  
+      // Unverify all listings connected to this landlord profile
+      await listingModel.update(
+        { isVerified: false }, // Set isVerified to false
+        { where: { landlordId: landlordProfile.landlordId } } // Match listings by landlordId
+      );
+  
+      // Handle profile image deletion
+      if (landlordProfile.profileImage) {
+        try {
+          const profileImage = JSON.parse(landlordProfile.profileImage);
+          if (profileImage.publicId) {
+            await cloudinary.uploader.destroy(profileImage.publicId);
+          }
+        } catch (parseError) {
+          console.error('Error parsing profileImage:', parseError.message);
+          return res.status(500).json({ message: 'Error parsing profile image', error: parseError.message });
+        }
+      }
+  
+      // Delete the landlord profile
+      await landlordProfile.destroy();
+  
+      res.status(200).json({ message: 'Landlord profile and associated listings unverification completed successfully' });
+    } catch (error) {
+      console.error('Error deleting landlord profile:', error.message);
+      res.status(500).json({ message: 'Error deleting landlord profile', error: error.message });
+    }
+  };
 
 
 
