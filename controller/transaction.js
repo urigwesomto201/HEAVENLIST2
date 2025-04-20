@@ -130,6 +130,7 @@ exports.initialPayment = async (req, res) => {
   }
 };
 
+
 exports.verifyPayment = async (req, res) => {
   try {
     const { reference } = req.query;
@@ -191,7 +192,7 @@ exports.verifyPayment = async (req, res) => {
       const isFullyPaid = newBalance <= 0;
       await listing.update({
         balance: newBalance,
-        isAvailable: !isFullyPaid, // Mark the property as unavailable if fully paid
+        isAvailable: false, // Mark the property as unavailable after payment verification
       });
 
       // Send email to the tenant
@@ -234,7 +235,7 @@ exports.verifyPayment = async (req, res) => {
     console.error(error);
     res.status(500).json({ message: 'Error verifying payment', error: error.message });
   }
-}
+};
 
 
 // exports.payBalance = async (req, res) => {
