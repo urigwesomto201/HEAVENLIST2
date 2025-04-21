@@ -356,7 +356,6 @@ exports.updateListing = async (req, res) => {
 };
 
 
-
 exports.deleteListing = async (req, res) => {
     try {
       const { landlordId, listingId } = req.params;
@@ -381,18 +380,16 @@ exports.deleteListing = async (req, res) => {
         return res.status(404).json({ message: 'Listing not found or does not belong to the specified landlord' });
       }
   
-      // Mark the listing as unavailable and update its status
-      await listing.update({
-        isAvailable: false,
-        status: 'rejected', // Optional: Update the status to indicate deletion
-      });
+      // Permanently delete the listing from the database
+      await listing.destroy();
   
-      res.status(200).json({ message: 'Listing marked as unavailable successfully', data: listing });
+      res.status(200).json({ message: 'Listing deleted successfully' });
     } catch (error) {
-      console.error('Error marking listing as unavailable:', error.message);
-      res.status(500).json({ message: 'Error marking listing as unavailable', error: error.message });
+      console.error('Error deleting listing:', error.message);
+      res.status(500).json({ message: 'Error deleting listing', error: error.message });
     }
 };
+
 
 
 exports.searchListing = async (req, res) => {
