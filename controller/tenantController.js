@@ -267,6 +267,7 @@ exports.VerifyTenantOtp = async (req, res) => {
             return res.status(400).json({ message: validationError.message });
         }
 
+        
         const { otp } = validated;
 
         if (!otp) {
