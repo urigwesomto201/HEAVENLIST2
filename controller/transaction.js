@@ -125,7 +125,8 @@ exports.initialPayment = async (req, res) => {
     });
 
     await listing.update({
-      balance: listing.price - amount, // Update the listing's balance
+      balance: listing.price - amount,
+      isAvailable: false, // Update the listing's balance
     });
 
     res.status(201).json({
