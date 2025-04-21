@@ -102,19 +102,18 @@ Listing.init(
         }
       },
       set(value) {
-        this.setDataValue('listingImage', JSON.stringify(value));
-    },
+      this.setDataValue('listingImage', JSON.stringify(value));
+      }
     },
     landlordId: {
       type: DataTypes.UUID,
       references: {
-        model: Landlord,
-        key: 'id'
+        model: Landlord, // Fixed: Use the table name as a string
+        key: 'id',
       },
       onUpdate: 'CASCADE',
-      onDelete: 'CASCADE'
+      onDelete: 'CASCADE',
     },
-    
   },
   {
     // Other model options go here
