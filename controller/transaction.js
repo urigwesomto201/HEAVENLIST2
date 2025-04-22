@@ -147,7 +147,7 @@ exports.initialPayment = async (req, res) => {
 
 exports.verifyPayment = async (req, res) => {
   try {
-    const { reference } = req.query;
+    const { reference } = req.params;
 
     if (!reference) {
       return res.status(400).json({ message: 'Reference is required' });
