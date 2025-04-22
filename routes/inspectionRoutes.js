@@ -132,7 +132,7 @@ router.post('/schedule/:tenantId/:listingId', scheduleInspection);
  *     consumes:
  *       - application/json
  *     security:
- *       - AdminBearerAuth: []
+ *       - AdminBearerAuth: [] # Requires admin authentication
  *     parameters:
  *       - in: path
  *         name: inspectionId
