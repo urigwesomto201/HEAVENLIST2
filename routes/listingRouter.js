@@ -9,6 +9,8 @@ const {
     deleteListing,
     searchListing,
     getClicksbyListing,
+    getAllPropertiesRentedOut,
+    getAllAreasCovered,
 } = require('../controller/listingController');
 const { landlordAuthenticate, adminAuthenticate } = require('../middlewares/authentication');
 const upload = require('../utils/multer');
@@ -570,5 +572,131 @@ router.get('/searchListing', searchListing);
  *         description: error while fetching clicks for the listing.
  */
 router.get('/getClicksbyListing/:landlordId/:listingId', landlordAuthenticate, getClicksbyListing);
+
+
+/**
+ * @swagger
+ * /api/v1/getAllPropertiesRentedOut:
+ *   get:
+ *     summary: Get all rented-out listings
+ *     description: Fetch all listings that have been rented out
+ *     tags:
+ *       - Listings
+ *     security: [] # No authentication required
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved all rented-out listings.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Rented-out listings retrieved successfully"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         example: "64a8e9b7b56c8d001c9a4b2d"
+ *                       title:
+ *                         type: string
+ *                         example: "Luxury 3-Bedroom Apartment in Lekki"
+ *                       landlordId:
+ *                         type: string
+ *                         example: "123e4567-e89b-12d3-a456-426614174000"
+ *                       status:
+ *                         type: string
+ *                         example: "rented"
+ *       404:
+ *         description: No rented-out listings found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No rented-out listings found"
+ *       500:
+ *         description: Internal server error while fetching rented-out listings.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Error while fetching rented-out listings"
+ */
+
+router.get('/getAllPropertiesRentedOut', getAllPropertiesRentedOut)
+
+
+
+/**
+ * @swagger
+ * /api/v1/getAllAreasCovered:
+ *   get:
+ *     summary: Get all areas covered by listings
+ *     description: Fetch all areas where listings are available. 
+ *     tags:
+ *       - Listings
+ *     security: [] # No authentication required
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved all areas covered by listings.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Areas covered by listings retrieved successfully"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         example: "64a8e9b7b56c8d001c9a4b2d"
+ *                       title:
+ *                         type: string
+ *                         example: "Luxury 3-Bedroom Apartment in Lekki"
+ *                       landlordId:
+ *                         type: string
+ *                         example: "123e4567-e89b-12d3-a456-426614174000"
+ *                       status:
+ *                         type: string
+ *                         example: "rented"
+ *       404:
+ *         description: No areas covered found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No areas covered found"
+ *       500:
+ *         description: Internal server error while fetching areas covered by listings.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Error while fetching areas covered by listings"
+ */
+
+
+router.get('/getAllAreasCovered', getAllAreasCovered)
 
 module.exports = router;
