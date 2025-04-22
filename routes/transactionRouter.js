@@ -107,7 +107,7 @@ transactionrouter.post("/initialize/:tenantId/:landlordId/:listingId", initialPa
  *     summary: Verify a payment
  *     description: This endpoint verifies the status of a payment transaction using the transaction reference.
  *     parameters:
- *       - in: query
+ *       - in: path
  *         name: reference
  *         required: true
  *         schema:
@@ -166,9 +166,70 @@ transactionrouter.get("/charges/:reference",verifyPayment)
 
 
 
-
-
-
 module.exports = transactionrouter;
 
 
+
+
+// /**
+//  * @swagger
+//  * /api/v1/charges/{reference}:
+//  *   get:
+//  *     tags:
+//  *       - Transactions
+//  *     summary: Verify a payment
+//  *     description: This endpoint verifies the status of a payment transaction using the transaction reference.
+//  *     parameters:
+//  *       - in: query
+//  *         name: reference
+//  *         required: true
+//  *         schema:
+//  *           type: string
+//  *         description: The reference ID of the transaction to verify.
+//  *         example: "TCA-AF123456789"
+//  *     responses:
+//  *       200:
+//  *         description: Payment verification successful.
+//  *         content:
+//  *           application/json:
+//  *             schema:
+//  *               type: object
+//  *               properties:
+//  *                 message:
+//  *                   type: string
+//  *                   example: Payment verification successful
+//  *                 reference:
+//  *                   type: string
+//  *                   description: The verified transaction reference.
+//  *                   example: "TCA-AF123456789"
+//  *       400:
+//  *         description: Bad request. Payment already verified or failed.
+//  *         content:
+//  *           application/json:
+//  *             schema:
+//  *               type: object
+//  *               properties:
+//  *                 message:
+//  *                   type: string
+//  *                   example: Payment has already been verified successfully
+//  *       404:
+//  *         description: Transaction not found.
+//  *         content:
+//  *           application/json:
+//  *             schema:
+//  *               type: object
+//  *               properties:
+//  *                 message:
+//  *                   type: string
+//  *                   example: Transaction not found
+//  *       500:
+//  *         description: Internal server error.
+//  *         content:
+//  *           application/json:
+//  *             schema:
+//  *               type: object
+//  *               properties:
+//  *                 message:
+//  *                   type: string
+//  *                   example: Error verifying payment
+//  */

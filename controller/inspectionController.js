@@ -13,7 +13,7 @@ exports.scheduleInspection = async (req, res) => {
   try {
     const { tenantId, listingId } = req.params;
 
-    const { timeRange, days } = req.query;
+    const { timeRange, days } = req.body;
 
 
     if (!timeRange || !days) {
@@ -138,7 +138,7 @@ exports.scheduleInspection = async (req, res) => {
 exports.confirmSchedule = async (req, res) => {
   try {
     const { inspectionId } = req.params;
-    const { status } = req.query;
+    const { status } = req.body;
 
 
     if (!status) {

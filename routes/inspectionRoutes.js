@@ -17,6 +17,7 @@ const { adminAuthenticate } = require('../middlewares/authentication')
 
 
 
+
 /**
  * @swagger
  * /api/v1/schedule/{tenantId}/{listingId}:
@@ -25,37 +26,38 @@ const { adminAuthenticate } = require('../middlewares/authentication')
  *       - Inspections
  *     summary: Schedule an inspection
  *     description: This endpoint allows a tenant to schedule an inspection for a specific listing.
+ *     consumes:
+ *       - application/json
  *     parameters:
  *       - in: path
  *         name: tenantId
  *         required: true
- *         schema:
- *           type: string
+ *         type: string
  *         description: The ID of the tenant scheduling the inspection.
  *         example: "123e4567-e89b-12d3-a456-426614174000"
  *       - in: path
  *         name: listingId
  *         required: true
- *         schema:
- *           type: string
+ *         type: string
  *         description: The ID of the listing for which the inspection is being scheduled.
  *         example: "456e7890-e12b-34d5-a678-426614174001"
- *       - in: query
- *         name: days
- *         required: true
- *         schema:
- *           type: string
- *           enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
- *         description: The day of the week for the inspection.
- *         example: "Monday"
- *       - in: query
- *         name: timeRange
- *         required: true
- *         schema:
- *           type: string
- *           enum: ["10am-4pm"]
- *         description: The time range for the inspection.
- *         example: "10am-4pm"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               days:
+ *                 type: string
+ *                 description: The day of the week for the inspection.
+ *                 enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+ *                 example: "Monday"
+ *               timeRange:
+ *                 type: string
+ *                 enum: ["10am-4pm"]
+ *                 description: The time range for the inspection.
+ *                 example: "10am-4pm"
  *     responses:
  *       201:
  *         description: Inspection scheduled successfully.
@@ -89,10 +91,10 @@ const { adminAuthenticate } = require('../middlewares/authentication')
  *                     timeRange:
  *                       type: string
  *                       description: The time range of the inspection.
- *                       example: "9am-12pm"
+ *                       example: "10am-4pm"
  *                     status:
  *                       type: string
- *                       description: The time status of the inspection.
+ *                       description: The status of the inspection.
  *                       example: "scheduled"
  *       400:
  *         description: Bad request. Missing or invalid parameters.
@@ -126,25 +128,30 @@ router.post('/schedule/:tenantId/:listingId', scheduleInspection);
  *     tags:
  *       - Inspections
  *     summary: Confirm or update the status of an inspection
- *     description: This endpoint allows an admin to confirm or update the status of a scheduled inspection.  Requires admin authentication
+ *     description: This endpoint allows an admin to confirm or update the status of a scheduled inspection. Requires admin authentication.
+ *     consumes:
+ *       - application/json
  *     security:
- *       - AdminBearerAuth: [] # Requires admin token
+ *       - AdminBearerAuth: []
  *     parameters:
  *       - in: path
  *         name: inspectionId
  *         required: true
- *         schema:
- *           type: string
+ *         type: string
  *         description: The ID of the inspection to confirm or update.
  *         example: "789e1234-e56b-78d9-a012-426614174002"
- *       - in: query
- *         name: status
- *         required: true
- *         schema:
- *           type: string
- *           enum: ["confirmed", "cancelled"]
- *         description: The new status of the inspection.
- *         example: "confirmed"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: ["confirmed", "cancelled"]
+ *                 description: The new status of the inspection.
+ *                 example: "confirmed"
  *     responses:
  *       200:
  *         description: Inspection status updated successfully.
@@ -206,7 +213,6 @@ router.post('/schedule/:tenantId/:listingId', scheduleInspection);
  *                   type: string
  *                   example: Cannot confirm schedule date.
  */
-
 router.post('/confirmSchedule/:inspectionId',adminAuthenticate, confirmSchedule);
 
 
