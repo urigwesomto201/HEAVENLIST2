@@ -1,6 +1,8 @@
 const landlordModel = require('../models/landlord')
 const transactionModel = require('../models/transaction');
 const tenantModel = require('../models/tenant')
+const landlordProfileModel = require('../models/landlordprofile')
+const listingModel = require('../models/listing')
 // const bcrypt  = require('bcryptjs')
 const sendEmail = require('../middlewares/nodemailer')
 const bcrypt  = require('bcrypt')
@@ -46,12 +48,14 @@ exports.registerlandlord = async (req, res) => {
         const salt = await bcrypt.genSalt(10)
         const hashedPassword = await bcrypt.hash(password, salt)
 
-     
+        
+
 
         const newlandlord = await landlordModel.create({
             fullName,
             email,
             password: hashedPassword,
+            
              
         })
 
@@ -244,12 +248,15 @@ exports.loginlandlord = async (req, res) => {
        
         const token = jwt.sign({ landlordId: landlord.id, isLoggedIn: true },process.env.JWT_SECRET,{ expiresIn: '1d' });
 
-        
+        const landlordProfile = await landlordProfileModel.findOne({
+            where: { landlordId: landlord.id }
+        });
+
         landlord.isLoggedIn = true;
         await landlord.save();
 
         
-        res.status(200).json({ message: 'Login successful', data: landlord, token });
+        res.status(200).json({ message: 'Login successful', data: landlord, token, landlordProfile });
     } catch (error) {
         console.error(error.message);
         res.status(500).json({ message: 'Error logging in landlord', error: error.message });
