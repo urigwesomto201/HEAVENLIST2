@@ -13,7 +13,7 @@ module.exports = {
         allowNull: false,
       },
       type: {
-        type: Sequelize.ENUM('Bungalow','Flat','Duplex','Mini-flat'),
+        type: Sequelize.ENUM('Bungalow', 'Flat', 'Duplex', 'Mini-flat'),
       },
       bedrooms: {
         type: Sequelize.ENUM('1', '2', '3', '4', '5+'),
@@ -65,37 +65,37 @@ module.exports = {
       },
       partPayment: {
         type: Sequelize.ENUM('10%', '20%', '30%'),
-        allowNull: false 
+        allowNull: false,
       },
       partPaymentAmount: {
         type: Sequelize.FLOAT,
         allowNull: false,
         defaultValue: 0.0,
-     },
-    listingImage: {
-      type: Sequelize.TEXT,
-      allowNull: false, // No default value, can be null
-      get() {
-        const raw = this.getDataValue('listingImage');
-        try {
-          return raw ? JSON.parse(raw) : [];
-        } catch (e) {
-          return []; // fallback if somehow stored invalid JSON
+      },
+      listingImage: {
+        type: Sequelize.TEXT,
+        allowNull: false, // No default value, can be null
+        get() {
+          const raw = this.getDataValue('listingImage');
+          try {
+            return raw ? JSON.parse(raw) : [];
+          } catch (e) {
+            return []; // fallback if somehow stored invalid JSON
+          }
+        },
+        set(value) {
+        this.setDataValue('listingImage', JSON.stringify(value));
         }
       },
-      set(value) {
-        this.setDataValue('listingImage', JSON.stringify(value));
-    },
       landlordId: {
         type: Sequelize.UUID,
         references: {
-          model: 'Landlords', // Fixed: Use the table name as a string
+          model: 'Landlords', // Use the correct table name
           key: 'id',
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
-      
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
@@ -104,7 +104,6 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE,
       },
-    }
     });
   },
   async down(queryInterface, Sequelize) {
