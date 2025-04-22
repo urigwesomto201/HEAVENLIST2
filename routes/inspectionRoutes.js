@@ -27,7 +27,7 @@ const { adminAuthenticate } = require('../middlewares/authentication')
  *     summary: Schedule an inspection
  *     description: This endpoint allows a tenant to schedule an inspection for a specific listing.
  *     parameters:
- *       - name: tenentId
+ *       - name: tenantId
  *         in: path
  *         required: true
  *         description: The unique ID of the tenant scheduling the inspection
