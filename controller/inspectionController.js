@@ -13,12 +13,13 @@ exports.scheduleInspection = async (req, res) => {
   try {
     const { tenantId, listingId } = req.params;
 
+
     const { timeRange, days } = req.body;
 
 
-    if (!timeRange || !days) {
-      return res.status(400).json({ message: 'All fields are required' });
-    }
+    // if (!timeRange || !days) {
+    //   return res.status(400).json({ message: 'All fields are required' });
+    // }
 
     const validDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     if (!validDays.includes(days)) {
@@ -45,9 +46,11 @@ exports.scheduleInspection = async (req, res) => {
       where: {
         tenantId,
         listingId,
-        status: 'success',
+        [Op.or]: [{ status: 'success' }, { status: 'partPayment' }],
       },
     });
+
+  
 
     if (!transaction) {
       return res.status(403).json({
@@ -56,7 +59,7 @@ exports.scheduleInspection = async (req, res) => {
     }
 
  
-    const listing = await listingModel.findOne({ where: { id: listingId } });
+    const listing = await listingModel.findOne({ where: { id: listingId, isAvailable: false } });
     if (!listing) {
       return res.status(404).json({ message: 'Listing not found' });
     }
