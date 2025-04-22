@@ -100,7 +100,7 @@ transactionrouter.post("/initialize/:tenantId/:landlordId/:listingId", initialPa
 
 /**
  * @swagger
- * /api/v1/charges/{reference}:
+ * /api/v1/charges:
  *   get:
  *     tags:
  *       - Transactions
@@ -160,7 +160,7 @@ transactionrouter.post("/initialize/:tenantId/:landlordId/:listingId", initialPa
  *                   type: string
  *                   example: Error verifying payment
  */
-transactionrouter.get("/charges/:reference",verifyPayment)
+transactionrouter.get("/charges",verifyPayment)
 
 
 
