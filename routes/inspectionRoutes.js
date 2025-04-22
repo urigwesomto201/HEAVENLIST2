@@ -26,25 +26,25 @@ const { adminAuthenticate } = require('../middlewares/authentication')
  *       - Inspections
  *     summary: Schedule an inspection
  *     description: This endpoint allows a tenant to schedule an inspection for a specific listing.
- *     consumes:
- *       - application/json
  *     parameters:
- *       - in: path
- *         name: tenantId
+ *       - name: tenentId
+ *         in: path
  *         required: true
- *         type: string
- *         description: The ID of the tenant scheduling the inspection.
- *         example: "123e4567-e89b-12d3-a456-426614174000"
- *       - in: path
- *         name: listingId
+ *         description: The unique ID of the tenant scheduling the inspection
+ *         schema:
+ *           type: string
+ *           example: "64a8e9b7b56c8d001c9a4b2d"
+ *       - name: listingId
+ *         in: path
  *         required: true
- *         type: string
- *         description: The ID of the listing for which the inspection is being scheduled.
- *         example: "456e7890-e12b-34d5-a678-426614174001"
+ *         description: The unique ID of the listing for which the inspection is being scheduled
+ *         schema:
+ *           type: string
+ *           example: "64a8e9b7b56c8d001c9a4b2d"
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
  *             type: object
  *             properties:
@@ -129,21 +129,20 @@ router.post('/schedule/:tenantId/:listingId', scheduleInspection);
  *       - Inspections
  *     summary: Confirm or update the status of an inspection
  *     description: This endpoint allows an admin to confirm or update the status of a scheduled inspection. Requires admin authentication.
- *     consumes:
- *       - application/json
  *     security:
  *       - AdminBearerAuth: [] # Requires admin authentication
  *     parameters:
- *       - in: path
- *         name: inspectionId
+ *       - name: inspectionId
+ *         in: path
  *         required: true
- *         type: string
- *         description: The ID of the inspection to confirm or update.
- *         example: "789e1234-e56b-78d9-a012-426614174002"
+ *         description: The unique ID of the inspection to be confirmed or updated
+ *         schema:
+ *           type: string
+ *           example: "64a8e9b7b56c8d001c9a4b2d"
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
  *             type: object
  *             properties:
