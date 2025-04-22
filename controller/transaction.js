@@ -9,14 +9,17 @@ const nodemailer = require('nodemailer');
 const { tenentRentMessage, landlordRentMessage } = require('../utils/mailTemplates');
 const sendEmail = require('../middlewares/nodemailer');
 
-
-const otp = otpGenerator.generate(12, { specialChars: false });
-const ref = `TCA-AF${otp}`;
 const secret_key = process.env.koraPay_SECRET_KEY;
-const formatDate = new Date().toLocaleString();
+
+// const otp = otpGenerator.generate(12, { specialChars: false });
+// const ref = `TCA-AF${otp}`;
+// const formatDate = new Date().toLocaleString();
 
 exports.initialPayment = async (req, res) => {
   try {
+    const otp = otpGenerator.generate(12, { specialChars: false });
+    const ref = `TCA-AF${otp}`;
+    const formatDate = new Date().toLocaleString();
     const { amount, email, name } = req.body;
     const { tenantId, landlordId, listingId } = req.params;
 
@@ -88,6 +91,10 @@ exports.initialPayment = async (req, res) => {
       return res.status(404).json({ message: 'Tenant not found.' });
     }
 
+    
+
+    
+
     const paymentData = {
       amount,
       customer: { name, email },
@@ -95,9 +102,10 @@ exports.initialPayment = async (req, res) => {
       reference: ref,
       redirect_url: "https://haven-list.vercel.app/api/v1/payment/status",
     };
-
+    
     console.log('Payment Data:', paymentData);
 
+    
     const response = await axios.post(
       'https://api.korapay.com/merchant/api/v1/charges/initialize',
       paymentData,
@@ -107,9 +115,9 @@ exports.initialPayment = async (req, res) => {
         },
       }
     );
-
+    
     const { data } = response?.data;
-
+    
     await transactionModel.create({
       email,
       amount, // Save the actual amount paid by the tenant
