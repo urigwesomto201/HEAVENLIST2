@@ -464,3 +464,91 @@ exports.landlordRentMessage = (amountPaid, remainingBalance, landlordName)=>{
     
     `
 }
+// utils/mailTemplates.js
+
+const currentYear = new Date().getFullYear();
+
+const baseTemplate = (content, title) => `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>${title}</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #2c2c2c;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .container {
+      width: 90%;
+      max-width: 600px;
+      margin: 30px auto;
+      background-color: #f4f4f4;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgb(40, 142, 167);
+    }
+    .header {
+      background-color: rgb(74, 92, 248);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      border-radius: 10px 10px 0 0;
+    }
+    .content {
+      padding: 20px;
+    }
+    .footer {
+      background-color: rgb(74, 92, 248);
+      color: #ccc;
+      font-size: 13px;
+      text-align: center;
+      padding: 15px;
+      border-radius: 0 0 10px 10px;
+    }
+    .highlight {
+      font-weight: bold;
+      color: rgb(40, 142, 167);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>HavenList</h1>
+    </div>
+    <div class="content">
+      ${content}
+    </div>
+    <div class="footer">
+      &copy; ${currentYear} HavenList. All rights reserved.
+    </div>
+  </div>
+</body>
+</html>
+`;
+
+exports.pendingListingMessage = (landlordName) => baseTemplate(`
+  <p>Dear <span class="highlight">${landlordName}</span>,</p>
+  <p>Your property listing has been successfully submitted and is currently <strong>under review</strong>.</p>
+  <p>Our team will verify your listing shortly. Once approved, it will be published and available to potential tenants.</p>
+  <p>Thank you for choosing <strong>HavenList</strong>!</p>
+`, 'Listing Pending');
+
+exports.approvedListingMessage = (landlordName) => baseTemplate(`
+  <p>Dear <span class="highlight">${landlordName}</span>,</p>
+  <p>Good news! Your property listing has been <strong>approved</strong> and is now live on HavenList.</p>
+  <p>Potential tenants can now view and book inspections for your property.</p>
+  <p>We wish you a seamless rental experience.</p>
+`, 'Listing Approved');
+
+exports.rejectedListingMessage = (landlordName) => baseTemplate(`
+  <p>Dear <span class="highlight">${landlordName}</span>,</p>
+  <p>We regret to inform you that your property listing did not meet our requirements and has been <strong>rejected</strong>.</p>
+  <p>You can review the reasons and resubmit after making the necessary updates.</p>
+  <p>If you need assistance, feel free to reach out to our support team.</p>
+`, 'Listing Rejected');
+

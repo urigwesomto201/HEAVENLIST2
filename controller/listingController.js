@@ -7,6 +7,10 @@ const { Op } = require('sequelize');
 
 const fs = require('fs')
 
+const {  pendingListingMessage,approvedListingMessage,rejectedListingMessage} = require('../utils/mailTemplates');
+const sendEmail = require('../middlewares/nodemailer');
+
+
 
 
 
@@ -98,7 +102,32 @@ exports.createListing = async (req, res) => {
             isClicked: 0,
             status: 'pending',
         });
+     await sendEmail({
+        to: landlord.email,
+        subject: 'Your Property Listing is Under Review',
+        html: pendingListingMessage(landlord.fullName)
+     })
+       const simulateApproval = true
 
+       if(simulateApproval){
+        newListing.status = 'accepted';
+        await newListing.save()
+
+        await sendEmail({
+            to: landlord.email,
+            subject: 'Your Property Listing Has Been Approved',
+            html: approvedListingMessage(landlord.fullName)
+         })
+       }else{
+        newListing.status = 'rejected';
+        await newListing.save();
+        
+        await sendEmail({
+            to: landlord.email,
+            subject: 'Your Property Listing Has Been Approved',
+            html: rejectedListingMessage(landlord.fullName)
+         })
+       }
         res.status(201).json({
             message: 'Listing created successfully',
             data: newListing,
