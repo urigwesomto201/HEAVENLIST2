@@ -6,7 +6,7 @@ const landlordModel = require('../models/landlord')
 const { Op } = require('sequelize');
 
 const fs = require('fs')
-
+const nodemailer = require('nodemailer');
 const {  pendingListingMessage,approvedListingMessage,rejectedListingMessage} = require('../utils/mailTemplates');
 const sendEmail = require('../middlewares/nodemailer');
 
