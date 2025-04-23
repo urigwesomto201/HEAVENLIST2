@@ -107,7 +107,7 @@ exports.createListing = async (req, res) => {
         subject: 'Your Property Listing is Under Review',
         html: pendingListingMessage(landlord.fullName)
      })
-       
+   
         res.status(201).json({
             message: 'Listing created successfully',
             data: newListing,
