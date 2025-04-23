@@ -107,27 +107,7 @@ exports.createListing = async (req, res) => {
         subject: 'Your Property Listing is Under Review',
         html: pendingListingMessage(landlord.fullName)
      })
-       const simulateApproval = true
-
-       if(simulateApproval){
-        newListing.status = 'accepted';
-        await newListing.save()
-
-        await sendEmail({
-            to: landlord.email,
-            subject: 'Your Property Listing Has Been Approved',
-            html: approvedListingMessage(landlord.fullName)
-         })
-       }else{
-        newListing.status = 'rejected';
-        await newListing.save();
-        
-        await sendEmail({
-            to: landlord.email,
-            subject: 'Your Property Listing Has Been rejected',
-            html: rejectedListingMessage(landlord.fullName)
-         })
-       }
+   
         res.status(201).json({
             message: 'Listing created successfully',
             data: newListing,
@@ -375,6 +355,24 @@ exports.updateListing = async (req, res) => {
                 },
             ],
         });
+        updatedListing.status = Status;
+        await updatedListing.save();
+        if(!updatedListing){return res.status(404).json({message:'Listing not found'})};
+
+        const landlordEmail = updatedListing.landlord.email;
+        const landlordName = updatedListing.landlord.fullName;
+
+        if(Status === 'accpted'){
+            await sendEmail({ to: landlordEmail,
+                subject:'Your property Has Been Approved',
+                html: approvedListingMessage(landlordName)}
+            )
+        }else if(Status === 'rejected'){
+            await sendEmail({ to: landlordEmail,
+                subject:'Your property Has Been rejected',
+                html: rejectedListingMessage(landlordName)}
+            )
+        }
 
         res.status(200).json({ message: 'Listing updated successfully', data: updatedListing });
     } catch (error) {
