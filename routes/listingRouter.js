@@ -11,6 +11,7 @@ const {
     getClicksbyListing,
     getAllPropertiesRentedOut,
     getAllAreasCovered,
+    getAllPropertiesListed,
 } = require('../controller/listingController');
 const { landlordAuthenticate, adminAuthenticate } = require('../middlewares/authentication');
 const upload = require('../utils/multer');
@@ -698,5 +699,71 @@ router.get('/getAllPropertiesRentedOut', getAllPropertiesRentedOut)
 
 
 router.get('/getAllAreasCovered', getAllAreasCovered)
+
+
+
+/**
+ * @swagger
+ * /api/v1/getAllPropertiesListed:
+ *   get:
+ *     summary: Get all properties listed by landlords
+ *     description: Fetch all properties that have been listed by landlords.
+ *     tags:
+ *       - Listings
+ *     security: [] # No authentication required
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved all properties listed by landlords.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Properties listed retrieved successfully"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         example: "64a8e9b7b56c8d001c9a4b2d"
+ *                       title:
+ *                         type: string
+ *                         example: "Luxury 3-Bedroom Apartment in Lekki"
+ *                       landlordId:
+ *                         type: string
+ *                         example: "123e4567-e89b-12d3-a456-426614174000"
+ *                       status:
+ *                         type: string
+ *                         example: "listed"
+ *       404:
+ *         description: No areas covered found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No areas covered found"
+ *       500:
+ *         description: Internal server error while fetching areas covered by listings.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Error while fetching areas covered by listings"
+ * 
+ *
+ */
+
+
+router.get('/getAllPropertiesListed', getAllPropertiesListed)
 
 module.exports = router;
