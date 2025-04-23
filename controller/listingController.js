@@ -461,3 +461,49 @@ exports.getClicksbyListing = async (req, res) => {
         res.status(500).json({ message: 'Error getting clicks by listing', error: error.message });
     }
 }
+
+
+exports.getAllPropertiesRentedOut = async (req, res) => {
+    try {
+        const listings = await listingModel.findAll({
+            where: { isAvailable: false },
+            include: [
+                {
+                    model: landlordModel,
+                    attributes: ['id', 'fullName'], 
+                    as: 'landlord', 
+                },
+            ],
+        });
+
+        if (!listings || listings.length === 0) {
+            return res.status(404).json({ message: 'No rented out properties found' });
+        }
+
+        res.status(200).json({message: 'find all rented out properties below', total: listings.length, data: listings})
+
+    } catch (error) {
+        
+        res.status(500).json({ message: 'Error fetching rented out properties',   error:error.message})
+    }
+}
+
+
+exports.getAllAreasCovered = async (req, res) => {
+    try {
+        const areas = await listingModel.findAll({
+            attributes: ['area'],
+            where: { isAvailable: true, status: 'accepted' },
+        });
+
+        if (!areas || areas.length === 0) {
+            return res.status(404).json({ message: 'No areas found' });
+        }
+
+        res.status(200).json({message: 'find all areas covered below', total: areas.length, data: areas})
+
+    } catch (error) {
+        
+        res.status(500).json({ message: 'Error fetching areas',   error:error.message})
+    }
+}
