@@ -483,7 +483,7 @@ exports.getAllPropertiesRentedOut = async (req, res) => {
         res.status(200).json({message: 'find all rented out properties below', total: listings.length, data: listings})
 
     } catch (error) {
-        
+        console.log(error.message)
         res.status(500).json({ message: 'Error fetching rented out properties',   error:error.message})
     }
 }
@@ -503,7 +503,33 @@ exports.getAllAreasCovered = async (req, res) => {
         res.status(200).json({message: 'find all areas covered below', total: areas.length, data: areas})
 
     } catch (error) {
-        
+        console.log(error.message)
         res.status(500).json({ message: 'Error fetching areas',   error:error.message})
+    }
+}
+
+
+exports.getAllPropertiesListed = async (req,res) => {
+    try {
+        const listings = await listingModel.findAll({
+        
+            include: [
+                {
+                    model: landlordModel,
+                    attributes: ['id', 'fullName'], 
+                    as: 'landlord', 
+                },
+            ],
+        });
+
+        if (!listings || listings.length === 0) {
+            return res.status(404).json({ message: 'No properties listed found' });
+        }
+
+        res.status(200).json({message: 'find all properties listed below', total: listings.length, data: listings})
+
+    } catch (error) {
+        console.log(error.message)
+        res.status(500).json({ message: 'Error fetching properties listed',   error:error.message})
     }
 }
