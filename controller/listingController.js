@@ -124,7 +124,7 @@ exports.createListing = async (req, res) => {
         
         await sendEmail({
             to: landlord.email,
-            subject: 'Your Property Listing Has Been Approved',
+            subject: 'Your Property Listing Has Been rejected',
             html: rejectedListingMessage(landlord.fullName)
          })
        }
