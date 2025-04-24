@@ -102,12 +102,15 @@ exports.createListing = async (req, res) => {
             isClicked: 0,
             status: 'pending',
         });
-     await sendEmail({
-        to: landlord.email,
-        subject: 'Your Property Listing is Under Review',
-        html: pendingListingMessage(landlord.fullName)
-     })
-   
+
+        const sendPending = {
+           subject: 'Your Property Listing is Under Review',
+           email: landlord.email,
+           html: pendingListingMessage(landlord.fullName)
+        }
+
+        await sendEmail(sendPending)
+
         res.status(201).json({
             message: 'Listing created successfully',
             data: newListing,
