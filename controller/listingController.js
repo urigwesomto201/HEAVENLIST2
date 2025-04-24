@@ -46,7 +46,7 @@ exports.createListing = async (req, res) => {
         // Check if landlord exists
         const landlord = await landlordModel.findOne({
             where: { id: landlordId },
-            attributes: ['id', 'fullName'],
+            attributes: ['id', 'fullName','email'],
         });
 
         if (!landlord) {
